@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.http.ResponseEntity;
 
 @Getter
 @AllArgsConstructor
@@ -30,6 +31,9 @@ public class ApiResponse<T> {
     }
     public static <T> ApiResponse<T> success(T data, int status, String message) {
         return new ApiResponse<>(true, status, message, data);
+    }
+    public ResponseEntity<ApiResponse<T>> toResponseEntity() {
+        return ResponseEntity.status(status).body(this);
     }
     public static <T> ApiResponse<T> fail(int status, String message) {
         return new ApiResponse<>(false, status, message, null);
