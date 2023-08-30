@@ -1,6 +1,7 @@
 package com.github.supercodingfinalprojectbackend.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.supercodingfinalprojectbackend.dto.response.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,8 +19,28 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class FilterExceptionHandler extends OncePerRequestFilter {
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException {
         log.info("Api 요청! {} {}", request.getMethod(), request.getRequestURI());
-        doFilter(request, response, filterChain);
+        try {
+            doFilter(request, response, filterChain);
+            log.info("Api 응답! {}", HttpStatus.valueOf(response.getStatus()));
+        }
+        catch (ApiException e) {
+            ApiResponse<?> data = ApiResponse.fail(e.getStatus(), e.getMessage());
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setStatus(e.getStatus());
+            response.getOutputStream().write(new ObjectMapper()
+                    .writeValueAsString(data).getBytes(StandardCharsets.UTF_8));
+            log.info("Api 응답! {}", HttpStatus.valueOf(response.getStatus()));
+        }
+        catch (Exception e) {
+            ApiResponse<?> data = ApiResponse.fail(500, e.getMessage());
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setStatus(500);
+            response.getOutputStream().write(new ObjectMapper()
+                    .writeValueAsString(data).getBytes(StandardCharsets.UTF_8));
+            log.info("Api 응답! {}", HttpStatus.valueOf(response.getStatus()));
+            e.printStackTrace();
+        }
     }
 }
