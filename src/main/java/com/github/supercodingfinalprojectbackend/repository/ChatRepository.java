@@ -2,5 +2,5 @@ package com.github.supercodingfinalprojectbackend.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ChatRepository extends JpaRepository {
-}
+//public interface ChatRepository extends JpaRepository<> {
+//}
