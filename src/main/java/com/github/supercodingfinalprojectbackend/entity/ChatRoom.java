@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.time.Instant;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,7 +13,7 @@ import java.sql.Timestamp;
 @Builder
 @Entity
 @Table(name = "chat_rooms")
-public class ChatRoom extends CommonEntity {
+public class ChatRoom {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "chat_room_id",nullable = false)
     private Long chatRoomId;
