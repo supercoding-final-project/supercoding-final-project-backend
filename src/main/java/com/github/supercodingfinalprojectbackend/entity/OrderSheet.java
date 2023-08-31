@@ -16,26 +16,19 @@ public class OrderSheet extends CommonEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_sheet_id")
     private int id;
-    @Column(name = "mentee_id")
-    private int menteeId;
-    @Column(name = "mentee_nickname")
-    private String menteeNickname;
-    @Column(name = "mentee_account_number")
-    private String menteeAccountNumber;
-    @Column(name = "mentor_id")
-    private int mentorId;
-    @Column(name = "mentor_nickname")
-    private String mentorNickname;
-    @Column(name = "mentor_account_number")
-    private String mentorAccountNumber;
-    @Column(name = "post_id")
-    private int postId;
-    @Column(name = "post_title")
-    private String postTitle;
-    @Column(name = "post_level")
-    private String postLevel;
-    @Column(name = "price_per_hour")
-    private int pricePerHour;
+    @ManyToOne
+    @JoinColumn(name = "mentee_id")
+    private Mentee mentee;
+    @ManyToOne
+    @JoinColumn(name = "mentor_id")
+    private Mentor mentor;
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    private Post post;
+    @Column(name = "total_price")
+    private int totlaPrice;
     @Column(name = "is_completed")
     private boolean isCompleted;
+    @Column(name = "transaction_type")
+    private String transactionType;
 }
