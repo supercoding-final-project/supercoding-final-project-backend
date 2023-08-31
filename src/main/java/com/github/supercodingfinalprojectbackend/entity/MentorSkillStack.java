@@ -19,7 +19,6 @@ import lombok.Setter;
 @Entity
 @Table(name = "Mentor_Skill_Stacks")
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

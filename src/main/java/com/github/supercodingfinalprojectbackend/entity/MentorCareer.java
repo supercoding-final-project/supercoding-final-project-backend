@@ -18,7 +18,6 @@ import lombok.Setter;
 @Entity
 @Table(name = "Mentor_Careers")
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
