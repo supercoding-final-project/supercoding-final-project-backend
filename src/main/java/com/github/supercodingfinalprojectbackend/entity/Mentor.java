@@ -15,7 +15,6 @@ import lombok.Setter;
 @Entity
 @Table(name = "Mentors")
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
