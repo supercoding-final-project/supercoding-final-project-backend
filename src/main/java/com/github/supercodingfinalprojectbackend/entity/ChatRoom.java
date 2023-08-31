@@ -1,6 +1,7 @@
 package com.github.supercodingfinalprojectbackend.entity;
 
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -8,11 +9,10 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
 @Builder
 @Entity
 @Table(name = "chat_rooms")
-public class ChatRoom extends CommonEntity {
+public class ChatRoom  {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "chat_room_id",nullable = false)
     private Long chatRoomId;
@@ -24,10 +24,8 @@ public class ChatRoom extends CommonEntity {
     private Boolean isChat;
 
     @Column(name = "created_at")
+    @CreationTimestamp
     private Timestamp createdAt;
-
-
-
 
 
 }
