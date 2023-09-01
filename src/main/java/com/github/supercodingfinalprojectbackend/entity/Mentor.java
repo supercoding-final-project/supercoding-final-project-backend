@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 import javax.persistence.*;
 
 @Entity
@@ -13,7 +12,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Mentor extends CommonEntity{
+public class Mentor extends CommonEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,8 +31,8 @@ public class Mentor extends CommonEntity{
 	@Column(name = "introduction")
 	private String introduction;
 
-	@Column(name = "is_incumbent")
-	private Boolean isIncumbent;
+	@Column(name = "company")
+	private String company;
 
 	@Column(name = "searchable")
 	private Boolean searchable;

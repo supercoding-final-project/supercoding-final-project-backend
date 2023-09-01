@@ -5,6 +5,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import org.hibernate.annotations.CreationTimestamp;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,7 +13,7 @@ import java.sql.Timestamp;
 @Builder
 @Entity
 @Table(name = "chat_rooms")
-public class ChatRoom  {
+public class ChatRoom {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "chat_room_id",nullable = false)
     private Long chatRoomId;
@@ -23,9 +24,8 @@ public class ChatRoom  {
     @Column(name = "is_chat")
     private Boolean isChat;
 
+    @CreationTimestamp
     @Column(name = "created_at")
     @CreationTimestamp
     private Timestamp createdAt;
-
-
 }
