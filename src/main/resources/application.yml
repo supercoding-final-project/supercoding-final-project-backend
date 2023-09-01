@@ -1,4 +1,10 @@
 spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: ENC(uLG5WRtHobOOt7u56kiy5Td/Lp8fZRMXOkSJ7mwwsBs5I1rco3OaJgORWr1Kx8nl)
   jpa:
     hibernate:
       ddl-auto: update
@@ -21,4 +27,4 @@ jasypt:
   encryptor:
     bean: jasyptStringEncryptor
 
-secret-key-source: ${SECRET-KEY-SOURCE}
+secret-key-source: ${SECRET_KEY_SOURCE}
