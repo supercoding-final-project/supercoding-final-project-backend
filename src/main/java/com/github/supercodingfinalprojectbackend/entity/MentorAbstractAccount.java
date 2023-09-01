@@ -12,12 +12,15 @@ import javax.persistence.*;
 @EqualsAndHashCode(of = "id", callSuper = false)
 @Table(name = "mentor_abstract_account")
 public class MentorAbstractAccount extends CommonEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "mentor_abstract_account_id")
-    private int id;
+    private Long mentorAbstractAccountId;
+
     @Column(name = "account_number")
     private String accountNumber;
-    @Column(name = "paymoney")
-    private long paymoney;
+
+    @Column(name = "pay_money")
+    private Long payMoney;
 }

@@ -14,7 +14,9 @@ import java.sql.Timestamp;
 @Table(name = "messages")
 public class Message {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "message_id",nullable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "message_id",nullable = false)
     private Long messageId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -24,7 +26,8 @@ public class Message {
     @Column(name = "message_context")
     private String messageContext;
 
-    @Column(name = "send_at") @CreationTimestamp
+    @CreationTimestamp
+    @Column(name = "send_at")
     private Timestamp sendAt;
 
     @Column(name = "is_check")

@@ -27,14 +27,14 @@ public class MentorSocialInfo extends CommonEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "mentor_social_info_id")
-	private int id;
+	private Long mentorSocialInfoId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "mentor_id")
 	private Mentor mentor;
 
 	@Column(name = "social_id")
-	private long socialId;
+	private Long socialId;
 
 	@Column(name = "social_platform")
 	private String socialPlatform;

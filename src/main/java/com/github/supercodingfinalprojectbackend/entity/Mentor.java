@@ -17,7 +17,7 @@ public class Mentor extends CommonEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "mentor_id", nullable = false)
-	private Long id;
+	private Long mentorId;
 
 	@OneToOne
 	@JoinColumn(name = "mentor_abstract_account_id")

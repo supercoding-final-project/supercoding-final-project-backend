@@ -18,12 +18,13 @@ public class MentorSkillStack {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "mentor_skill_stack_id", nullable = false)
-	private Long id;
+	private Long mentorSkillStackId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "mentor_id")
 	private Mentor mentor;
 
-	@Column(name = "skill_stack")
-	private String skillStack;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "skill_stack_id")
+	private SkillStack skillStack;
 }

@@ -18,7 +18,7 @@ public class MentorCareer {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "mentor_career_id", nullable = false)
-	private Long id;
+	private Long mentorCareerId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "mentor_id")
