@@ -26,6 +26,5 @@ public class ChatRoom {
 
     @CreationTimestamp
     @Column(name = "created_at")
-    @CreationTimestamp
     private Timestamp createdAt;
 }
