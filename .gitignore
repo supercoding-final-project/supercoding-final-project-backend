@@ -313,4 +313,7 @@ gradle-app.setting
 # Java heap dump
 *.hprof
 
+# Test
+JasyptTest.java
+
 # End of https://www.toptal.com/developers/gitignore/api/gradle,java,maven,eclipse,windows,macos,intellij+all,visualstudiocode,netbeans
