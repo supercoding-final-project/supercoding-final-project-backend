@@ -1,15 +1,15 @@
 package com.github.supercodingfinalprojectbackend.entity;
 
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.time.Instant;
+import org.hibernate.annotations.CreationTimestamp;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
 @Builder
 @Entity
 @Table(name = "chat_rooms")
@@ -24,11 +24,8 @@ public class ChatRoom {
     @Column(name = "is_chat")
     private Boolean isChat;
 
+    @CreationTimestamp
     @Column(name = "created_at")
+    @CreationTimestamp
     private Timestamp createdAt;
-
-
-
-
-
 }
