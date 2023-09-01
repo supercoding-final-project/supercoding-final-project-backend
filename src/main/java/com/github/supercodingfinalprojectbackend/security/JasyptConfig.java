@@ -1,4 +1,4 @@
-package com.github.supercodingfinalprojectbackend.config;
+package com.github.supercodingfinalprojectbackend.security;
 
 import lombok.RequiredArgsConstructor;
 import org.jasypt.encryption.StringEncryptor;
@@ -13,13 +13,15 @@ import javax.crypto.SecretKey;
 @Configuration
 @RequiredArgsConstructor
 public class JasyptConfig {
-    private final SecretKey secretKey;
+
+    @Value("${secret-key-source}")
+    private String secretKeySource;
 
     @Bean(name = "jasyptStringEncryptor")
     public StringEncryptor stringEncryptor() {
         PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
         SimpleStringPBEConfig config = new SimpleStringPBEConfig();
-        config.setPassword(secretKey.toString());
+        config.setPassword(secretKeySource);
         config.setAlgorithm("PBEWithMD5AndDES"); //암호화 알고리즘
         config.setKeyObtentionIterations("1000"); // 반복할 해싱 회수
         config.setPoolSize("1"); // 인스턴스 pool
