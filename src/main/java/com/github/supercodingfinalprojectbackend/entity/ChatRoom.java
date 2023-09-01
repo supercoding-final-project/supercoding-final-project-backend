@@ -4,7 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.time.Instant;
+import org.hibernate.annotations.CreationTimestamp;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,11 +24,8 @@ public class ChatRoom {
     @Column(name = "is_chat")
     private Boolean isChat;
 
+    @CreationTimestamp
     @Column(name = "created_at")
     private Timestamp createdAt;
-
-
-
-
 
 }
