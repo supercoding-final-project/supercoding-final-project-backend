@@ -1,8 +1,19 @@
 package com.github.supercodingfinalprojectbackend.entity;
 
-import lombok.*;
-
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
@@ -10,16 +21,21 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(of = "id", callSuper = false)
-@Table(name = "montor_social_infos")
+@Table(name = "mentor_social_infos")
 public class MentorSocialInfo extends CommonEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "mentor_social_info_id")
-    private int id;
-    @Column(name = "mentor_id")
-    private int mentorId;
-    @Column(name = "social_id")
-    private long socialId;
-    @Column(name = "social_platform")
-    private String socialPlatform;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "mentor_social_info_id")
+	private int id;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "mentor_id")
+	private Mentor mentor;
+
+	@Column(name = "social_id")
+	private long socialId;
+
+	@Column(name = "social_platform")
+	private String socialPlatform;
 }

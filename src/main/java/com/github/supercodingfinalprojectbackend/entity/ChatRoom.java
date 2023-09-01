@@ -15,8 +15,17 @@ import org.hibernate.annotations.CreationTimestamp;
 @Table(name = "chat_rooms")
 public class ChatRoom {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "chat_room_id",nullable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "chat_room_id",nullable = false)
     private Long chatRoomId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mentor_id")
+    private Mentor mentor;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mentee_id")
+    private Mentee mentee;
 
     @Column(name = "chat_name")
     private String  chatName;
