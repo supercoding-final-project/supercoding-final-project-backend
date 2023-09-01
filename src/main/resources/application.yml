@@ -17,5 +17,8 @@ springdoc:
     disable-swagger-default-url: true
     display-request-duration: true
     operations-sorter: method
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
 
 secret-key-source: ${SECRET-KEY-SOURCE}
