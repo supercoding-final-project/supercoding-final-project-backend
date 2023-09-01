@@ -15,7 +15,7 @@ public class Mentee extends CommonEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "mentee_id")
-    private int id;
+    private Long menteeId;
 
     @OneToOne
     @JoinColumn(name = "account_id")

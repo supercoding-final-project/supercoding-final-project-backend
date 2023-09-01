@@ -1,11 +1,13 @@
 package com.github.supercodingfinalprojectbackend.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import org.hibernate.annotations.CreationTimestamp;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -26,6 +28,5 @@ public class ChatRoom {
 
     @CreationTimestamp
     @Column(name = "created_at")
-    @CreationTimestamp
     private Timestamp createdAt;
 }
