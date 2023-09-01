@@ -21,4 +21,6 @@ public abstract class CommonEntity {
     @UpdateTimestamp
     @Column(name = "updated_at", insertable = false)
     private Instant updatedAt;
+
+    public boolean isValid() { return !isDeleted; }
 }

@@ -24,9 +24,6 @@ public class MentorCareer {
 	@JoinColumn(name = "mentor_id")
 	private Mentor mentor;
 
-	@Column(name = "company")
-	private String company;
-
 	@Column(name = "duty")
 	private String duty;
 
