@@ -1,7 +1,7 @@
 package com.github.supercodingfinalprojectbackend.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.supercodingfinalprojectbackend.dto.response.ApiResponse;
+import com.github.supercodingfinalprojectbackend.dto.response.JsonResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -26,7 +25,7 @@ public class FilterExceptionHandler extends OncePerRequestFilter {
             log.info("Api 응답! {}", HttpStatus.valueOf(response.getStatus()));
         }
         catch (ApiException e) {
-            ApiResponse<?> data = ApiResponse.fail(e.getStatus(), e.getMessage());
+            JsonResponse.JsonForm<?> data = new JsonResponse.JsonForm<>(e.getStatus(), e.getMessage(), null);
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setStatus(e.getStatus());
             response.getOutputStream().write(new ObjectMapper()
@@ -34,7 +33,7 @@ public class FilterExceptionHandler extends OncePerRequestFilter {
             log.info("Api 응답! {}", HttpStatus.valueOf(response.getStatus()));
         }
         catch (Exception e) {
-            ApiResponse<?> data = ApiResponse.fail(500, e.getMessage());
+            JsonResponse.JsonForm<?> data = new JsonResponse.JsonForm<>(500, e.getMessage(), null);
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setStatus(500);
             response.getOutputStream().write(new ObjectMapper()
