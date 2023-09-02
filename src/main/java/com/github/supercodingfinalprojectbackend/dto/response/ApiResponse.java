@@ -2,14 +2,13 @@ package com.github.supercodingfinalprojectbackend.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.springframework.http.ResponseEntity;
 
 @Getter
 @AllArgsConstructor
 @Schema(title = "공통응답 폼")
+@Deprecated(since = "v1.0.0")
 public class ApiResponse<T> {
     @Schema(title = "요청 성공 여부")
     private boolean success;
