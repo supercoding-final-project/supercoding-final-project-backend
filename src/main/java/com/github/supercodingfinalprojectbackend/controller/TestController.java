@@ -1,9 +1,10 @@
 package com.github.supercodingfinalprojectbackend.controller;
 
-import com.github.supercodingfinalprojectbackend.dto.response.ApiResponse;
+import com.github.supercodingfinalprojectbackend.dto.response.PageResponse;
+import com.github.supercodingfinalprojectbackend.dto.response.JsonResponse;
+import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,8 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
     @GetMapping("/")
     @Operation(summary = "스웨거 정상 동작 테스트")
-    public ResponseEntity<ApiResponse<String>> test() {
+    public JsonResponse<PageResponse<String>> test() {
 
-        return ApiResponse.success("this is data").toResponseEntity();
+        return JsonResponse.<PageResponse<String>>builder()
+                .status(203)
+                .message("hello, world")
+                .data(new PageResponse<String>())
+                .build();
     }
 }
