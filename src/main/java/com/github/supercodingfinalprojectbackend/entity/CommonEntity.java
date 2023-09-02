@@ -12,7 +12,7 @@ import java.time.Instant;
 @MappedSuperclass
 public abstract class CommonEntity {
     @Column(name = "is_deleted", nullable = false, columnDefinition = "tinyint default 0")
-    private boolean isDeleted;
+    private Boolean isDeleted;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

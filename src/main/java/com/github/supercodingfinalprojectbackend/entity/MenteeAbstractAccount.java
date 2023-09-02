@@ -16,11 +16,9 @@ public class MenteeAbstractAccount extends CommonEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "mentee_abstract_account_id")
-    private int id;
-
+    private Long menteeAccountId;
     @Column(name = "account_number")
     private String accountNumber;
-
-    @Column(name = "pay_money")
-    private long payMoney;
+    @Column(name = "paymoney")
+    private Long paymoney;
 }
