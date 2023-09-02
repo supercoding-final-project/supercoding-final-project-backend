@@ -1,94 +1,217 @@
 package com.github.supercodingfinalprojectbackend.dto.response;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.http.*;
 
-@Schema(title = "공통응답 폼")
-public class ApiResponse<T> {
-    @Schema(title = "요청 성공 여부")
-    private final boolean success;
-    @Schema(title = "응답 상태 코드")
-    private final int status;
-    @Schema(title = "응답 메세지")
-    private final String message;
-    @Schema(title = "응답 데이터")
-    private final T data;
+import java.net.URI;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.function.Consumer;
 
-    public boolean isSuccess() { return success; }
-    public int getStatus() { return status; }
-    public String getMessage() { return message; }
-    public T getData() { return data; }
+public class ResponseUtils {
 
-    public ApiResponse(HttpStatus status, String message, T data) {
-        this(status.value(), message, data);
+    private ResponseUtils() {}
+
+    public static <T> ResponseEntity<ApiResponse<T>> status(HttpStatus status, String message, T data) {
+        ApiResponse<T> body = new ApiResponse<>(HttpStatus.OK, message, data);
+        return new ResponseEntity<>(body, status);
     }
-    public ApiResponse(int status, String message, T data) {
-        this.success = status >= 200 && status < 300;
-        this.status = status;
-        this.message = message;
-        this.data = data;
+    public static <T> ResponseEntity<ApiResponse<T>> status(int status, String message, T data) {
+        HttpStatus statusObj = HttpStatus.valueOf(status);
+        ApiResponse<T> body = new ApiResponse<>(statusObj, message, data);
+        return new ResponseEntity<>(body, statusObj);
+    }
+    public static <T> ResponseEntity<ApiResponse<T>> ok(String message, T data) {
+        ApiResponse<T> body = new ApiResponse<>(HttpStatus.OK, message, data);
+        return new ResponseEntity<>(body, HttpStatus.OK);
+    }
+    public static <T> ResponseEntity<ApiResponse<T>> created(String message, T data) {
+        ApiResponse<T> body = new ApiResponse<>(HttpStatus.CREATED, message, data);
+        return new ResponseEntity<>(body, HttpStatus.CREATED);
+    }
+    public static <T> ResponseEntity<ApiResponse<T>> accepted(String message, T data) {
+        ApiResponse<T> body = new ApiResponse<>(HttpStatus.ACCEPTED, message, data);
+        return new ResponseEntity<>(body, HttpStatus.ACCEPTED);
+    }
+    public static <T> ResponseEntity<ApiResponse<T>> noContent(String message, T data) {
+        ApiResponse<T> body = new ApiResponse<>(HttpStatus.NO_CONTENT, message, data);
+        return new ResponseEntity<>(body, HttpStatus.NO_CONTENT);
+    }
+    public static <T> ResponseEntity<ApiResponse<T>> movedPermanently(String message, T data) {
+        ApiResponse<T> body = new ApiResponse<>(HttpStatus.MOVED_PERMANENTLY, message, data);
+        return new ResponseEntity<>(body, HttpStatus.MOVED_PERMANENTLY);
+    }
+    public static <T> ResponseEntity<ApiResponse<T>> found(String message, T data) {
+        ApiResponse<T> body = new ApiResponse<>(HttpStatus.FOUND, message, data);
+        return new ResponseEntity<>(body, HttpStatus.FOUND);
+    }
+    public static <T> ResponseEntity<ApiResponse<T>> notModified(String message, T data) {
+        ApiResponse<T> body = new ApiResponse<>(HttpStatus.NOT_MODIFIED, message, data);
+        return new ResponseEntity<>(body, HttpStatus.NOT_MODIFIED);
+    }
+    public static <T> ResponseEntity<ApiResponse<T>> badRequest(String message, T data) {
+        ApiResponse<T> body = new ApiResponse<>(HttpStatus.BAD_REQUEST, message, data);
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+    public static <T> ResponseEntity<ApiResponse<T>> unauthorized(String message, T data) {
+        ApiResponse<T> body = new ApiResponse<>(HttpStatus.UNAUTHORIZED, message, data);
+        return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
+    }
+    public static <T> ResponseEntity<ApiResponse<T>> forbidden(String message, T data) {
+        ApiResponse<T> body = new ApiResponse<>(HttpStatus.FORBIDDEN, message, data);
+        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    }
+    public static <T> ResponseEntity<ApiResponse<T>> notFound(String message, T data) {
+        ApiResponse<T> body = new ApiResponse<>(HttpStatus.NOT_FOUND, message, data);
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+    public static <T> ResponseEntity<ApiResponse<T>> conflict(String message, T data) {
+        ApiResponse<T> body = new ApiResponse<>(HttpStatus.CONFLICT, message, data);
+        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+    }
+    public static <T> ResponseEntity<ApiResponse<T>> unprocessableEntity(String message, T data) {
+        ApiResponse<T> body = new ApiResponse<>(HttpStatus.UNPROCESSABLE_ENTITY, message, data);
+        return new ResponseEntity<>(body, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+    public static <T> ResponseEntity<ApiResponse<T>> internalServerError(String message, T data) {
+        ApiResponse<T> body = new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, message, data);
+        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    public static <T> ResponseEntity<ApiResponse<T>> serviceUnavailable(String message, T data) {
+        ApiResponse<T> body = new ApiResponse<>(HttpStatus.SERVICE_UNAVAILABLE, message, data);
+        return new ResponseEntity<>(body, HttpStatus.SERVICE_UNAVAILABLE);
     }
 
-    public ResponseEntity<ApiResponse<T>> toResponseEntity() {
-        return ResponseEntity.status(status).body(this);
-    }
+    public static ApiResponseBuilder status(int status) { return new ApiResponseBuilder(status); }
+    public static ApiResponseBuilder status(HttpStatus status) { return new ApiResponseBuilder(status); }
+    public static ApiResponseBuilder ok() { return new ApiResponseBuilder(HttpStatus.OK); }
+    public static ApiResponseBuilder created() { return new ApiResponseBuilder(HttpStatus.CREATED); }
+    public static ApiResponseBuilder accepted() { return new ApiResponseBuilder(HttpStatus.ACCEPTED); }
+    public static ApiResponseBuilder noContent() { return new ApiResponseBuilder(HttpStatus.NO_CONTENT); }
+    public static ApiResponseBuilder movedPermanently() { return new ApiResponseBuilder(HttpStatus.MOVED_PERMANENTLY); }
+    public static ApiResponseBuilder found() { return new ApiResponseBuilder(HttpStatus.FOUND); }
+    public static ApiResponseBuilder notModified() { return new ApiResponseBuilder(HttpStatus.NOT_MODIFIED); }
+    public static ApiResponseBuilder badRequest() { return new ApiResponseBuilder(HttpStatus.BAD_REQUEST); }
+    public static ApiResponseBuilder unauthorized() { return new ApiResponseBuilder(HttpStatus.UNAUTHORIZED); }
+    public static ApiResponseBuilder forbidden() { return new ApiResponseBuilder(HttpStatus.FORBIDDEN); }
+    public static ApiResponseBuilder notFound() { return new ApiResponseBuilder(HttpStatus.NOT_FOUND); }
+    public static ApiResponseBuilder conflict() { return new ApiResponseBuilder(HttpStatus.CONFLICT); }
+    public static ApiResponseBuilder unprocessableEntity() { return new ApiResponseBuilder(HttpStatus.UNPROCESSABLE_ENTITY); }
+    public static ApiResponseBuilder internalServerError() { return new ApiResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR); }
+    public static ApiResponseBuilder serviceUnavailable() { return new ApiResponseBuilder(HttpStatus.SERVICE_UNAVAILABLE); }
 
-    public static <T> ApiResponse<T> ok(String message, T data) { return new ApiResponse<>(HttpStatus.OK, message, data); }
-    public static <T> ApiResponse<T> created(String message, T data) { return new ApiResponse<>(HttpStatus.CREATED, message, data); }
-    public static <T> ApiResponse<T> accepted(String message, T data) { return new ApiResponse<>(HttpStatus.ACCEPTED, message, data); }
-    public static <T> ApiResponse<T> noContent(String message, T data) { return new ApiResponse<>(HttpStatus.NO_CONTENT, message, data); }
-    public static <T> ApiResponse<T> movedPermanently(String message, T data) { return new ApiResponse<>(HttpStatus.MOVED_PERMANENTLY, message, data); }
-    public static <T> ApiResponse<T> found(String message, T data) { return new ApiResponse<>(HttpStatus.FOUND, message, data); }
-    public static <T> ApiResponse<T> notModified(String message, T data) { return new ApiResponse<>(HttpStatus.NOT_MODIFIED, message, data); }
-    public static <T> ApiResponse<T> badRequest(String message, T data) { return new ApiResponse<>(HttpStatus.BAD_REQUEST, message, data); }
-    public static <T> ApiResponse<T> unauthorized(String message, T data) { return new ApiResponse<>(HttpStatus.UNAUTHORIZED, message, data); }
-    public static <T> ApiResponse<T> forbidden(String message, T data) { return new ApiResponse<>(HttpStatus.FORBIDDEN, message, data); }
-    public static <T> ApiResponse<T> notFound(String message, T data) { return new ApiResponse<>(HttpStatus.NOT_FOUND, message, data); }
-    public static <T> ApiResponse<T> conflict(String message, T data) { return new ApiResponse<>(HttpStatus.CONFLICT, message, data); }
-    public static <T> ApiResponse<T> unprocessableEntity(String message, T data) { return new ApiResponse<>(HttpStatus.UNPROCESSABLE_ENTITY, message, data); }
-    public static <T> ApiResponse<T> internalServerError(String message, T data) { return new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, message, data); }
-    public static <T> ApiResponse<T> serviceUnavailable(String message, T data) { return new ApiResponse<>(HttpStatus.SERVICE_UNAVAILABLE, message, data); }
-
-    public static Builder status(int status) { return new Builder(status); }
-    public static Builder status(HttpStatus status) { return new Builder(status); }
-    public static Builder ok() { return new Builder(HttpStatus.OK); }
-    public static Builder created() { return new Builder(HttpStatus.CREATED); }
-    public static Builder accepted() { return new Builder(HttpStatus.ACCEPTED); }
-    public static Builder noContent() { return new Builder(HttpStatus.NO_CONTENT); }
-    public static Builder movedPermanently() { return new Builder(HttpStatus.MOVED_PERMANENTLY); }
-    public static Builder found() { return new Builder(HttpStatus.FOUND); }
-    public static Builder notModified() { return new Builder(HttpStatus.NOT_MODIFIED); }
-    public static Builder badRequest() { return new Builder(HttpStatus.BAD_REQUEST); }
-    public static Builder unauthorized() { return new Builder(HttpStatus.UNAUTHORIZED); }
-    public static Builder forbidden() { return new Builder(HttpStatus.FORBIDDEN); }
-    public static Builder notFound() { return new Builder(HttpStatus.NOT_FOUND); }
-    public static Builder conflict() { return new Builder(HttpStatus.CONFLICT); }
-    public static Builder unprocessableEntity() { return new Builder(HttpStatus.UNPROCESSABLE_ENTITY); }
-    public static Builder internalServerError() { return new Builder(HttpStatus.INTERNAL_SERVER_ERROR); }
-    public static Builder serviceUnavailable() { return new Builder(HttpStatus.SERVICE_UNAVAILABLE); }
-
-
-    public static class Builder {
-        private final int status;
+    public static class ApiResponseBuilder {
+        private final HttpStatus status;
         private String message;
+        private HttpHeaders headers;
 
-        public Builder(int status) {
+        public ApiResponseBuilder(int status) {
+            this.status = HttpStatus.valueOf(status);
+            this.message = "";
+            this.headers = new HttpHeaders();
+        }
+        public ApiResponseBuilder(HttpStatus status) {
             this.status = status;
             this.message = "";
+            this.headers = new HttpHeaders();
         }
-        public Builder(HttpStatus status) {
-            this.status = status.value();
-            this.message = "";
-        }
-        public Builder message(String message) {
+        public ApiResponseBuilder message(String message) {
             this.message = message;
             return this;
         }
-        public <T> ApiResponse<T> build() {
+        public ApiResponseBuilder header(String headerName, String... headerValues) {
+            for (String headerValue : headerValues) {
+                this.headers.add(headerName, headerValue);
+            }
+            return this;
+        }
+        public ApiResponseBuilder headers(HttpHeaders headers) {
+            this.headers = headers;
+            return this;
+        }
+        public ApiResponseBuilder headers(Consumer<HttpHeaders> headersConsumer) {
+            headersConsumer.accept(this.headers);
+            return this;
+        }
+        public ApiResponseBuilder allow(HttpMethod... allowedMethods) {
+            this.headers.setAllow(new LinkedHashSet<>(Arrays.asList(allowedMethods)));
+            return this;
+        }
+        public ApiResponseBuilder contentLength(long contentLength) {
+            this.headers.setContentLength(contentLength);
+            return this;
+        }
+        public ApiResponseBuilder contentType(MediaType contentType) {
+            this.headers.setContentType(contentType);
+            return this;
+        }
+        public ApiResponseBuilder eTag(String etag) {
+            if (!etag.startsWith("\"") && !etag.startsWith("W/\"")) {
+                etag = "\"" + etag;
+            }
+            if (!etag.endsWith("\"")) {
+                etag = etag + "\"";
+            }
+            this.headers.setETag(etag);
+            return this;
+        }
+        public ApiResponseBuilder lastModified(ZonedDateTime date) {
+            this.headers.setLastModified(date);
+            return this;
+        }
+        public ApiResponseBuilder lastModified(Instant date) {
+            this.headers.setLastModified(date);
+            return this;
+        }
+        public ApiResponseBuilder lastModified(long date) {
+            this.headers.setLastModified(date);
+            return this;
+        }
+        public ApiResponseBuilder location(URI location) {
+            this.headers.setLocation(location);
+            return this;
+        }
+        public ApiResponseBuilder cacheControl(CacheControl cacheControl) {
+            this.headers.setCacheControl(cacheControl);
+            return this;
+        }
+        public ApiResponseBuilder varyBy(String... requestHeaders) {
+            this.headers.setVary(Arrays.asList(requestHeaders));
+            return this;
+        }
+        public <T> ResponseEntity<ApiResponse<T>> build() {
             return body(null);
         }
-        public <T> ApiResponse<T> body(T data) {
-            return new ApiResponse<>(status, message, data);
+        public <T> ResponseEntity<ApiResponse<T>> body(T data) {
+            ApiResponse<T> apiResponse =  new ApiResponse<>(status.value(), message, data);
+            return new ResponseEntity<>(apiResponse, headers, status);
+        }
+    }
+
+    public static class ApiResponse<T> {
+        private boolean success;
+        private int status;
+        private String message;
+        private T data;
+
+        public boolean isSuccess() { return success; }
+        public int getStatus() { return status; }
+        public String getMessage() { return message; }
+        public T getData() { return data; }
+
+        public ApiResponse(int status, String message, T data) {
+            this.success = HttpStatus.valueOf(status).is2xxSuccessful();
+            this.status = status;
+            this.message = message;
+            this.data = data;
+        }
+        public ApiResponse(HttpStatus status, String message, T data) {
+            int statusInt = status.value();
+            this.success = status.is2xxSuccessful();
+            this.status = statusInt;
+            this.message = message;
+            this.data = data;
         }
     }
 }
