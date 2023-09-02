@@ -13,11 +13,13 @@ import javax.persistence.*;
 @Table(name = "mentor_schedule_templates")
 public class MentorScheduleTemplate {
 
-    @Id  @Column(name = "schedule_template_id",nullable = false) @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @Column(name = "schedule_template_id",nullable = false) @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long scheduleTemplateId;
 
-    @Column(name = "mentor_id")
-    private Long mentorId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mentor_id")
+    private Mentor mentor;
 
     @Column(name = "schedule_week")
     private String scheduleWeek;

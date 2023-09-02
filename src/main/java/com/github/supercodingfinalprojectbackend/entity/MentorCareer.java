@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "Mentor_Careers")
+@Table(name = "mentor_careers")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,7 +18,7 @@ public class MentorCareer {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "mentor_career_id", nullable = false)
-	private Long id;
+	private Long mentorCareerId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "mentor_id")

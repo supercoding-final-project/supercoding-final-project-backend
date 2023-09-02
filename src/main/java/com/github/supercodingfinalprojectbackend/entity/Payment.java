@@ -11,31 +11,31 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "payments")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "id", callSuper = false)
-@Table(name = "mentor_social_infos")
-public class MentorSocialInfo extends CommonEntity {
+public class Payment {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "mentor_social_info_id")
-	private Long mentorSocialInfoId;
+	@Column(name = "payment_id", nullable = false)
+	private Long paymentId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "mentor_id")
-	private Mentor mentor;
+	@JoinColumn(name = "order_sheet_id")
+	private OrderSheet orderSheet;
 
-	@Column(name = "social_id")
-	private Long socialId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "mentee_abstract_account_id")
+	private MenteeAbstractAccount menteeAbstractAccount;
 
-	@Column(name = "social_platform")
-	private String socialPlatform;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "mentor_abstract_account_id")
+	private MentorAbstractAccount mentorAbstractAccount;
 }

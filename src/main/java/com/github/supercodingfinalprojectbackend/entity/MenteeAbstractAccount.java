@@ -12,6 +12,7 @@ import javax.persistence.*;
 @EqualsAndHashCode(of = "id", callSuper = false)
 @Table(name = "mentee_abstract_account")
 public class MenteeAbstractAccount extends CommonEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "mentee_abstract_account_id")
