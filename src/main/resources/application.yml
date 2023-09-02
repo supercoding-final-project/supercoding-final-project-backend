@@ -6,7 +6,7 @@ spring:
           kakao:
             client-id: ENC(kU/6R0xQEox+FwAjjzL10/Gja2dPW+vTGQah5S26x++rSz5xSj/kJcKmf5B1B/BS)
             client-secret: ENC(PL5VbHaSX5T9vDYCmRenM0XV5dhuIrs15Uy0hmtgvTwvak9vxiUsGTHZcZfMA7o2)
-            redirect-uri: ENC(osEhDnbHfjFguDTUD+ZMRD1OtcnQmsstSgD+9ZfFSx0PwS/R3IiwhTVwJqpJzCGD)
+            redirect-uri: ENC(eKdwWJhueShvp8bHY9fiTKJYAHh/AphH/H/nX4hySE5/yxfe5HgB/GH6vvKplpTk)
             authorization-grant-type: authorization_code
             scope:
               - profile_nickname
@@ -18,7 +18,6 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
-
   jpa:
     hibernate:
       ddl-auto: update
