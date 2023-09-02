@@ -15,11 +15,15 @@ public class MenteeSocialInfo extends CommonEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "mentee_social_info_id")
-    private int id;
-    @Column(name = "mentee_id")
-    private int menteeId;
+    private Long menteeSocialId;
+
+    @ManyToOne
+    @JoinColumn(name = "mentee_id")
+    private Mentee mentee;
+
     @Column(name = "social_id")
-    private long socialId;
+    private Long socialId;
+
     @Column(name = "social_platform")
     private String socialPlatform;
 }

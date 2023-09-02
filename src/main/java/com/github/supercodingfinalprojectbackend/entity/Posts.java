@@ -17,8 +17,7 @@ public class Posts extends CommonEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "post_id", nullable = false)
-    private Integer postId;
-
+    private Long postId;
     @Column(name = "title")
     private String title;
     @Column(name = "level")
@@ -27,6 +26,10 @@ public class Posts extends CommonEntity{
     private String reviewObjective;
     @Column(name = "price")
     private Integer price;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mentor_id")
+    private Mentor mentor;
 
 
 }

@@ -15,7 +15,7 @@ public class OrderSheet extends CommonEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_sheet_id")
-    private int id;
+    private Long orderSheetId;
     @ManyToOne
     @JoinColumn(name = "mentee_id")
     private Mentee mentee;
@@ -26,9 +26,9 @@ public class OrderSheet extends CommonEntity {
     @JoinColumn(name = "post_id")
     private Post post;
     @Column(name = "total_price")
-    private int totlaPrice;
+    private Integer totlaPrice;
     @Column(name = "is_completed")
-    private boolean isCompleted;
+    private Boolean isCompleted;
     @Column(name = "transaction_type")
     private String transactionType;
 }
