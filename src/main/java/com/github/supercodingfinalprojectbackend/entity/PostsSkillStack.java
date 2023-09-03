@@ -16,6 +16,7 @@ public class PostsSkillStack extends CommonEntity{
     @Column(name = "stack_id", nullable = false)
     private Long stackId;
 
-    @Column(name = "post_stack")
-    private String postStack;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "skill_stack_id")
+    private SkillStack skillStack;
 }
