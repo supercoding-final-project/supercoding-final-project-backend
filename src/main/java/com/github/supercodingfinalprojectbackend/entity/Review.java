@@ -11,31 +11,33 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "reviews")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "id", callSuper = false)
-@Table(name = "mentor_social_infos")
-public class MentorSocialInfo extends CommonEntity {
+public class Review {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "mentor_social_info_id")
-	private Long mentorSocialInfoId;
+	@Column(name = "review_id", nullable = false)
+	private Long reviewId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "mentor_id")
-	private Mentor mentor;
+	@JoinColumn(name = "mentee_id")
+	private Mentee mentee;
 
-	@Column(name = "social_id")
-	private Long socialId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "post_id")
+	private Posts post;
 
-	@Column(name = "social_platform")
-	private String socialPlatform;
+	@Column(name = "content")
+	private String content;
+
+	@Column(name = "start")
+	private Integer star;
 }

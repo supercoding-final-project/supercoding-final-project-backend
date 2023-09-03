@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "Mentors")
+@Table(name = "mentors")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,7 +17,11 @@ public class Mentor extends CommonEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "mentor_id", nullable = false)
-	private Long id;
+	private Long mentorId;
+
+	@OneToOne
+	@JoinColumn(name = "mentor_abstract_account_id")
+	private MentorAbstractAccount mentorAbstractAccount;
 
 	@Column(name = "name")
 	private String name;

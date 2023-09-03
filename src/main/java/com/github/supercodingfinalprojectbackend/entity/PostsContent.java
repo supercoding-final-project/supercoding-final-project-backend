@@ -14,11 +14,15 @@ public class PostsContent extends CommonEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "post_content_id", nullable = false)
-    private Integer postContentId;
+    private Long postContentId;
 
     @Column(name = "text")
     private String text;
 
     @Column(name = "location")
     private String location;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
+    private Posts posts;
 }
