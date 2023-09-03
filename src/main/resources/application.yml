@@ -30,7 +30,7 @@ spring:
     url: ${DB_URL}
   mvc:
     view:
-      prefix: /WEB-INF/views/
+      prefix: /webapp/WEB-INF/views/
       suffix: .jsp
 springdoc:
   packages-to-scan: com.github.supercodingfinalprojectbackend.controller
