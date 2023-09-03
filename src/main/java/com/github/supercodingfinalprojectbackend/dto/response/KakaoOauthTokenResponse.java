@@ -1,7 +1,11 @@
 package com.github.supercodingfinalprojectbackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.ToString;
 
+@Getter
+@ToString
 public class KakaoOauthTokenResponse {
     @JsonProperty("access_token")
     private String accessToken;
@@ -9,7 +13,7 @@ public class KakaoOauthTokenResponse {
     private String tokenType;
     @JsonProperty("refresh_token")
     private String refreshToken;
-    @JsonProperty("expires_id")
+    @JsonProperty("expires_in")
     private Integer expiresIn;
     @JsonProperty("scope")
     private String scope;
