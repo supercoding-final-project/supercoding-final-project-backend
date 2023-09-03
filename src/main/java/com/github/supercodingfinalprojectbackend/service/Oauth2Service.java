@@ -1,5 +1,6 @@
 package com.github.supercodingfinalprojectbackend.service;
 
+import com.github.supercodingfinalprojectbackend.dto.response.KakaoOauthTokenResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -10,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +28,9 @@ public class Oauth2Service {
     public void getToken(String code) {
         RestTemplate restTemplate = new RestTemplate();
         RequestEntity<?> request = createKakaoTokenRequest(code);
-        ResponseEntity<String> response = restTemplate.exchange(request, String.class);
-        System.out.println(response.getBody());
+        ResponseEntity<KakaoOauthTokenResponse> response = restTemplate.exchange(request, KakaoOauthTokenResponse.class);
+        KakaoOauthTokenResponse kakaoOauthTokenResponse = Objects.requireNonNull(response.getBody());
+        System.out.println(kakaoOauthTokenResponse);
     }
 
     private RequestEntity<MultiValueMap<String, String>> createKakaoTokenRequest(String code) {
