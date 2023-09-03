@@ -28,6 +28,10 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     url: ${DB_URL}
+  mvc:
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
 springdoc:
   packages-to-scan: com.github.supercodingfinalprojectbackend.controller
   default-consumes-media-type: application/json;charset=UTF-8
