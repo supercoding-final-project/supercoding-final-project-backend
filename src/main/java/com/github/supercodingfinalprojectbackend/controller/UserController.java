@@ -1,5 +1,7 @@
 package com.github.supercodingfinalprojectbackend.controller;
 
+import com.github.supercodingfinalprojectbackend.dto.KakaoOauthToken;
+import com.github.supercodingfinalprojectbackend.dto.KakaoUserInfo;
 import com.github.supercodingfinalprojectbackend.service.Oauth2Service;
 import lombok.RequiredArgsConstructor;
 
@@ -18,6 +20,6 @@ public class UserController {
     @GetMapping("/oauth2/kakao/login")
     public void kakaoLogin(@RequestParam(name = "code") String code){
         System.out.println(code);
-        oauth2Service.getToken(code);
+        oauth2Service.kakaoLogin(code);
     }
 }

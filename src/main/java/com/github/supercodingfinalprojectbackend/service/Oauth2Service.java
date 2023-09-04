@@ -29,6 +29,11 @@ public class Oauth2Service {
     @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
     private String kakaoUserInfoUri;
 
+    public void kakaoLogin(String code) {
+        KakaoOauthToken kakaoOauthToken = getToken(code);
+        KakaoUserInfo kakaoUserInfo = getUserInfo(kakaoOauthToken);
+    }
+
     public KakaoOauthToken getToken(String code) {
         RestTemplate restTemplate = new RestTemplate();
         RequestEntity<?> request = createKakaoTokenRequest(code);
