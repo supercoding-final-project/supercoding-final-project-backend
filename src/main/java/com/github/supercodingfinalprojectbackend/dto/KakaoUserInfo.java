@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.time.Instant;
+import java.util.List;
 
 @Getter
 @ToString
@@ -17,8 +18,8 @@ public class KakaoUserInfo {
     private Instant connetedAt;
     @JsonProperty("synched_at")
     private Instant synchedAt;
-//    @JsonProperty("properties")
-//    private List<String> properties;
+    @JsonProperty("properties")
+    private KakaoProperty property;
     @JsonProperty("kakao_account")
     private KakaoAccount kakaoAccount;
     @JsonProperty("for_partner")
