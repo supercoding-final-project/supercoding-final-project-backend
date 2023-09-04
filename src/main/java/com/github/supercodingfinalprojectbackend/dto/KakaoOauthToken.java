@@ -1,4 +1,4 @@
-package com.github.supercodingfinalprojectbackend.dto.response;
+package com.github.supercodingfinalprojectbackend.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class KakaoOauthTokenResponse {
+public class KakaoOauthToken {
     @JsonProperty("token_type")
     private String tokenType;
     @JsonProperty("access_token")

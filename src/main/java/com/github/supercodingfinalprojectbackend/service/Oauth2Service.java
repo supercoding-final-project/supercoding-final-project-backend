@@ -1,6 +1,6 @@
 package com.github.supercodingfinalprojectbackend.service;
 
-import com.github.supercodingfinalprojectbackend.dto.response.KakaoOauthTokenResponse;
+import com.github.supercodingfinalprojectbackend.dto.KakaoOauthToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -25,12 +25,13 @@ public class Oauth2Service {
     @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
     private String kakaoRedirectUri;
 
-    public void getToken(String code) {
+    public KakaoOauthToken getToken(String code) {
         RestTemplate restTemplate = new RestTemplate();
         RequestEntity<?> request = createKakaoTokenRequest(code);
-        ResponseEntity<KakaoOauthTokenResponse> response = restTemplate.exchange(request, KakaoOauthTokenResponse.class);
-        KakaoOauthTokenResponse kakaoOauthTokenResponse = Objects.requireNonNull(response.getBody());
-        System.out.println(kakaoOauthTokenResponse);
+        ResponseEntity<KakaoOauthToken> response = restTemplate.exchange(request, KakaoOauthToken.class);
+        KakaoOauthToken kakaoOauthToken = Objects.requireNonNull(response.getBody());
+        System.out.println(kakaoOauthToken);
+        return kakaoOauthToken;
     }
 
     private RequestEntity<MultiValueMap<String, String>> createKakaoTokenRequest(String code) {
@@ -47,5 +48,8 @@ public class Oauth2Service {
         body.add("code", code);
 
         return RequestEntity.post(uri).headers(headers).body(body);
+    }
+
+    public void getUserInfo(KakaoOauthToken kakaoOauthToken) {
     }
 }
