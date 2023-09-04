@@ -27,11 +27,11 @@ public class JwtProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        String email = (String) authentication.getPrincipal();
-        String jwt = (String) authentication.getCredentials();
-        AuthorizationDetails details = authorizationDetailsService.loadUserByUsername(email);
+        String userId = (String) authentication.getPrincipal();
+        String accessToken = (String) authentication.getCredentials();
+        AuthorizationDetails details = authorizationDetailsService.loadUserByUsername(userId);
 
-        if (!details.getPassword().equals(jwt)) throw new AuthenticationException("JWT 토큰 인증에 실패했습니다.") {
+        if (!details.getPassword().equals(accessToken)) throw new AuthenticationException("JWT 토큰 인증에 실패했습니다.") {
         };
 
         return new UsernamePasswordAuthenticationToken(details.getUsername(), details.getPassword(), details.getAuthorities());
@@ -63,9 +63,9 @@ public class JwtProvider implements AuthenticationProvider {
         }
     }
 
-    public UsernamePasswordAuthenticationToken parseAuthentication(String jwt) {
-        Claims claims = parseClaims(jwt);
-        String email = claims.getSubject();
+    public UsernamePasswordAuthenticationToken parseAuthentication(String accessToken) {
+        Claims claims = parseClaims(accessToken);
+        String userId = claims.getSubject();
         List<?> authorities = claims.get("authorities", List.class);
         if (authorities == null ) throw JwtErrorCode.INVALID_SIGNATURE.exception();
         Set<SimpleGrantedAuthority> grantedAuthorities = authorities.stream()
@@ -73,31 +73,31 @@ public class JwtProvider implements AuthenticationProvider {
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());
 
-        return new UsernamePasswordAuthenticationToken(email, jwt, grantedAuthorities);
+        return new UsernamePasswordAuthenticationToken(userId, accessToken, grantedAuthorities);
     }
 
-    public Map<String, String> createToken(String email, Set<String> authorities) {
+    public Map<String, String> createToken(String subject, Set<String> authorities) {
         Date now = new Date();
         final long oneHour = 3_600_000L;
         final long oneMonth = oneHour * 24 * 30;
         String jwt = Jwts.builder()
-                .setSubject(email)
+                .setSubject(subject)
                 .claim("authorities", authorities)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + oneHour))
                 .signWith(secretKey)
                 .compact();
         String refresh = Jwts.builder()
-                .setSubject(email)
-                .claim("token", jwt)
+                .setSubject(subject)
+                .claim("access_token", jwt)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + oneMonth))
                 .signWith(secretKey)
                 .compact();
 
         HashMap<String, String> map = new HashMap<>();
-        map.put("token", jwt);
-        map.put("refresh", refresh);
+        map.put("access_token", jwt);
+        map.put("refresh_token", refresh);
         return map;
     }
 
