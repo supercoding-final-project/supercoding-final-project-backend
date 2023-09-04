@@ -3,7 +3,6 @@ package com.github.supercodingfinalprojectbackend.service;
 import com.github.supercodingfinalprojectbackend.dto.KakaoOauthToken;
 import com.github.supercodingfinalprojectbackend.dto.KakaoUserInfo;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
