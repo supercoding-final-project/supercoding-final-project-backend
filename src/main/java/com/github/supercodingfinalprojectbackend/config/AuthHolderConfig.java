@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class AuthHolderConfig {
 
     @Bean("AuthHolder")
-        public ConcurrentHashMap<Long, LoginInfo> concurrentHashMap() {
+        public ConcurrentHashMap<String, LoginInfo> concurrentHashMap() {
         return new ConcurrentHashMap<>();
     }
 }
