@@ -1,7 +1,9 @@
 package com.github.supercodingfinalprojectbackend.service;
 
 import com.github.supercodingfinalprojectbackend.dto.KakaoOauthToken;
+import com.github.supercodingfinalprojectbackend.dto.KakaoUserInfo;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,8 @@ public class Oauth2Service {
     private String kakaoClientId;
     @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
     private String kakaoRedirectUri;
+    @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
+    private String kakaoUserInfoUri;
 
     public KakaoOauthToken getToken(String code) {
         RestTemplate restTemplate = new RestTemplate();
@@ -50,6 +54,25 @@ public class Oauth2Service {
         return RequestEntity.post(uri).headers(headers).body(body);
     }
 
-    public void getUserInfo(KakaoOauthToken kakaoOauthToken) {
+    public KakaoUserInfo getUserInfo(KakaoOauthToken kakaoOauthToken) {
+        RestTemplate restTemplate = new RestTemplate();
+        RequestEntity<?> request = createKakaoUserInfoRequest(kakaoOauthToken);
+        ResponseEntity<KakaoUserInfo> response = restTemplate.exchange(request, KakaoUserInfo.class);
+        KakaoUserInfo userInfo = Objects.requireNonNull(response.getBody());
+        System.out.println(userInfo);
+        return userInfo;
+    }
+
+    private RequestEntity<Void> createKakaoUserInfoRequest(KakaoOauthToken kakaoOauthToken) {
+        System.out.println(kakaoUserInfoUri);
+        URI uri = URI.create(kakaoUserInfoUri);
+
+        String accessToken = kakaoOauthToken.getAccessToken();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+
+        return RequestEntity.get(uri).headers(headers).build();
     }
 }
