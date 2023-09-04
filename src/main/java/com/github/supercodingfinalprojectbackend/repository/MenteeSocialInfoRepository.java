@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MenteeSocialInfoRepository extends JpaRepository<MenteeSocialInfo, Long> {
 
+    boolean existsBySocialIdAndSocialPlatform(Long socialId, String socialPlatform);
 }
