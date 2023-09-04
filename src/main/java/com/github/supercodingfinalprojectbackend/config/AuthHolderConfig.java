@@ -1,5 +1,6 @@
 package com.github.supercodingfinalprojectbackend.config;
 
+import com.github.supercodingfinalprojectbackend.dto.LoginInfo;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -9,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class AuthHolderConfig {
 
     @Bean("AuthHolder")
-        public ConcurrentHashMap<Long, String> concurrentHashMap() {
+        public ConcurrentHashMap<Long, LoginInfo> concurrentHashMap() {
         return new ConcurrentHashMap<>();
     }
 }
