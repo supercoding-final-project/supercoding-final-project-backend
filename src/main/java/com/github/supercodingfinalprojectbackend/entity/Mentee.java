@@ -9,7 +9,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "menteeId", callSuper = true)
+@EqualsAndHashCode(of = "menteeId", callSuper = false)
 @Table(name = "mentees")
 public class Mentee extends CommonEntity {
     @Id
