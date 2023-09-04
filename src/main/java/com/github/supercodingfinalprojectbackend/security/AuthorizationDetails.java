@@ -11,9 +11,9 @@ import java.util.Set;
 @Builder
 public class AuthorizationDetails implements UserDetails {
 
-    private Set<SimpleGrantedAuthority> authorities;
-    private String jwt;
     private String id;
+    private String accessToken;
+    private Set<SimpleGrantedAuthority> authorities;
 
     @Override
     public Set<SimpleGrantedAuthority> getAuthorities() {
@@ -22,7 +22,7 @@ public class AuthorizationDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return jwt;
+        return accessToken;
     }
 
     @Override
