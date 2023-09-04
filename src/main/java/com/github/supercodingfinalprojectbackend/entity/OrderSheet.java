@@ -9,7 +9,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "order_sheet_id", callSuper = false)
+@EqualsAndHashCode(of = "orderSheetId", callSuper = false)
 @Table(name = "order_sheets")
 public class OrderSheet extends CommonEntity {
     @Id
@@ -24,7 +24,7 @@ public class OrderSheet extends CommonEntity {
     private Mentor mentor;
     @ManyToOne
     @JoinColumn(name = "post_id")
-    private Post post;
+    private Posts post;
     @Column(name = "total_price")
     private Integer totlaPrice;
     @Column(name = "is_completed")
