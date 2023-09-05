@@ -8,4 +8,6 @@ public class AuthHolder<K, V> {
     public V put(K key, V value) { return authMap.put(key, value); }
     public V remove(K key) { return authMap.remove(key); }
     public V get(K key) { return authMap.get(key); }
+
+    public AuthHolder() {}
 }
