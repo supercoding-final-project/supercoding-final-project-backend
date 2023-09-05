@@ -7,13 +7,16 @@ import com.github.supercodingfinalprojectbackend.dto.TokenHolder;
 import com.github.supercodingfinalprojectbackend.entity.*;
 import com.github.supercodingfinalprojectbackend.entity.type.SocialPlatformType;
 import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
+import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.KakaoErrorCode;
+import com.github.supercodingfinalprojectbackend.exception.errorcode.UserErrorCode;
 import com.github.supercodingfinalprojectbackend.repository.*;
 import com.github.supercodingfinalprojectbackend.security.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -163,11 +166,9 @@ public class Oauth2Service {
         RestTemplate restTemplate = new RestTemplate();
         RequestEntity<?> request = createKakaoTokenRequest(code);
         ResponseEntity<Kakao.OauthToken> response = restTemplate.exchange(request, Kakao.OauthToken.class);
-        try {
-            return Objects.requireNonNull(response.getBody());
-        } catch (NullPointerException e) {
-            throw KakaoErrorCode.FAIL_TO_RECEIVE_TOKEN.exception();
-        }
+        Kakao.OauthToken kakaoOauthToken = response.getBody();
+        if (kakaoOauthToken == null) throw KakaoErrorCode.FAIL_TO_RECEIVE_TOKEN.exception();
+        return kakaoOauthToken;
     }
 
     private RequestEntity<MultiValueMap<String, String>> createKakaoTokenRequest(String code) {
@@ -187,14 +188,14 @@ public class Oauth2Service {
     }
 
     public Kakao.UserInfo getKakaoUserInfo(Kakao.OauthToken kakaoOauthToken) {
-        RestTemplate restTemplate = new RestTemplate();
         RequestEntity<?> request = createKakaoUserInfoRequest(kakaoOauthToken);
+
+        RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<Kakao.UserInfo> response = restTemplate.exchange(request, Kakao.UserInfo.class);
-        try {
-            return Objects.requireNonNull(response.getBody());
-        } catch (NullPointerException e) {
-            throw KakaoErrorCode.NOT_FOUND_USER_INFO.exception();
-        }
+
+        Kakao.UserInfo kakaoUserInfo = response.getBody();
+        if (kakaoUserInfo == null) throw KakaoErrorCode.NOT_FOUND_USER_INFO.exception();
+        return kakaoUserInfo;
     }
 
     private RequestEntity<Void> createKakaoUserInfoRequest(Kakao.OauthToken kakaoOauthToken) {
@@ -210,21 +211,29 @@ public class Oauth2Service {
     }
 
     public void kakaoLogout() {
-        Long userId = Long.valueOf((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        RestTemplate restTemplate = new RestTemplate();
+        Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) throw ApiErrorCode.NOT_AUTHENTICATED.exception();
+
+        Long userId = Long.valueOf((String) auth.getPrincipal());
+        Login login = authHolder.get(userId);
+        if (login == null) throw UserErrorCode.ALREADY_LOGGED_OUT.exception();
 
         URI uri = URI.create(kakaoLogoutUri);
+        String kakaoAccessToken = login.getKakaoToken().getAccessToken();
         HttpHeaders headers = new HttpHeaders();
-        String kakaoAccessToken = authHolder.get(userId).getKakaoToken().getAccessToken();
         headers.add("Content-Type", "application/x-www-form-urlencoded");
         headers.add("Authorization", "Bearer " + kakaoAccessToken);
         RequestEntity<?> request = RequestEntity.get(uri).headers(headers).build();
 
+        RestTemplate restTemplate = new RestTemplate();
         restTemplate.exchange(request, Object.class);
     }
 
     public void serviceLogout() {
-        Long userId = Long.valueOf((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) throw ApiErrorCode.NOT_AUTHENTICATED.exception();
+
+        Long userId = Long.valueOf((String) auth.getPrincipal());
         authHolder.remove(userId);
     }
 }
