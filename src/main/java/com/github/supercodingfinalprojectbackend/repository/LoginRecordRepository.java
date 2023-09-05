@@ -10,5 +10,5 @@ import java.util.Optional;
 @Repository
 public interface LoginRecordRepository extends JpaRepository<LoginRecord, Long> {
 
-    Optional<LoginRecord> findByUserAndIsDeletedIsFalseOrderByCreatedAtDesc(User user);
+    Optional<LoginRecord> findFirstByUserAndIsDeletedIsFalseOrderByCreatedAtDesc(User user);
 }

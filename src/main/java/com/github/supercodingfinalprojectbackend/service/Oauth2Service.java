@@ -61,7 +61,7 @@ public class Oauth2Service {
 
         // 이전 로그인 기록을 뒤져서 어떤 역할로 로그인할 것인지 선택
         User user = userSocialInfo.getUser();
-        LoginRecord loginRecord = loginRecordRepository.findByUserAndIsDeletedIsFalseOrderByCreatedAtDesc(user).orElse(null);
+        LoginRecord loginRecord = loginRecordRepository.findFirstByUserAndIsDeletedIsFalseOrderByCreatedAtDesc(user).orElse(null);
         String roleName = loginRecord == null ? UserRole.MENTEE : loginRecord.getRoleName();
 
         // 토큰 생성
