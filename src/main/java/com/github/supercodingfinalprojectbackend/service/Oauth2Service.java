@@ -7,6 +7,7 @@ import com.github.supercodingfinalprojectbackend.dto.TokenHolder;
 import com.github.supercodingfinalprojectbackend.entity.*;
 import com.github.supercodingfinalprojectbackend.entity.type.SocialPlatformType;
 import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
+import com.github.supercodingfinalprojectbackend.exception.errorcode.KakaoErrorCode;
 import com.github.supercodingfinalprojectbackend.repository.*;
 import com.github.supercodingfinalprojectbackend.security.JwtProvider;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
@@ -139,18 +140,18 @@ public class Oauth2Service {
         String num2 = String.format("%08x", time);
         String num3 = Integer.toHexString(random.nextInt(max - min + 1) + min);
         String num4 = Integer.toHexString(random.nextInt(max - min + 1) + min);
-        String AccountNumber = num1 + "-" + num2 + "-" + num3 + "-" + num4;
-        System.out.println(AccountNumber);
-        return AccountNumber ;
+        return num1 + "-" + num2 + "-" + num3 + "-" + num4;
     }
 
     public Kakao.OauthToken getKakaoToken(String code) {
         RestTemplate restTemplate = new RestTemplate();
         RequestEntity<?> request = createKakaoTokenRequest(code);
         ResponseEntity<Kakao.OauthToken> response = restTemplate.exchange(request, Kakao.OauthToken.class);
-        Kakao.OauthToken kakaoOauthToken = Objects.requireNonNull(response.getBody());
-        System.out.println(kakaoOauthToken);
-        return kakaoOauthToken;
+        try {
+            return Objects.requireNonNull(response.getBody());
+        } catch (NullPointerException e) {
+            throw KakaoErrorCode.FAIL_TO_RECEIVE_TOKEN.exception();
+        }
     }
 
     private RequestEntity<MultiValueMap<String, String>> createKakaoTokenRequest(String code) {
@@ -173,9 +174,11 @@ public class Oauth2Service {
         RestTemplate restTemplate = new RestTemplate();
         RequestEntity<?> request = createKakaoUserInfoRequest(kakaoOauthToken);
         ResponseEntity<Kakao.UserInfo> response = restTemplate.exchange(request, Kakao.UserInfo.class);
-        Kakao.UserInfo userInfo = Objects.requireNonNull(response.getBody());
-        System.out.println(userInfo);
-        return userInfo;
+        try {
+            return Objects.requireNonNull(response.getBody());
+        } catch (NullPointerException e) {
+            throw KakaoErrorCode.NOT_FOUND_USER_INFO.exception();
+        }
     }
 
     private RequestEntity<Void> createKakaoUserInfoRequest(Kakao.OauthToken kakaoOauthToken) {
