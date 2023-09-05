@@ -18,13 +18,13 @@ public class Login {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Response {
-        private String userId;
+        private Long userId;
         private String accessToken;
         private String refreshToken;
         private String roleName;
 
         public static Response from(Login login) {
-            String userId = login.getUserId();
+            Long userId = Long.parseLong(login.getUserId());
             String accessToken = "Bearer " + login.getAccessToken();
             String refreshToken = "Bearer " + login.getRefreshToken();
             String roleName = login.getRoleName();
