@@ -1,5 +1,6 @@
 package com.github.supercodingfinalprojectbackend.security;
 
+import com.github.supercodingfinalprojectbackend.dto.TokenHolder;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.JwtErrorCode;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
@@ -76,29 +77,26 @@ public class JwtProvider implements AuthenticationProvider {
         return new UsernamePasswordAuthenticationToken(userId, accessToken, grantedAuthorities);
     }
 
-    public Map<String, String> createToken(String userId, Set<String> authorities) {
+    public TokenHolder createToken(String userId, Set<String> authorities) {
         Date now = new Date();
         final long oneHour = 3_600_000L;
         final long oneMonth = oneHour * 24 * 30;
-        String jwt = Jwts.builder()
+        String accessToken = Jwts.builder()
                 .setSubject(userId)
                 .claim("authorities", authorities)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + oneHour))
                 .signWith(secretKey)
                 .compact();
-        String refresh = Jwts.builder()
+        String refreshToken = Jwts.builder()
                 .setSubject(userId)
-                .claim("access_token", jwt)
+                .claim("access_token", accessToken)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + oneMonth))
                 .signWith(secretKey)
                 .compact();
 
-        HashMap<String, String> map = new HashMap<>();
-        map.put("access_token", jwt);
-        map.put("refresh_token", refresh);
-        return map;
+        return new TokenHolder().putAccessToken(accessToken).putRefreshToken(refreshToken);
     }
 
     public String parseJwt(HttpServletRequest request) {
