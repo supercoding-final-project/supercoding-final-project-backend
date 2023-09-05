@@ -20,10 +20,6 @@ public class Mentor extends CommonEntity {
 	private Long mentorId;
 
 	@OneToOne
-	@JoinColumn(name = "mentor_abstract_account_id")
-	private MentorAbstractAccount mentorAbstractAccount;
-
-	@OneToOne
 	@JoinColumn(name = "user_id")
 	private User user;
 
