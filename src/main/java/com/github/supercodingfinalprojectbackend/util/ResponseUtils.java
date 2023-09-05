@@ -1,4 +1,4 @@
-package com.github.supercodingfinalprojectbackend.dto.response;
+package com.github.supercodingfinalprojectbackend.util;
 
 import org.springframework.http.*;
 

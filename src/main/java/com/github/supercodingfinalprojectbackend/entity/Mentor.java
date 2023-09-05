@@ -28,14 +28,12 @@ public class Mentor extends CommonEntity {
 	@OneToMany(mappedBy = "mentor")
 	private List<MentorSkillStack> mentorSkillStacks = new ArrayList<>();
 
+	@OneToOne
+	@JoinColumn(name = "user_id")
+	private User user;
+
 	@Column(name = "name")
 	private String name;
-
-	@Column(name = "nickname")
-	private String nickname;
-
-	@Column(name = "email")
-	private String email;
 
 	@Column(name = "introduction")
 	private String introduction;
