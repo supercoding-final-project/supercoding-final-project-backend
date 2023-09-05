@@ -1,6 +1,7 @@
 package com.github.supercodingfinalprojectbackend.dto;
 
 import com.github.supercodingfinalprojectbackend.entity.Mentor;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -37,7 +38,6 @@ public class MentorDto {
 
 	@Getter
 	@NoArgsConstructor
-	@AllArgsConstructor
 	@Builder
 	public static class MentorInfoResponse {
 
@@ -47,6 +47,19 @@ public class MentorDto {
 		private String email;
 		private String introduction;
 		private String company;
+
+		@QueryProjection
+		public MentorInfoResponse(
+				Long mentorId, String name, String nickname, String email,
+				String introduction, String company
+		){
+			this.mentorId = mentorId;
+			this.name = name;
+			this.nickname = nickname;
+			this.email = email;
+			this.introduction = introduction;
+			this.company = company;
+		}
 
 		public static MentorInfoResponse from(MentorDto mentorDto){
 			return MentorInfoResponse.builder()
