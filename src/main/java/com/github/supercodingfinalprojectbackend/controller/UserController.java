@@ -24,4 +24,12 @@ public class UserController {
         Login.Response response = Login.Response.from(login);
         return ResponseUtils.ok("로그인에 성공했습니다.", response);
     }
+
+    @GetMapping("/oauth2/kakao/logout")
+    public ResponseEntity<ResponseUtils.ApiResponse<Void>> kakaoLogout() {
+        oauth2Service.kakaoLogout();
+        oauth2Service.serviceLogout();
+
+        return ResponseUtils.ok("로그아웃에 성공했습니다.", null);
+    }
 }

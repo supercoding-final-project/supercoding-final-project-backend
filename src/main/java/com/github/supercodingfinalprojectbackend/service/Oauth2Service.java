@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -40,6 +41,8 @@ public class Oauth2Service {
     private String kakaoRedirectUri;
     @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
     private String kakaoUserInfoUri;
+    @Value("${spring.security.oauth2.client.provider.kakao.logout-uri}")
+    private String kakaoLogoutUri;
 
     private final MenteeRepository menteeRepository;
     private final UserRepository userRepository;
@@ -204,5 +207,24 @@ public class Oauth2Service {
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
         return RequestEntity.get(uri).headers(headers).build();
+    }
+
+    public void kakaoLogout() {
+        Long userId = Long.valueOf((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        RestTemplate restTemplate = new RestTemplate();
+
+        URI uri = URI.create(kakaoLogoutUri);
+        HttpHeaders headers = new HttpHeaders();
+        String kakaoAccessToken = authHolder.get(userId).getKakaoToken().getAccessToken();
+        headers.add("Content-Type", "application/x-www-form-urlencoded");
+        headers.add("Authorization", "Bearer " + kakaoAccessToken);
+        RequestEntity<?> request = RequestEntity.get(uri).headers(headers).build();
+
+        restTemplate.exchange(request, Object.class);
+    }
+
+    public void serviceLogout() {
+        Long userId = Long.valueOf((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        authHolder.remove(userId);
     }
 }
