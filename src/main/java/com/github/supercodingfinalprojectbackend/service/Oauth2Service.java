@@ -48,7 +48,7 @@ public class Oauth2Service {
     private final UserAbstractAccountRepository userAbstractAccountRepository;
     private final JwtProvider jwtProvider;
     @Qualifier("AuthHolder")
-    private final AuthHolder<String, Login> authHolder;
+    private final AuthHolder<Long, Login> authHolder;
 
     public Login kakaoLogin(String code) {
         Kakao.OauthToken kakaoOauthToken = getKakaoToken(code);
@@ -65,9 +65,10 @@ public class Oauth2Service {
         String roleName = loginRecord == null ? UserRole.MENTEE : loginRecord.getRoleName();
 
         // 토큰 생성
-        String userId = user.getUserId().toString();
+        Long userId = user.getUserId();
+        String userIdString = userId.toString();
         Set<String> authorities = Set.of(roleName);
-        TokenHolder tokenHolder = jwtProvider.createToken(userId, authorities);
+        TokenHolder tokenHolder = jwtProvider.createToken(userIdString, authorities);
 
         // 메모리에 로그인 정보 저장
         Login login = Login.builder()

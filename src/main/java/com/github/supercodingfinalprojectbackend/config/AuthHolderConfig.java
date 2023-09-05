@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 public class AuthHolderConfig {
 
     @Bean("AuthHolder")
-    public AuthHolder<String, Login> authHolder() {
+    public AuthHolder<Long, Login> authHolder() {
         return new AuthHolder<>();
     }
 }
