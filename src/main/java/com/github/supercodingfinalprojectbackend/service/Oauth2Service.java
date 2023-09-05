@@ -182,7 +182,6 @@ public class Oauth2Service {
     }
 
     private RequestEntity<Void> createKakaoUserInfoRequest(Kakao.OauthToken kakaoOauthToken) {
-        System.out.println(kakaoUserInfoUri);
         URI uri = URI.create(kakaoUserInfoUri);
 
         String accessToken = kakaoOauthToken.getAccessToken();
