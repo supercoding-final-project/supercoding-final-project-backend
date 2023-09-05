@@ -1,18 +1,17 @@
 package com.github.supercodingfinalprojectbackend.service;
 
+import com.github.supercodingfinalprojectbackend.dto.AuthHolder;
 import com.github.supercodingfinalprojectbackend.dto.Kakao;
-import com.github.supercodingfinalprojectbackend.entity.Mentee;
-import com.github.supercodingfinalprojectbackend.entity.MenteeAbstractAccount;
-import com.github.supercodingfinalprojectbackend.entity.MenteeSocialInfo;
-import com.github.supercodingfinalprojectbackend.entity.User;
+import com.github.supercodingfinalprojectbackend.dto.Login;
+import com.github.supercodingfinalprojectbackend.dto.TokenHolder;
+import com.github.supercodingfinalprojectbackend.entity.*;
 import com.github.supercodingfinalprojectbackend.entity.type.SocialPlatformType;
-import com.github.supercodingfinalprojectbackend.repository.MenteeAbstractAccountRepository;
-import com.github.supercodingfinalprojectbackend.repository.MenteeRepository;
-import com.github.supercodingfinalprojectbackend.repository.MenteeSocialInfoRepository;
-import com.github.supercodingfinalprojectbackend.repository.UserRepository;
+import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
+import com.github.supercodingfinalprojectbackend.repository.*;
 import com.github.supercodingfinalprojectbackend.security.JwtProvider;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -25,9 +24,7 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -48,9 +45,12 @@ public class Oauth2Service {
     private final MenteeRepository menteeRepository;
     private final MenteeSocialInfoRepository menteeSocialInfoRepository;
     private final UserRepository userRepository;
+    private final LoginRecordRepository loginRecordRepository;
     private final JwtProvider jwtProvider;
+    @Qualifier("AuthHolder")
+    private final AuthHolder<String, Login> authHolder;
 
-    public ResponseEntity<?> kakaoLogin(String code) {
+    public ResponseEntity<ResponseUtils.ApiResponse<Login>> kakaoLogin(String code) {
         Kakao.OauthToken kakaoOauthToken = getKakaoToken(code);
         Kakao.UserInfo kakaoUserInfo = getKakaoUserInfo(kakaoOauthToken);
 
@@ -58,48 +58,73 @@ public class Oauth2Service {
         MenteeSocialInfo menteeSocialInfo = menteeSocialInfoRepository.findBySocialIdAndSocialPlatformAndIsDeletedIsFalse(kakaoUserInfo.getId(), SocialPlatformType.KAKAO)
                 .orElseGet(()-> signupMenteeWithKakao(kakaoUserInfo));
 
-        // TODO: 토큰을 만들어서 반환
+        // 토큰을 만들어서 반환
+        String userId = menteeSocialInfo.getMentee().getUser().getUserId().toString();
+        Set<String> authorities = Set.of(UserRole.MENTEE);
+        TokenHolder tokenHolder = jwtProvider.createToken(userId, authorities);
 
-        // 토큰에 들어갈 정보
-        // 1. 유저 아이디
-        // 2. 유저 역할
-        // 3.
+        // 메모리에 로그인 정보 저장
+        Login login = Login.builder()
+                .userId(userId)
+                .roleName(UserRole.MENTEE)
+                .accessToken(tokenHolder.getAccessToken())
+                .refreshToken(tokenHolder.getRefreshToken())
+                .build();
+        authHolder.put(userId, login);
 
-        // 1. 액세스 토큰 생성
-        //      1-1. 유저 아이디, 액세스 토큰, 유저 역할
-        // 2. 리프레쉬 토큰 생성
-        //      2-1. 유저 아이디, 엑세스 토큰, 유저 역할
+        // DB에 로그인 기록 저장
+        LoginRecord loginRecord = LoginRecord.builder()
+                .user(menteeSocialInfo.getMentee().getUser())
+                .roleName(UserRole.MENTEE)
+                .build();
+        loginRecordRepository.save(loginRecord);
 
-        Mentee mentee = menteeSocialInfo.getMentee();
-        return ResponseUtils.ok("성공적으로 로그인 됨", mentee);
+        return ResponseUtils.ok("로그인에 성공했습니다.", login);
     }
 
     private MenteeSocialInfo signupMenteeWithKakao(Kakao.UserInfo kakaoUserInfo) {
-        User newUser = User.builder()
-                .name(kakaoUserInfo.getKakaoAccount().getName())
-                .nickname(kakaoUserInfo.getKakaoAccount().getProfile().getNickName())
-                .thumbnailImageUrl(kakaoUserInfo.getKakaoAccount().getProfile().getThumbnailImageUrl())
-                .build();
-        User savedUser = userRepository.save(newUser);
+        String name = kakaoUserInfo.getKakaoAccount().getName();
+        String nickname = kakaoUserInfo.getKakaoAccount().getProfile().getNickName();
+        String thumbnailImageUrl = kakaoUserInfo.getKakaoAccount().getProfile().getThumbnailImageUrl();
 
+        User user = createAndSaveUser(name, nickname, thumbnailImageUrl);
+        MenteeAbstractAccount menteeAbstractAccount = createAndSaveMenteeAbstractAccount();
+        Mentee mentee = createAndSaveMentee(user, menteeAbstractAccount);
+        return createAndSaveMenteeSocialInfo(mentee, kakaoUserInfo.getId(), SocialPlatformType.KAKAO);
+    }
+
+    private MenteeSocialInfo createAndSaveMenteeSocialInfo(Mentee mentee, Long socialId, String socialPlatform) {
+        MenteeSocialInfo newMenteeSocialInfo = MenteeSocialInfo.builder()
+                .mentee(mentee)
+                .socialId(socialId)
+                .socialPlatform(socialPlatform)
+                .build();
+        return menteeSocialInfoRepository.save(newMenteeSocialInfo);
+    }
+
+    private Mentee createAndSaveMentee(User user, MenteeAbstractAccount menteeAbstractAccount) {
+        Mentee newMentee = Mentee.builder()
+                .abstractAccount(menteeAbstractAccount)
+                .user(user)
+                .build();
+        return menteeRepository.save(newMentee);
+    }
+
+    private MenteeAbstractAccount createAndSaveMenteeAbstractAccount() {
         MenteeAbstractAccount newMenteeAbstractAccount = MenteeAbstractAccount.builder()
                 .accountNumber(createAccountNumber())
                 .paymoney(0L)
                 .build();
-        MenteeAbstractAccount savedMenteeAbstractAccount = menteeAbstractAccountRepository.save(newMenteeAbstractAccount);
+        return menteeAbstractAccountRepository.save(newMenteeAbstractAccount);
+    }
 
-        Mentee newMentee = Mentee.builder()
-                .abstractAccount(savedMenteeAbstractAccount)
-                .user(savedUser)
+    private User createAndSaveUser(String name, String nickname, String thumbnailImageUrl) {
+        User newUser = User.builder()
+                .name(name)
+                .nickname(nickname)
+                .thumbnailImageUrl(thumbnailImageUrl)
                 .build();
-        Mentee savedMentee = menteeRepository.save(newMentee);
-
-        MenteeSocialInfo newMenteeSocialInfo = MenteeSocialInfo.builder()
-                .mentee(savedMentee)
-                .socialId(kakaoUserInfo.getId())
-                .socialPlatform(SocialPlatformType.KAKAO)
-                .build();
-        return menteeSocialInfoRepository.save(newMenteeSocialInfo);
+        return userRepository.save(newUser);
     }
 
     private String createAccountNumber() {
