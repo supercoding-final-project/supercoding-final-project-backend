@@ -40,8 +40,8 @@ public class JwtProvider implements AuthenticationProvider {
 
         if (
                 !details.getPassword().equals(accessToken) ||
-                !userId.equals(details.getUsername()) ||
-                authorities.size() != details.getAuthorities().size() ||
+                !details.getUsername().equals(userId) ||
+                details.getAuthorities().size() != authorities.size() ||
                 !details.getAuthorities().containsAll(authorities)
         ) {
             throw JwtErrorCode.UNRELIABLE_JWT.exception();
