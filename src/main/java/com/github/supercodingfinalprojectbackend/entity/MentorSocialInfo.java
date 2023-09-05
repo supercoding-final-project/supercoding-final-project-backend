@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "id", callSuper = false)
+@EqualsAndHashCode(of = "mentorSocialInfoId", callSuper = false)
 @Table(name = "mentor_social_infos")
 public class MentorSocialInfo extends CommonEntity {
 
