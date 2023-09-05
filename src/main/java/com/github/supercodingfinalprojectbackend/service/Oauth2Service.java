@@ -76,6 +76,7 @@ public class Oauth2Service {
                 .roleName(roleName)
                 .accessToken(tokenHolder.getAccessToken())
                 .refreshToken(tokenHolder.getRefreshToken())
+                .kakaoToken(kakaoOauthToken)
                 .build();
         authHolder.put(userId, login);
 
