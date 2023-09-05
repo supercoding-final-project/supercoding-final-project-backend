@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
@@ -30,9 +31,20 @@ public class JwtProvider implements AuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String userId = (String) authentication.getPrincipal();
         String accessToken = (String) authentication.getCredentials();
+        Set<SimpleGrantedAuthority> authorities = new HashSet<>();
+        for (GrantedAuthority authority : authentication.getAuthorities()) {
+            authorities.add(new SimpleGrantedAuthority(authority.getAuthority()));
+        }
+
         AuthorizationDetails details = authorizationDetailsService.loadUserByUsername(userId);
 
-        if (!details.getPassword().equals(accessToken)) throw new AuthenticationException("JWT 토큰 인증에 실패했습니다.") {
+        if (
+                !details.getPassword().equals(accessToken) ||
+                !userId.equals(details.getUsername()) ||
+                authorities.size() != details.getAuthorities().size() ||
+                !details.getAuthorities().containsAll(authorities)
+        ) {
+            throw JwtErrorCode.UNRELIABLE_JWT.exception();
         };
 
         return new UsernamePasswordAuthenticationToken(details.getUsername(), details.getPassword(), details.getAuthorities());
