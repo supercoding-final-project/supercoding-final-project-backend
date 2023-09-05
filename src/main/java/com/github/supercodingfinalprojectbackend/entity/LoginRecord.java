@@ -18,7 +18,7 @@ public class LoginRecord extends CommonEntity {
     @Column(name = "login_record_id")
     private Long loginRecordId;
     @ManyToOne
-    @Column(name = "user_id")
+    @JoinColumn(name = "user_id")
     private User user;
     @Column(name = "role_name")
     private String roleName;
