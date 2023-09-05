@@ -19,5 +19,5 @@ public class TokenHolder {
         return this;
     }
     public String getAccessToken() { return tokenMap.get(ACCESS_TOKEN_KEY_NAME); }
-    public String getRefreshTokenKeyName() { return tokenMap.get(REFRESH_TOKEN_KEY_NAME); }
+    public String getRefreshToken() { return tokenMap.get(REFRESH_TOKEN_KEY_NAME); }
 }
