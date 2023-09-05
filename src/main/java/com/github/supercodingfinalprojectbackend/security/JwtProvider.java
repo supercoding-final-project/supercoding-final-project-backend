@@ -76,19 +76,19 @@ public class JwtProvider implements AuthenticationProvider {
         return new UsernamePasswordAuthenticationToken(userId, accessToken, grantedAuthorities);
     }
 
-    public Map<String, String> createToken(String subject, Set<String> authorities) {
+    public Map<String, String> createToken(String userId, Set<String> authorities) {
         Date now = new Date();
         final long oneHour = 3_600_000L;
         final long oneMonth = oneHour * 24 * 30;
         String jwt = Jwts.builder()
-                .setSubject(subject)
+                .setSubject(userId)
                 .claim("authorities", authorities)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + oneHour))
                 .signWith(secretKey)
                 .compact();
         String refresh = Jwts.builder()
-                .setSubject(subject)
+                .setSubject(userId)
                 .claim("access_token", jwt)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + oneMonth))
