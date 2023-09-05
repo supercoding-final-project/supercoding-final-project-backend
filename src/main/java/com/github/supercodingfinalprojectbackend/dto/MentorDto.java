@@ -29,9 +29,9 @@ public class MentorDto {
 //				.mentorAbstractAccountId(
 //						mentor.getMentorAbstractAccount().getMentorAbstractAccountId())
 				.name(mentor.getName())
-				.nickname(mentor.getNickname())
+//				.nickname(mentor.getNickname())
 				.introduction(mentor.getIntroduction())
-				.email(mentor.getEmail())
+//				.email(mentor.getEmail())
 				.company(mentor.getCompany())
 				.build();
 	}
@@ -43,20 +43,13 @@ public class MentorDto {
 
 		private Long mentorId;
 		private String name;
-		private String nickname;
-		private String email;
 		private String introduction;
 		private String company;
 
 		@QueryProjection
-		public MentorInfoResponse(
-				Long mentorId, String name, String nickname, String email,
-				String introduction, String company
-		){
+		public MentorInfoResponse(Long mentorId, String name, String introduction, String company){
 			this.mentorId = mentorId;
 			this.name = name;
-			this.nickname = nickname;
-			this.email = email;
 			this.introduction = introduction;
 			this.company = company;
 		}
@@ -65,8 +58,6 @@ public class MentorDto {
 			return MentorInfoResponse.builder()
 					.mentorId(mentorDto.getMentorId())
 					.name(mentorDto.getName())
-					.nickname(mentorDto.getNickname())
-					.email(mentorDto.getEmail())
 					.introduction(mentorDto.getIntroduction())
 					.company(mentorDto.getCompany())
 					.build();

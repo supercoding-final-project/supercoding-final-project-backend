@@ -44,8 +44,6 @@ public class MentorRepositoryImpl implements MentorRepositoryCustom {
 				.selectDistinct(new QMentorDto_MentorInfoResponse(
 						mentor.mentorId,
 						mentor.name,
-						mentor.nickname,
-						mentor.email,
 						mentor.introduction,
 						mentor.company
 				))
@@ -67,8 +65,6 @@ public class MentorRepositoryImpl implements MentorRepositoryCustom {
 				.selectDistinct(new QMentorDto_MentorInfoResponse(
 						mentor.mentorId,
 						mentor.name,
-						mentor.nickname,
-						mentor.email,
 						mentor.introduction,
 						mentor.company
 				))
@@ -98,8 +94,6 @@ public class MentorRepositoryImpl implements MentorRepositoryCustom {
 				.selectDistinct(new QMentorDto_MentorInfoResponse(
 						mentor.mentorId,
 						mentor.name,
-						mentor.nickname,
-						mentor.email,
 						mentor.introduction,
 						mentor.company
 				))

@@ -1,9 +1,9 @@
 package com.github.supercodingfinalprojectbackend.controller;
 
 import com.github.supercodingfinalprojectbackend.dto.MentorDto.MentorInfoResponse;
-import com.github.supercodingfinalprojectbackend.dto.response.ResponseUtils;
-import com.github.supercodingfinalprojectbackend.dto.response.ResponseUtils.ApiResponse;
 import com.github.supercodingfinalprojectbackend.service.MentorService;
+import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
+import com.github.supercodingfinalprojectbackend.util.ResponseUtils.ApiResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
