@@ -18,10 +18,6 @@ public class Mentee extends CommonEntity {
     private Long menteeId;
 
     @OneToOne
-    @JoinColumn(name = "account_id")
-    private MenteeAbstractAccount abstractAccount;
-
-    @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
 }
