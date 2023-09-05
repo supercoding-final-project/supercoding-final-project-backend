@@ -12,6 +12,7 @@ public class Login {
     private String accessToken;
     private String refreshToken;
     private String roleName;
+    private Kakao.OauthToken kakaoToken;
 
     @Getter
     @ToString
