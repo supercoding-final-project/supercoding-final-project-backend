@@ -51,7 +51,7 @@ public class Oauth2Service {
     @Qualifier("AuthHolder")
     private final AuthHolder<String, Login> authHolder;
 
-    public ResponseEntity<ResponseUtils.ApiResponse<Login>> kakaoLogin(String code) {
+    public Login kakaoLogin(String code) {
         Kakao.OauthToken kakaoOauthToken = getKakaoToken(code);
         Kakao.UserInfo kakaoUserInfo = getKakaoUserInfo(kakaoOauthToken);
 
@@ -80,7 +80,7 @@ public class Oauth2Service {
                 .build();
         loginRecordRepository.save(loginRecord);
 
-        return ResponseUtils.ok("로그인에 성공했습니다.", login);
+        return login;
     }
 
     private MenteeSocialInfo signupMenteeWithKakao(Kakao.UserInfo kakaoUserInfo) {
