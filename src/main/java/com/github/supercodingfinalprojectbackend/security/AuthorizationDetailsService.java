@@ -17,11 +17,17 @@ import java.util.Set;
 public class AuthorizationDetailsService implements UserDetailsService {
 
     @Qualifier("AuthHolder")
-    private final AuthHolder<String, Login> authHolder;
+    private final AuthHolder<Long, Login> authHolder;
 
     @Override
     public AuthorizationDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-        Login login = authHolder.get(userId);
+        long userIdLong;
+        try {
+            userIdLong = Long.parseLong(userId);
+        } catch (NumberFormatException e) {
+            throw JwtErrorCode.UNRELIABLE_JWT.exception();
+        }
+        Login login = authHolder.get(userIdLong);
         if (login == null) throw JwtErrorCode.UNRELIABLE_JWT.exception();
         String accessToken = login.getAccessToken();
         Set<SimpleGrantedAuthority> authorities = Set.of(new SimpleGrantedAuthority(login.getRoleName()));
