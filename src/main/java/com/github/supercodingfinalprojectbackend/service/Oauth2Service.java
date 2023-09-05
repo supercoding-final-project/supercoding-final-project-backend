@@ -1,7 +1,6 @@
 package com.github.supercodingfinalprojectbackend.service;
 
-import com.github.supercodingfinalprojectbackend.dto.KakaoOauthToken;
-import com.github.supercodingfinalprojectbackend.dto.KakaoUserInfo;
+import com.github.supercodingfinalprojectbackend.dto.Kakao;
 import com.github.supercodingfinalprojectbackend.entity.Mentee;
 import com.github.supercodingfinalprojectbackend.entity.MenteeAbstractAccount;
 import com.github.supercodingfinalprojectbackend.entity.MenteeSocialInfo;
@@ -52,8 +51,8 @@ public class Oauth2Service {
     private final JwtProvider jwtProvider;
 
     public ResponseEntity<?> kakaoLogin(String code) {
-        KakaoOauthToken kakaoOauthToken = getKakaoToken(code);
-        KakaoUserInfo kakaoUserInfo = getKakaoUserInfo(kakaoOauthToken);
+        Kakao.OauthToken kakaoOauthToken = getKakaoToken(code);
+        Kakao.UserInfo kakaoUserInfo = getKakaoUserInfo(kakaoOauthToken);
 
         // 회원이 존재하지 않으면 회원 가입
         MenteeSocialInfo menteeSocialInfo = menteeSocialInfoRepository.findBySocialIdAndSocialPlatformAndIsDeletedIsFalse(kakaoUserInfo.getId(), SocialPlatformType.KAKAO)
@@ -75,7 +74,7 @@ public class Oauth2Service {
         return ResponseUtils.ok("성공적으로 로그인 됨", mentee);
     }
 
-    private MenteeSocialInfo signupMenteeWithKakao(KakaoUserInfo kakaoUserInfo) {
+    private MenteeSocialInfo signupMenteeWithKakao(Kakao.UserInfo kakaoUserInfo) {
         User newUser = User.builder()
                 .name(kakaoUserInfo.getKakaoAccount().getName())
                 .nickname(kakaoUserInfo.getKakaoAccount().getProfile().getNickName())
@@ -120,11 +119,11 @@ public class Oauth2Service {
         return AccountNumber ;
     }
 
-    public KakaoOauthToken getKakaoToken(String code) {
+    public Kakao.OauthToken getKakaoToken(String code) {
         RestTemplate restTemplate = new RestTemplate();
         RequestEntity<?> request = createKakaoTokenRequest(code);
-        ResponseEntity<KakaoOauthToken> response = restTemplate.exchange(request, KakaoOauthToken.class);
-        KakaoOauthToken kakaoOauthToken = Objects.requireNonNull(response.getBody());
+        ResponseEntity<Kakao.OauthToken> response = restTemplate.exchange(request, Kakao.OauthToken.class);
+        Kakao.OauthToken kakaoOauthToken = Objects.requireNonNull(response.getBody());
         System.out.println(kakaoOauthToken);
         return kakaoOauthToken;
     }
@@ -145,16 +144,16 @@ public class Oauth2Service {
         return RequestEntity.post(uri).headers(headers).body(body);
     }
 
-    public KakaoUserInfo getKakaoUserInfo(KakaoOauthToken kakaoOauthToken) {
+    public Kakao.UserInfo getKakaoUserInfo(Kakao.OauthToken kakaoOauthToken) {
         RestTemplate restTemplate = new RestTemplate();
         RequestEntity<?> request = createKakaoUserInfoRequest(kakaoOauthToken);
-        ResponseEntity<KakaoUserInfo> response = restTemplate.exchange(request, KakaoUserInfo.class);
-        KakaoUserInfo userInfo = Objects.requireNonNull(response.getBody());
+        ResponseEntity<Kakao.UserInfo> response = restTemplate.exchange(request, Kakao.UserInfo.class);
+        Kakao.UserInfo userInfo = Objects.requireNonNull(response.getBody());
         System.out.println(userInfo);
         return userInfo;
     }
 
-    private RequestEntity<Void> createKakaoUserInfoRequest(KakaoOauthToken kakaoOauthToken) {
+    private RequestEntity<Void> createKakaoUserInfoRequest(Kakao.OauthToken kakaoOauthToken) {
         System.out.println(kakaoUserInfoUri);
         URI uri = URI.create(kakaoUserInfoUri);
 
