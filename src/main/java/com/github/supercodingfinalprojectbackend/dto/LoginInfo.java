@@ -1,8 +1,12 @@
 package com.github.supercodingfinalprojectbackend.dto;
 
-import lombok.Getter;
+import lombok.*;
 
 @Getter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class LoginInfo {
     private String userId;
     private String accessToken;
