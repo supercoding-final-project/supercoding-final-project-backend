@@ -1,8 +1,10 @@
 package com.github.supercodingfinalprojectbackend.security;
 
+import com.github.supercodingfinalprojectbackend.dto.AuthHolder;
 import com.github.supercodingfinalprojectbackend.dto.LoginInfo;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.JwtErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,8 +17,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class AuthorizationDetailsService implements UserDetailsService {
 
-//    @Qualifier("AuthHolder")
-    private final ConcurrentHashMap<String, LoginInfo> authHolder;
+    @Qualifier("AuthHolder")
+    private final AuthHolder<String, LoginInfo> authHolder;
 
     @Override
     public AuthorizationDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
