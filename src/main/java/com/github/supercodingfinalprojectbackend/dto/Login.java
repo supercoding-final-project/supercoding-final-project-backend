@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class Login {
-    private String userId;
+    private Long userId;
     private String accessToken;
     private String refreshToken;
     private String roleName;
@@ -24,7 +24,7 @@ public class Login {
         private String roleName;
 
         public static Response from(Login login) {
-            Long userId = Long.parseLong(login.getUserId());
+            Long userId = login.getUserId();
             String accessToken = "Bearer " + login.getAccessToken();
             String refreshToken = "Bearer " + login.getRefreshToken();
             String roleName = login.getRoleName();
