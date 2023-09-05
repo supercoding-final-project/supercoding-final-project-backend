@@ -16,6 +16,9 @@ public class User extends CommonEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long userId;
+    @OneToOne
+    @JoinColumn(name = "abstract_account_id")
+    private UserAbstractAccount abstractAccount;
     @Column(name = "name")
     private String name;
     @Column(name = "nickname")
