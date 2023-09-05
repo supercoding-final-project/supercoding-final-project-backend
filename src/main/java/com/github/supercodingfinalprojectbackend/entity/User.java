@@ -9,8 +9,8 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "userId", callSuper = true)
-@Table(name = "mentees")
+@EqualsAndHashCode(of = "userId", callSuper = false)
+@Table(name = "users")
 public class User extends CommonEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
