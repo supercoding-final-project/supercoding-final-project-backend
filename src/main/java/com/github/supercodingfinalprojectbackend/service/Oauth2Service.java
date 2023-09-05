@@ -10,7 +10,6 @@ import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.KakaoErrorCode;
 import com.github.supercodingfinalprojectbackend.repository.*;
 import com.github.supercodingfinalprojectbackend.security.JwtProvider;
-import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,11 +41,11 @@ public class Oauth2Service {
     @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
     private String kakaoUserInfoUri;
 
-    private final MenteeAbstractAccountRepository menteeAbstractAccountRepository;
     private final MenteeRepository menteeRepository;
-    private final MenteeSocialInfoRepository menteeSocialInfoRepository;
     private final UserRepository userRepository;
     private final LoginRecordRepository loginRecordRepository;
+    private final UserSocialInfoRepository userSocialInfoRepository;
+    private final UserAbstractAccountRepository userAbstractAccountRepository;
     private final JwtProvider jwtProvider;
     @Qualifier("AuthHolder")
     private final AuthHolder<String, Login> authHolder;
@@ -56,71 +55,83 @@ public class Oauth2Service {
         Kakao.UserInfo kakaoUserInfo = getKakaoUserInfo(kakaoOauthToken);
 
         // 회원이 존재하지 않으면 회원 가입
-        MenteeSocialInfo menteeSocialInfo = menteeSocialInfoRepository.findBySocialIdAndSocialPlatformAndIsDeletedIsFalse(kakaoUserInfo.getId(), SocialPlatformType.KAKAO)
-                .orElseGet(()-> signupMenteeWithKakao(kakaoUserInfo));
+        Long kakaoId = kakaoUserInfo.getId();
+        UserSocialInfo userSocialInfo = userSocialInfoRepository.findBySocialIdAndSocialPlatformNameAndIsDeletedIsFalse(kakaoId, SocialPlatformType.KAKAO)
+                .orElseGet(()->signupWithKakao(kakaoUserInfo));
 
-        // 토큰을 만들어서 반환
-        String userId = menteeSocialInfo.getMentee().getUser().getUserId().toString();
-        Set<String> authorities = Set.of(UserRole.MENTEE);
+        // 이전 로그인 기록을 뒤져서 어떤 역할로 로그인할 것인지 선택
+        User user = userSocialInfo.getUser();
+        LoginRecord loginRecord = loginRecordRepository.findByUserAndIsDeletedIsFalseOrderByCreatedAtDesc(user).orElse(null);
+        String roleName = loginRecord == null ? UserRole.MENTEE : loginRecord.getRoleName();
+
+        // 토큰 생성
+        String userId = user.getUserId().toString();
+        Set<String> authorities = Set.of(roleName);
         TokenHolder tokenHolder = jwtProvider.createToken(userId, authorities);
 
         // 메모리에 로그인 정보 저장
         Login login = Login.builder()
                 .userId(userId)
-                .roleName(UserRole.MENTEE)
+                .roleName(roleName)
                 .accessToken(tokenHolder.getAccessToken())
                 .refreshToken(tokenHolder.getRefreshToken())
                 .build();
         authHolder.put(userId, login);
 
         // DB에 로그인 기록 저장
-        LoginRecord loginRecord = LoginRecord.builder()
-                .user(menteeSocialInfo.getMentee().getUser())
-                .roleName(UserRole.MENTEE)
+        LoginRecord newloginRecord = LoginRecord.builder()
+                .user(user)
+                .roleName(roleName)
                 .build();
-        loginRecordRepository.save(loginRecord);
+        loginRecordRepository.save(newloginRecord);
 
         return login;
     }
 
-    private MenteeSocialInfo signupMenteeWithKakao(Kakao.UserInfo kakaoUserInfo) {
-        String name = kakaoUserInfo.getKakaoAccount().getName();
-        String nickname = kakaoUserInfo.getKakaoAccount().getProfile().getNickName();
-        String thumbnailImageUrl = kakaoUserInfo.getKakaoAccount().getProfile().getThumbnailImageUrl();
+    private UserSocialInfo signupWithKakao(Kakao.UserInfo kakaoUserInfo) {
+        Kakao.Account account = kakaoUserInfo.getKakaoAccount();
+        Kakao.Profile profile = account.getProfile();
+        String name = account.getName();
+        String nickname = profile.getNickName();
+        String thumbnailImageUrl = profile.getThumbnailImageUrl();
+        Long socialId = kakaoUserInfo.getId();
+        String socialPlatformName = SocialPlatformType.KAKAO;
 
-        User user = createAndSaveUser(name, nickname, thumbnailImageUrl);
-        MenteeAbstractAccount menteeAbstractAccount = createAndSaveMenteeAbstractAccount();
-        Mentee mentee = createAndSaveMentee(user, menteeAbstractAccount);
-        return createAndSaveMenteeSocialInfo(mentee, kakaoUserInfo.getId(), SocialPlatformType.KAKAO);
+        UserAbstractAccount savedAbstractAccount = createAndSaveUserAbstractAccount();
+        User savedUser = createAndSaveUser(savedAbstractAccount, name, nickname, thumbnailImageUrl);
+        UserSocialInfo savedUserSocialInfo = createAndSaveUserSocialInfo(savedUser, socialId, socialPlatformName);
+        createAndSaveMentee(savedUser);
+
+        return savedUserSocialInfo;
     }
 
-    private MenteeSocialInfo createAndSaveMenteeSocialInfo(Mentee mentee, Long socialId, String socialPlatform) {
-        MenteeSocialInfo newMenteeSocialInfo = MenteeSocialInfo.builder()
-                .mentee(mentee)
-                .socialId(socialId)
-                .socialPlatform(socialPlatform)
+    private UserAbstractAccount createAndSaveUserAbstractAccount() {
+        UserAbstractAccount newAbstractAccount = UserAbstractAccount.builder()
+                .accountNumber(createAccountNumber())
+                .paymoney(0L)
                 .build();
-        return menteeSocialInfoRepository.save(newMenteeSocialInfo);
+        return userAbstractAccountRepository.save(newAbstractAccount);
     }
 
-    private Mentee createAndSaveMentee(User user, MenteeAbstractAccount menteeAbstractAccount) {
+    private UserSocialInfo createAndSaveUserSocialInfo(User user, Long socialId, String socialPlatformName) {
+        UserSocialInfo newUserSocialInfo = UserSocialInfo.builder()
+                .user(user)
+                .socialId(socialId)
+                .socialPlatformName(socialPlatformName)
+                .build();
+        return userSocialInfoRepository.save(newUserSocialInfo);
+    }
+
+    private Mentee createAndSaveMentee(User user) {
         Mentee newMentee = Mentee.builder()
-                .abstractAccount(menteeAbstractAccount)
                 .user(user)
                 .build();
         return menteeRepository.save(newMentee);
     }
 
-    private MenteeAbstractAccount createAndSaveMenteeAbstractAccount() {
-        MenteeAbstractAccount newMenteeAbstractAccount = MenteeAbstractAccount.builder()
-                .accountNumber(createAccountNumber())
-                .paymoney(0L)
-                .build();
-        return menteeAbstractAccountRepository.save(newMenteeAbstractAccount);
-    }
-
-    private User createAndSaveUser(String name, String nickname, String thumbnailImageUrl) {
+    private User createAndSaveUser(UserAbstractAccount abstractAccount, String name, String nickname, String thumbnailImageUrl) {
         User newUser = User.builder()
+                .abstractAccount(abstractAccount)
                 .name(name)
                 .nickname(nickname)
                 .thumbnailImageUrl(thumbnailImageUrl)
