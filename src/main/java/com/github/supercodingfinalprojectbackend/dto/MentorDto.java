@@ -28,9 +28,9 @@ public class MentorDto {
 //				.mentorAbstractAccountId(
 //						mentor.getMentorAbstractAccount().getMentorAbstractAccountId())
 				.name(mentor.getName())
-				.nickname(mentor.getNickname())
+				.nickname(mentor.getUser().getNickname())
 				.introduction(mentor.getIntroduction())
-				.email(mentor.getEmail())
+				.email(mentor.getUser().getEmail())
 				.company(mentor.getCompany())
 				.build();
 	}
