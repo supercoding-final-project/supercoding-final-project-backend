@@ -12,7 +12,7 @@ name: Java CI with Gradle
 # develop branch에 push가 발생할 경우 동작
 on:
   push:
-    branches: [ "feature/gitAction" ]
+    branches: [ "develop" ]
 
 permissions:
   contents: read
