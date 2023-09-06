@@ -4,7 +4,9 @@ import com.github.supercodingfinalprojectbackend.exception.ApiException;
 import org.springframework.http.HttpStatus;
 
 public enum UserErrorCode implements ErrorCode {
-    ALREADY_LOGGED_OUT(HttpStatus.OK, "이미 로그아웃 되었습니다.");
+    ALREADY_LOGGED_OUT(HttpStatus.OK, "이미 로그아웃 되었습니다."),
+    IS_NOT_LOGGED_IN_KAKAO(HttpStatus.BAD_REQUEST, "카카오로 로그인하지 않았습니다.")
+    ;
 
     UserErrorCode(HttpStatus status, String message) {
         this.message = message;
