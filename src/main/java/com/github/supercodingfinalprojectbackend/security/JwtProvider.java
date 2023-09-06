@@ -40,7 +40,6 @@ public class JwtProvider implements AuthenticationProvider {
 
         if (
                 !details.getPassword().equals(accessToken) ||
-                !details.getUsername().equals(userId) ||
                 details.getAuthorities().size() != authorities.size() ||
                 !details.getAuthorities().containsAll(authorities)
         ) {
