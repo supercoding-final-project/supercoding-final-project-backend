@@ -5,8 +5,6 @@ import com.github.supercodingfinalprojectbackend.dto.MenteeDto;
 import com.github.supercodingfinalprojectbackend.dto.MentorDto;
 import com.github.supercodingfinalprojectbackend.entity.Mentee;
 import com.github.supercodingfinalprojectbackend.entity.Mentor;
-import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
-import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.service.Oauth2Service;
 import com.github.supercodingfinalprojectbackend.util.AuthUtils;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
@@ -37,33 +35,16 @@ public class UserController {
         return ResponseUtils.noContent("로그아웃에 성공했습니다.", null);
     }
 
-    @GetMapping("/switch/{roleName}")
-    public ResponseEntity<?> switchUserRole(@PathVariable String roleName) {
-        UserRole userRole;
-        try {
-            userRole = UserRole.valueOf(roleName.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw ApiErrorCode.INVALID_PATH_VARIABLE.exception();
-        }
-
-        switch (userRole) {
-            case MENTEE:
-                return switchToMentee();
-            case MENTOR:
-                return switchToMentor();
-            default:
-                return ResponseUtils.internalServerError("이 응답은 절대 내려갈 일 없는 응답입니다.", null);
-        }
-    }
-
-    private ResponseEntity<ResponseUtils.ApiResponse<MenteeDto>> switchToMentee() {
+    @GetMapping("/switch/mentee")
+    public ResponseEntity<ResponseUtils.ApiResponse<MenteeDto>> switchToMentee() {
         Long userId = AuthUtils.getUserId();
         Mentee mentee = oauth2Service.switchToMentee(userId);
         MenteeDto response = MenteeDto.from(mentee);
         return ResponseUtils.ok("멘티로 성공적으로 전환했습니다.", response);
     }
 
-    private ResponseEntity<ResponseUtils.ApiResponse<MentorDto>> switchToMentor() {
+    @GetMapping("/switch/mentor")
+    public ResponseEntity<ResponseUtils.ApiResponse<MentorDto>> switchToMentor() {
         Long userId = AuthUtils.getUserId();
         Mentor mentor = oauth2Service.switchToMentor(userId);
         MentorDto response = MentorDto.fromEntity(mentor);
