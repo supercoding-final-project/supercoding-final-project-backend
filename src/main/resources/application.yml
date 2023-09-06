@@ -4,9 +4,9 @@ spring:
       client:
         registration:
           kakao:
-            client-id: ENC(kU/6R0xQEox+FwAjjzL10/Gja2dPW+vTGQah5S26x++rSz5xSj/kJcKmf5B1B/BS)
-            client-secret: ENC(PL5VbHaSX5T9vDYCmRenM0XV5dhuIrs15Uy0hmtgvTwvak9vxiUsGTHZcZfMA7o2)
-            redirect-uri: ENC(lWuE6xrYoD6q17alGxHhvdV4eDaMw6ELXsvwnBUUPWTNN/zOOCkZXjZBbEQ8gNRctU/QLWwfN/ns1v/naaFJWA==)
+            client-id: ENC(uNAxhIKqrBffW2Xci1t7Nt3e0W0OcifYfkwFsm3we7+6v5ucclxxO/EVpUo2obly)
+            client-secret: ENC(4ASqJYZAwcKLj2LqzvKmPSGEe65kzIpU1KQpENpZ6dpg6zuqRXekyvSRVPaUJXuZ)
+            redirect-uri: ENC(aKIB3/sc3AAnUG4Jcwdneh7Z03HpzgZnnP9tSLbSZkxFL2rAYIInZGdcve7FTEIUhyRLojBlpASopTN5C0RjAw==)
             authorization-grant-type: authorization_code
             scope:
               - profile_nickname
@@ -17,6 +17,7 @@ spring:
             authorization-uri: https://kauth.kakao.com/oauth/authorize
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
+            logout-uri: https://kapi.kakao.com/v1/user/logout
             user-name-attribute: id
   jpa:
     hibernate:
@@ -25,9 +26,9 @@ spring:
     show-sql: true
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    url: ${DB_URL}
+    username: ENC(yRSnBz0zcd4GAC57nGGumw==)
+    password: ENC(HnQMcsCKTN0dGXN29eMbhBWNED7S/qZs)
+    url: ENC(3lU7uGf55PMulSrpDKDWu25/rDuMnX9CqxXeuJakA7KMgG4aspIrnZG1ghab+J08WUV9kWbYTfzbV1WF9JkUSMOWrtyQeKm6NfECNAKT1sQSKOjAKtb3KMIT0HK+mWifdgNguLZFqj0E8JU9zHl5lRLfjw2asWRcxtHWSLPIXmnvKrClMM3a94b7OQ6djM8b)
   mvc:
     view:
       prefix: /WEB-INF/views/

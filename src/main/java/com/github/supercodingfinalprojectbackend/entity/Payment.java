@@ -32,10 +32,10 @@ public class Payment {
 	private OrderSheet orderSheet;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "mentee_abstract_account_id")
-	private MenteeAbstractAccount menteeAbstractAccount;
+	@JoinColumn(name = "seller_abstract_account_id")
+	private UserAbstractAccount sellerAbstractAccount;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "mentor_abstract_account_id")
-	private MentorAbstractAccount mentorAbstractAccount;
+	@JoinColumn(name = "consumer_abstract_account_id")
+	private UserAbstractAccount consumerAbstarctAccount;
 }

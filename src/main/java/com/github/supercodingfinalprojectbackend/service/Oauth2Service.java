@@ -1,21 +1,23 @@
 package com.github.supercodingfinalprojectbackend.service;
 
-import com.github.supercodingfinalprojectbackend.dto.KakaoOauthToken;
-import com.github.supercodingfinalprojectbackend.dto.KakaoUserInfo;
-import com.github.supercodingfinalprojectbackend.entity.Mentee;
-import com.github.supercodingfinalprojectbackend.entity.MenteeAbstractAccount;
-import com.github.supercodingfinalprojectbackend.entity.MenteeSocialInfo;
-import com.github.supercodingfinalprojectbackend.entity.User;
+import com.github.supercodingfinalprojectbackend.dto.AuthHolder;
+import com.github.supercodingfinalprojectbackend.dto.Kakao;
+import com.github.supercodingfinalprojectbackend.dto.Login;
+import com.github.supercodingfinalprojectbackend.dto.TokenHolder;
+import com.github.supercodingfinalprojectbackend.entity.*;
 import com.github.supercodingfinalprojectbackend.entity.type.SocialPlatformType;
-import com.github.supercodingfinalprojectbackend.repository.MenteeAbstractAccountRepository;
-import com.github.supercodingfinalprojectbackend.repository.MenteeRepository;
-import com.github.supercodingfinalprojectbackend.repository.MenteeSocialInfoRepository;
-import com.github.supercodingfinalprojectbackend.repository.UserRepository;
+import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
+import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
+import com.github.supercodingfinalprojectbackend.exception.errorcode.KakaoErrorCode;
+import com.github.supercodingfinalprojectbackend.exception.errorcode.UserErrorCode;
+import com.github.supercodingfinalprojectbackend.repository.*;
 import com.github.supercodingfinalprojectbackend.security.JwtProvider;
-import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -26,9 +28,7 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -44,63 +44,107 @@ public class Oauth2Service {
     private String kakaoRedirectUri;
     @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
     private String kakaoUserInfoUri;
+    @Value("${spring.security.oauth2.client.provider.kakao.logout-uri}")
+    private String kakaoLogoutUri;
 
-    private final MenteeAbstractAccountRepository menteeAbstractAccountRepository;
     private final MenteeRepository menteeRepository;
-    private final MenteeSocialInfoRepository menteeSocialInfoRepository;
     private final UserRepository userRepository;
+    private final LoginRecordRepository loginRecordRepository;
+    private final UserSocialInfoRepository userSocialInfoRepository;
+    private final UserAbstractAccountRepository userAbstractAccountRepository;
     private final JwtProvider jwtProvider;
+    @Qualifier("AuthHolder")
+    private final AuthHolder<Long, Login> authHolder;
 
-    public ResponseEntity<?> kakaoLogin(String code) {
-        KakaoOauthToken kakaoOauthToken = getKakaoToken(code);
-        KakaoUserInfo kakaoUserInfo = getKakaoUserInfo(kakaoOauthToken);
+    public Login kakaoLogin(String code) {
+        Kakao.OauthToken kakaoOauthToken = getKakaoToken(code);
+        Kakao.UserInfo kakaoUserInfo = getKakaoUserInfo(kakaoOauthToken);
 
         // 회원이 존재하지 않으면 회원 가입
-        MenteeSocialInfo menteeSocialInfo = menteeSocialInfoRepository.findBySocialIdAndSocialPlatformAndIsDeletedIsFalse(kakaoUserInfo.getId(), SocialPlatformType.KAKAO)
-                .orElseGet(()-> signupMenteeWithKakao(kakaoUserInfo));
+        Long kakaoId = kakaoUserInfo.getId();
+        UserSocialInfo userSocialInfo = userSocialInfoRepository.findBySocialIdAndSocialPlatformNameAndIsDeletedIsFalse(kakaoId, SocialPlatformType.KAKAO)
+                .orElseGet(()->signupWithKakao(kakaoUserInfo));
 
-        // TODO: 토큰을 만들어서 반환
+        // 이전 로그인 기록을 뒤져서 어떤 역할로 로그인할 것인지 선택
+        User user = userSocialInfo.getUser();
+        LoginRecord loginRecord = loginRecordRepository.findFirstByUserAndIsDeletedIsFalseOrderByCreatedAtDesc(user).orElse(null);
+        String roleName = loginRecord == null ? UserRole.MENTEE : loginRecord.getRoleName();
 
-        // 토큰에 들어갈 정보
-        // 1. 유저 아이디
-        // 2. 유저 역할
-        // 3.
+        // 토큰 생성
+        Long userId = user.getUserId();
+        String userIdString = userId.toString();
+        Set<String> authorities = Set.of(roleName);
+        TokenHolder tokenHolder = jwtProvider.createToken(userIdString, authorities);
 
-        // 1. 액세스 토큰 생성
-        //      1-1. 유저 아이디, 액세스 토큰, 유저 역할
-        // 2. 리프레쉬 토큰 생성
-        //      2-1. 유저 아이디, 엑세스 토큰, 유저 역할
+        // 메모리에 로그인 정보 저장
+        Login login = Login.builder()
+                .userId(userId)
+                .roleName(roleName)
+                .accessToken(tokenHolder.getAccessToken())
+                .refreshToken(tokenHolder.getRefreshToken())
+                .kakaoToken(kakaoOauthToken)
+                .build();
+        authHolder.put(userId, login);
 
-        Mentee mentee = menteeSocialInfo.getMentee();
-        return ResponseUtils.ok("성공적으로 로그인 됨", mentee);
+        // DB에 로그인 기록 저장
+        LoginRecord newloginRecord = LoginRecord.builder()
+                .user(user)
+                .roleName(roleName)
+                .build();
+        loginRecordRepository.save(newloginRecord);
+
+        return login;
     }
 
-    private MenteeSocialInfo signupMenteeWithKakao(KakaoUserInfo kakaoUserInfo) {
-        User newUser = User.builder()
-                .name(kakaoUserInfo.getKakaoAccount().getName())
-                .nickname(kakaoUserInfo.getKakaoAccount().getProfile().getNickName())
-                .thumbnailImageUrl(kakaoUserInfo.getKakaoAccount().getProfile().getThumbnailImageUrl())
-                .build();
-        User savedUser = userRepository.save(newUser);
+    private UserSocialInfo signupWithKakao(Kakao.UserInfo kakaoUserInfo) {
+        Kakao.Account account = kakaoUserInfo.getKakaoAccount();
+        Kakao.Profile profile = account.getProfile();
+        String name = account.getName();
+        String nickname = profile.getNickName();
+        String thumbnailImageUrl = profile.getThumbnailImageUrl();
+        Long socialId = kakaoUserInfo.getId();
+        String socialPlatformName = SocialPlatformType.KAKAO;
 
-        MenteeAbstractAccount newMenteeAbstractAccount = MenteeAbstractAccount.builder()
+        UserAbstractAccount savedAbstractAccount = createAndSaveUserAbstractAccount();
+        User savedUser = createAndSaveUser(savedAbstractAccount, name, nickname, thumbnailImageUrl);
+        UserSocialInfo savedUserSocialInfo = createAndSaveUserSocialInfo(savedUser, socialId, socialPlatformName);
+        createAndSaveMentee(savedUser);
+
+        return savedUserSocialInfo;
+    }
+
+    private UserAbstractAccount createAndSaveUserAbstractAccount() {
+        UserAbstractAccount newAbstractAccount = UserAbstractAccount.builder()
                 .accountNumber(createAccountNumber())
                 .paymoney(0L)
                 .build();
-        MenteeAbstractAccount savedMenteeAbstractAccount = menteeAbstractAccountRepository.save(newMenteeAbstractAccount);
+        return userAbstractAccountRepository.save(newAbstractAccount);
+    }
 
+    private UserSocialInfo createAndSaveUserSocialInfo(User user, Long socialId, String socialPlatformName) {
+        UserSocialInfo newUserSocialInfo = UserSocialInfo.builder()
+                .user(user)
+                .socialId(socialId)
+                .socialPlatformName(socialPlatformName)
+                .build();
+        return userSocialInfoRepository.save(newUserSocialInfo);
+    }
+
+    private Mentee createAndSaveMentee(User user) {
         Mentee newMentee = Mentee.builder()
-                .abstractAccount(savedMenteeAbstractAccount)
-                .user(savedUser)
+                .user(user)
                 .build();
-        Mentee savedMentee = menteeRepository.save(newMentee);
+        return menteeRepository.save(newMentee);
+    }
 
-        MenteeSocialInfo newMenteeSocialInfo = MenteeSocialInfo.builder()
-                .mentee(savedMentee)
-                .socialId(kakaoUserInfo.getId())
-                .socialPlatform(SocialPlatformType.KAKAO)
+    private User createAndSaveUser(UserAbstractAccount abstractAccount, String name, String nickname, String thumbnailImageUrl) {
+        User newUser = User.builder()
+                .abstractAccount(abstractAccount)
+                .name(name)
+                .nickname(nickname)
+                .thumbnailImageUrl(thumbnailImageUrl)
                 .build();
-        return menteeSocialInfoRepository.save(newMenteeSocialInfo);
+        return userRepository.save(newUser);
     }
 
     private String createAccountNumber() {
@@ -115,17 +159,15 @@ public class Oauth2Service {
         String num2 = String.format("%08x", time);
         String num3 = Integer.toHexString(random.nextInt(max - min + 1) + min);
         String num4 = Integer.toHexString(random.nextInt(max - min + 1) + min);
-        String AccountNumber = num1 + "-" + num2 + "-" + num3 + "-" + num4;
-        System.out.println(AccountNumber);
-        return AccountNumber ;
+        return num1 + "-" + num2 + "-" + num3 + "-" + num4;
     }
 
-    public KakaoOauthToken getKakaoToken(String code) {
+    public Kakao.OauthToken getKakaoToken(String code) {
         RestTemplate restTemplate = new RestTemplate();
         RequestEntity<?> request = createKakaoTokenRequest(code);
-        ResponseEntity<KakaoOauthToken> response = restTemplate.exchange(request, KakaoOauthToken.class);
-        KakaoOauthToken kakaoOauthToken = Objects.requireNonNull(response.getBody());
-        System.out.println(kakaoOauthToken);
+        ResponseEntity<Kakao.OauthToken> response = restTemplate.exchange(request, Kakao.OauthToken.class);
+        Kakao.OauthToken kakaoOauthToken = response.getBody();
+        if (kakaoOauthToken == null) throw KakaoErrorCode.FAIL_TO_RECEIVE_TOKEN.exception();
         return kakaoOauthToken;
     }
 
@@ -145,17 +187,18 @@ public class Oauth2Service {
         return RequestEntity.post(uri).headers(headers).body(body);
     }
 
-    public KakaoUserInfo getKakaoUserInfo(KakaoOauthToken kakaoOauthToken) {
-        RestTemplate restTemplate = new RestTemplate();
+    public Kakao.UserInfo getKakaoUserInfo(Kakao.OauthToken kakaoOauthToken) {
         RequestEntity<?> request = createKakaoUserInfoRequest(kakaoOauthToken);
-        ResponseEntity<KakaoUserInfo> response = restTemplate.exchange(request, KakaoUserInfo.class);
-        KakaoUserInfo userInfo = Objects.requireNonNull(response.getBody());
-        System.out.println(userInfo);
-        return userInfo;
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<Kakao.UserInfo> response = restTemplate.exchange(request, Kakao.UserInfo.class);
+
+        Kakao.UserInfo kakaoUserInfo = response.getBody();
+        if (kakaoUserInfo == null) throw KakaoErrorCode.NOT_FOUND_USER_INFO.exception();
+        return kakaoUserInfo;
     }
 
-    private RequestEntity<Void> createKakaoUserInfoRequest(KakaoOauthToken kakaoOauthToken) {
-        System.out.println(kakaoUserInfoUri);
+    private RequestEntity<Void> createKakaoUserInfoRequest(Kakao.OauthToken kakaoOauthToken) {
         URI uri = URI.create(kakaoUserInfoUri);
 
         String accessToken = kakaoOauthToken.getAccessToken();
@@ -165,5 +208,32 @@ public class Oauth2Service {
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
         return RequestEntity.get(uri).headers(headers).build();
+    }
+
+    public void kakaoLogout() {
+        Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) throw ApiErrorCode.NOT_AUTHENTICATED.exception();
+
+        Long userId = Long.valueOf((String) auth.getPrincipal());
+        Login login = authHolder.get(userId);
+        if (login == null) throw UserErrorCode.ALREADY_LOGGED_OUT.exception();
+
+        URI uri = URI.create(kakaoLogoutUri);
+        String kakaoAccessToken = login.getKakaoToken().getAccessToken();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/x-www-form-urlencoded");
+        headers.add("Authorization", "Bearer " + kakaoAccessToken);
+        RequestEntity<?> request = RequestEntity.get(uri).headers(headers).build();
+
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.exchange(request, Object.class);
+    }
+
+    public void serviceLogout() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) throw ApiErrorCode.NOT_AUTHENTICATED.exception();
+
+        Long userId = Long.valueOf((String) auth.getPrincipal());
+        authHolder.remove(userId);
     }
 }

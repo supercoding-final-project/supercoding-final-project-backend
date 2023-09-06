@@ -1,5 +1,6 @@
 package com.github.supercodingfinalprojectbackend.security;
 
+import com.github.supercodingfinalprojectbackend.dto.TokenHolder;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.JwtErrorCode;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
@@ -29,9 +31,20 @@ public class JwtProvider implements AuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String userId = (String) authentication.getPrincipal();
         String accessToken = (String) authentication.getCredentials();
+        Set<SimpleGrantedAuthority> authorities = new HashSet<>();
+        for (GrantedAuthority authority : authentication.getAuthorities()) {
+            authorities.add(new SimpleGrantedAuthority(authority.getAuthority()));
+        }
+
         AuthorizationDetails details = authorizationDetailsService.loadUserByUsername(userId);
 
-        if (!details.getPassword().equals(accessToken)) throw new AuthenticationException("JWT 토큰 인증에 실패했습니다.") {
+        if (
+                !details.getPassword().equals(accessToken) ||
+                !details.getUsername().equals(userId) ||
+                details.getAuthorities().size() != authorities.size() ||
+                !details.getAuthorities().containsAll(authorities)
+        ) {
+            throw JwtErrorCode.UNRELIABLE_JWT.exception();
         };
 
         return new UsernamePasswordAuthenticationToken(details.getUsername(), details.getPassword(), details.getAuthorities());
@@ -76,29 +89,26 @@ public class JwtProvider implements AuthenticationProvider {
         return new UsernamePasswordAuthenticationToken(userId, accessToken, grantedAuthorities);
     }
 
-    public Map<String, String> createToken(String subject, Set<String> authorities) {
+    public TokenHolder createToken(String userId, Set<String> authorities) {
         Date now = new Date();
         final long oneHour = 3_600_000L;
         final long oneMonth = oneHour * 24 * 30;
-        String jwt = Jwts.builder()
-                .setSubject(subject)
+        String accessToken = Jwts.builder()
+                .setSubject(userId)
                 .claim("authorities", authorities)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + oneHour))
                 .signWith(secretKey)
                 .compact();
-        String refresh = Jwts.builder()
-                .setSubject(subject)
-                .claim("access_token", jwt)
+        String refreshToken = Jwts.builder()
+                .setSubject(userId)
+                .claim("access_token", accessToken)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + oneMonth))
                 .signWith(secretKey)
                 .compact();
 
-        HashMap<String, String> map = new HashMap<>();
-        map.put("access_token", jwt);
-        map.put("refresh_token", refresh);
-        return map;
+        return new TokenHolder().putAccessToken(accessToken).putRefreshToken(refreshToken);
     }
 
     public String parseJwt(HttpServletRequest request) {

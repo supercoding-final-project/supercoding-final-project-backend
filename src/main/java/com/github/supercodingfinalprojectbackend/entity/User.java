@@ -9,13 +9,16 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "userId", callSuper = true)
-@Table(name = "mentees")
+@EqualsAndHashCode(of = "userId", callSuper = false)
+@Table(name = "users")
 public class User extends CommonEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long userId;
+    @OneToOne
+    @JoinColumn(name = "abstract_account_id")
+    private UserAbstractAccount abstractAccount;
     @Column(name = "name")
     private String name;
     @Column(name = "nickname")

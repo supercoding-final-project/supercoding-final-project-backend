@@ -21,10 +21,6 @@ public class Mentor extends CommonEntity {
 	@Column(name = "mentor_id", nullable = false)
 	private Long mentorId;
 
-	@OneToOne
-	@JoinColumn(name = "mentor_abstract_account_id")
-	private MentorAbstractAccount mentorAbstractAccount;
-
 	@OneToMany(mappedBy = "mentor")
 	private List<MentorSkillStack> mentorSkillStacks = new ArrayList<>();
 

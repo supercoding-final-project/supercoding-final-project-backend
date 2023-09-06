@@ -3,13 +3,12 @@ package com.github.supercodingfinalprojectbackend.exception.errorcode;
 import com.github.supercodingfinalprojectbackend.exception.ApiException;
 import org.springframework.http.HttpStatus;
 
-public enum ApiErrorCode implements ErrorCode {
-    FAIL_TO_SAVE(HttpStatus.INTERNAL_SERVER_ERROR, "서버 측의 문제로 데이터 저장에 실패했습니다."),
-    INVALID_PATH_VARIABLE(HttpStatus.BAD_REQUEST, "path variable이 잘못되었습니다."),
-    NOT_AUTHENTICATED(HttpStatus.UNAUTHORIZED, "인증이 필요합니다.")
+public enum KakaoErrorCode implements ErrorCode {
+    NOT_FOUND_USER_INFO(HttpStatus.UNAUTHORIZED, "유저 정보를 찾지 못했습니다."),
+    FAIL_TO_RECEIVE_TOKEN(HttpStatus.UNAUTHORIZED, "카카오 인증에 실패했습니다.")
     ;
 
-    ApiErrorCode(HttpStatus status, String message) {
+    KakaoErrorCode(HttpStatus status, String message) {
         this.message = message;
         this.status = status.value();
     }

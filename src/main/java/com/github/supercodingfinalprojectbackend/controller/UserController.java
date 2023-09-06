@@ -1,6 +1,8 @@
 package com.github.supercodingfinalprojectbackend.controller;
 
+import com.github.supercodingfinalprojectbackend.dto.Login;
 import com.github.supercodingfinalprojectbackend.service.Oauth2Service;
+import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -17,8 +19,17 @@ public class UserController {
     private final Oauth2Service oauth2Service;
 
     @GetMapping("/oauth2/kakao/login")
-    public ResponseEntity<?> kakaoLogin(@RequestParam(name = "code") String code){
-        System.out.println(code);
-        return oauth2Service.kakaoLogin(code);
+    public ResponseEntity<ResponseUtils.ApiResponse<Login.Response>> kakaoLogin(@RequestParam(name = "code") String code){
+        Login login = oauth2Service.kakaoLogin(code);
+        Login.Response response = Login.Response.from(login);
+        return ResponseUtils.ok("로그인에 성공했습니다.", response);
+    }
+
+    @GetMapping("/oauth2/kakao/logout")
+    public ResponseEntity<ResponseUtils.ApiResponse<Void>> kakaoLogout() {
+        oauth2Service.kakaoLogout();
+        oauth2Service.serviceLogout();
+
+        return ResponseUtils.ok("로그아웃에 성공했습니다.", null);
     }
 }
