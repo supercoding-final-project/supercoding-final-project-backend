@@ -27,7 +27,7 @@ public class MentorDto {
 //				Test 때 mentor 계좌가 없이 테스트 하느라 임시 주석
 //				.mentorAbstractAccountId(
 //						mentor.getMentorAbstractAccount().getMentorAbstractAccountId())
-				.name(mentor.getName())
+				.name(mentor.getUser().getName())
 				.nickname(mentor.getUser().getNickname())
 				.introduction(mentor.getIntroduction())
 				.email(mentor.getUser().getEmail())
@@ -58,6 +58,10 @@ public class MentorDto {
 					.company(mentorDto.getCompany())
 					.build();
 		}
+	}
+
+	public static class JoinRequest {
+
 	}
 
 }
