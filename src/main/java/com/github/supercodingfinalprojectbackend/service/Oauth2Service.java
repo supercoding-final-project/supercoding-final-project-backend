@@ -65,6 +65,10 @@ public class Oauth2Service {
         UserSocialInfo userSocialInfo = userSocialInfoRepository.findBySocialIdAndSocialPlatformNameAndIsDeletedIsFalse(kakaoId, SocialPlatformType.KAKAO)
                 .orElseGet(()->signupWithKakao(kakaoUserInfo));
 
+        return serviceLogin(userSocialInfo, kakaoOauthToken.getAccessToken(), SocialPlatformType.KAKAO);
+    }
+
+    public Login serviceLogin(UserSocialInfo userSocialInfo, String socialPlatformName, String socialAccessToken) {
         // 이전 로그인 기록을 뒤져서 어떤 역할로 로그인할 것인지 선택
         User user = userSocialInfo.getUser();
         LoginRecord loginRecord = loginRecordRepository.findFirstByUserAndIsDeletedIsFalseOrderByCreatedAtDesc(user).orElse(null);
@@ -82,7 +86,8 @@ public class Oauth2Service {
                 .roleName(roleName)
                 .accessToken(tokenHolder.getAccessToken())
                 .refreshToken(tokenHolder.getRefreshToken())
-                .kakaoToken(kakaoOauthToken)
+                .socialPlatformName(socialPlatformName)
+                .socialAccessToken(socialAccessToken)
                 .build();
         authHolder.put(userId, login);
 
@@ -219,7 +224,9 @@ public class Oauth2Service {
         if (login == null) throw UserErrorCode.ALREADY_LOGGED_OUT.exception();
 
         URI uri = URI.create(kakaoLogoutUri);
-        String kakaoAccessToken = login.getKakaoToken().getAccessToken();
+        String kakaoAccessToken = login.getKakaoToken();
+        if (kakaoAccessToken == null) throw UserErrorCode.IS_NOT_LOGGED_IN_KAKAO.exception();
+
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/x-www-form-urlencoded");
         headers.add("Authorization", "Bearer " + kakaoAccessToken);
