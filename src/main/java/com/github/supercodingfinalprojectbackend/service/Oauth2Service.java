@@ -52,6 +52,7 @@ public class Oauth2Service {
     private final LoginRecordRepository loginRecordRepository;
     private final UserSocialInfoRepository userSocialInfoRepository;
     private final UserAbstractAccountRepository userAbstractAccountRepository;
+    private final MentorRepository mentorRepository;
     private final JwtProvider jwtProvider;
     @Qualifier("AuthHolder")
     private final AuthHolder<Long, Login> authHolder;
@@ -72,7 +73,7 @@ public class Oauth2Service {
         // 이전 로그인 기록을 뒤져서 어떤 역할로 로그인할 것인지 선택
         User user = userSocialInfo.getUser();
         LoginRecord loginRecord = loginRecordRepository.findFirstByUserAndIsDeletedIsFalseOrderByCreatedAtDesc(user).orElse(null);
-        String roleName = loginRecord == null ? UserRole.MENTEE : loginRecord.getRoleName();
+        String roleName = loginRecord == null ? UserRole.MENTEE.name() : loginRecord.getRoleName();
 
         // 토큰 생성
         Long userId = user.getUserId();
@@ -242,5 +243,37 @@ public class Oauth2Service {
 
         Long userId = Long.valueOf((String) auth.getPrincipal());
         authHolder.remove(userId);
+    }
+
+    public void joinMentor(Long userId) {
+        // todo: 멘토 등록이 안 되어 있으면 멘토 생성
+
+
+        // todo: 멘토 정보 반환
+    }
+
+    public Mentor switchToMentor(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(UserErrorCode.NOT_FOUND_USER::exception);
+        Mentor mentor = mentorRepository.findByUserAndIsDeletedIsFalse(user).orElseThrow(UserErrorCode.NOT_FOUND_MENTOR::exception);
+
+        Login existsLogin = authHolder.get(userId);
+        String roleName = UserRole.MENTOR.name();
+        Login newLogin = Login.builder()
+                .userId(existsLogin.getUserId())
+                .accessToken(existsLogin.getAccessToken())
+                .refreshToken(existsLogin.getRefreshToken())
+                .roleName(roleName)
+                .socialAccessToken(existsLogin.getSocialAccessToken())
+                .socialPlatformName(existsLogin.getSocialPlatformName())
+                .build();
+        authHolder.put(userId, newLogin);
+
+        LoginRecord newloginRecord = LoginRecord.builder()
+                .user(user)
+                .roleName(roleName)
+                .build();
+        loginRecordRepository.save(newloginRecord);
+
+        return mentor;
     }
 }
