@@ -257,7 +257,28 @@ public class Oauth2Service {
         Mentor mentor = mentorRepository.findByUserAndIsDeletedIsFalse(user).orElseThrow(UserErrorCode.NOT_FOUND_MENTOR::exception);
 
         Login existsLogin = authHolder.get(userId);
-        String roleName = UserRole.MENTOR.name();
+        if (!existsLogin.getRoleName().equals(UserRole.MENTOR.name())) {
+            String roleName = UserRole.MENTOR.name();
+            switchLogin(user, existsLogin, roleName);
+        }
+
+        return mentor;
+    }
+
+    public Mentee switchToMentee(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(UserErrorCode.NOT_FOUND_USER::exception);
+        Mentee mentee = menteeRepository.findByUser(user).orElseThrow(UserErrorCode.NOT_FOUND_MENTEE::exception);
+
+        Login existsLogin = authHolder.get(userId);
+        if (!existsLogin.getRoleName().equals(UserRole.MENTEE.name())) {
+            String roleName = UserRole.MENTOR.name();
+            switchLogin(user, existsLogin, roleName);
+        }
+
+        return mentee;
+    }
+
+    private void switchLogin(User user, Login existsLogin, String roleName) {
         Login newLogin = Login.builder()
                 .userId(existsLogin.getUserId())
                 .accessToken(existsLogin.getAccessToken())
@@ -266,14 +287,12 @@ public class Oauth2Service {
                 .socialAccessToken(existsLogin.getSocialAccessToken())
                 .socialPlatformName(existsLogin.getSocialPlatformName())
                 .build();
-        authHolder.put(userId, newLogin);
+        authHolder.put(user.getUserId(), newLogin);
 
         LoginRecord newloginRecord = LoginRecord.builder()
                 .user(user)
                 .roleName(roleName)
                 .build();
         loginRecordRepository.save(newloginRecord);
-
-        return mentor;
     }
 }
