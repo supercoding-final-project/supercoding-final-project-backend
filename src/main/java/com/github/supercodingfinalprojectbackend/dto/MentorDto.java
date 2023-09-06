@@ -17,6 +17,7 @@ public class MentorDto {
 	private String name;
 	private String nickname;
 	private String email;
+	private String thumbnailImageUrl;
 	private String introduction;
 	private String company;
 	private Boolean searchable;
@@ -32,6 +33,7 @@ public class MentorDto {
 				.introduction(mentor.getIntroduction())
 				.email(mentor.getUser().getEmail())
 				.company(mentor.getCompany())
+				.thumbnailImageUrl(mentor.getUser().getThumbnailImageUrl())
 				.build();
 	}
 
@@ -45,6 +47,7 @@ public class MentorDto {
 		private String name;
 		private String nickname;
 		private String email;
+		private String thumbnailImageUrl;
 		private String introduction;
 		private String company;
 
@@ -56,12 +59,8 @@ public class MentorDto {
 					.email(mentorDto.getEmail())
 					.introduction(mentorDto.getIntroduction())
 					.company(mentorDto.getCompany())
+					.thumbnailImageUrl(mentorDto.getThumbnailImageUrl())
 					.build();
 		}
 	}
-
-	public static class JoinRequest {
-
-	}
-
 }
