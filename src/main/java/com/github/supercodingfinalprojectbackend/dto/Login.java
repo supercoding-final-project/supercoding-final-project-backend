@@ -31,10 +31,10 @@ public class Login {
         private String roleName;
 
         public static Response from(Login login) {
-            Long userId = login.getUserId();
-            String accessToken = "Bearer " + login.getAccessToken();
-            String refreshToken = "Bearer " + login.getRefreshToken();
-            String roleName = login.getRoleName();
+            Long userId = login.userId;
+            String accessToken = "Bearer " + login.accessToken;
+            String refreshToken = "Bearer " + login.refreshToken;
+            String roleName = login.roleName;
             return new Response(userId, accessToken, refreshToken, roleName);
         }
     }
