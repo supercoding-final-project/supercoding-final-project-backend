@@ -30,6 +30,6 @@ public class UserController {
         oauth2Service.kakaoLogout();
         oauth2Service.serviceLogout();
 
-        return ResponseUtils.ok("로그아웃에 성공했습니다.", null);
+        return ResponseUtils.noContent("로그아웃에 성공했습니다.", null);
     }
 }
