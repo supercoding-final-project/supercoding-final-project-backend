@@ -39,6 +39,7 @@ public class MentorRepositoryImpl implements MentorRepositoryCustom {
 	}
 
 	private BooleanExpression mentorNameLike(String keyWord){
-		return keyWord != null ? mentor.name.like("%" + keyWord + "%") : null;
+//		return keyWord != null ? mentor.name.like("%" + keyWord + "%") : null;
+		return null;   // 주원님 여기 임시로 넣어놨습니다!
 	}
 }
