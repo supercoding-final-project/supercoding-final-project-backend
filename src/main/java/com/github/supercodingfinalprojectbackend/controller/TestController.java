@@ -47,4 +47,9 @@ public class TestController {
 
         return response6;
     }
+
+    @GetMapping("/ga")
+    public String gaTest() {
+        return "gitAction 성공";
+    }
 }
