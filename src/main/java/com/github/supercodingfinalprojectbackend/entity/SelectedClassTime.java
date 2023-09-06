@@ -9,7 +9,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "id", callSuper = false)
+@EqualsAndHashCode(of = "selectedId", callSuper = false)
 @Table(name = "selected_class_times")
 public class SelectedClassTime extends CommonEntity {
     @Id

@@ -23,4 +23,7 @@ public class SkillStack {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "skill_stack_id", nullable = false)
 	private Long skillStackId;
+
+	@Column(name = "skill_stack_name")
+	private String skillStackName;
 }

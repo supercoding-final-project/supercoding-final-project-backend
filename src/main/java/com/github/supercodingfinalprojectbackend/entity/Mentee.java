@@ -9,7 +9,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "id", callSuper = false)
+@EqualsAndHashCode(of = "menteeId", callSuper = false)
 @Table(name = "mentees")
 public class Mentee extends CommonEntity {
     @Id
@@ -18,12 +18,6 @@ public class Mentee extends CommonEntity {
     private Long menteeId;
 
     @OneToOne
-    @JoinColumn(name = "account_id")
-    private MenteeAbstractAccount abstractAccount;
-
-    @Column(name = "name")
-    private String name;
-
-    @Column(name = "nickname")
-    private String nickname;
+    @JoinColumn(name = "user_id")
+    private User user;
 }

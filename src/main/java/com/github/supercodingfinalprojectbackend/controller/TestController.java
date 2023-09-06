@@ -1,7 +1,7 @@
 package com.github.supercodingfinalprojectbackend.controller;
 
 import com.github.supercodingfinalprojectbackend.dto.response.PageResponse;
-import com.github.supercodingfinalprojectbackend.dto.response.ResponseUtils;
+import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
