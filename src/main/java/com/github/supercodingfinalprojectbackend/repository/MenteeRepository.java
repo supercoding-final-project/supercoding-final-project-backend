@@ -10,5 +10,5 @@ import java.util.Optional;
 @Repository
 public interface MenteeRepository extends JpaRepository<Mentee, Long> {
 
-    Optional<Mentee> findByUser(User user);
+    Optional<Mentee> findByUserAndIsDeletedIsFalse(User user);
 }
