@@ -28,9 +28,6 @@ public class Mentor extends CommonEntity {
 	@JoinColumn(name = "user_id")
 	private User user;
 
-	@Column(name = "name")
-	private String name;
-
 	@Column(name = "introduction")
 	private String introduction;
 
