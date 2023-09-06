@@ -49,9 +49,13 @@ jobs:
       - name: Make Directory for deliver
         run: mkdir deploy
 
-          # Jar 파일 Copy
+        # Jar 파일 Copy
       - name: Copy Jar
         run: cp ./build/libs/*.jar ./deploy/
+
+        # appspec.yml Copy
+      - name: Copy appspec
+        run: cp appspec.yml ./deploy/
 
          # 압축파일 형태로 전달
       - name: Make zip file
@@ -67,3 +71,16 @@ jobs:
           --region ap-northeast-2 \
           --acl private \
           ./codevelop.zip s3://codevelop/
+
+        # Deploy
+      - name: Deploy
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws deploy create-deployment \
+          --application-name codevelop \
+          --deployment-group-name codevelop_deploy_group \
+          --file-exists-behavior OVERWRITE \
+          --s3-location bucket=codevelop,bundleType=zip,key=codevelop.zip \
+          --region ap-northeast-2
