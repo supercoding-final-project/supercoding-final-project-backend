@@ -1,6 +1,7 @@
 package com.github.supercodingfinalprojectbackend.dto;
 
 import com.github.supercodingfinalprojectbackend.entity.type.SocialPlatformType;
+import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
 import lombok.*;
 
 @Getter
@@ -12,12 +13,12 @@ public class Login {
     private Long userId;
     private String accessToken;
     private String refreshToken;
-    private String roleName;
-    private String socialPlatformName;
+    private UserRole userRole;
+    private SocialPlatformType socialPlatformType;
     private String socialAccessToken;
 
     public String getKakaoToken() {
-        return socialPlatformName.equals(SocialPlatformType.KAKAO) ? socialAccessToken : null;
+        return socialPlatformType.equals(SocialPlatformType.KAKAO) ? socialAccessToken : null;
     }
 
     @Getter
@@ -34,7 +35,7 @@ public class Login {
             Long userId = login.userId;
             String accessToken = "Bearer " + login.accessToken;
             String refreshToken = "Bearer " + login.refreshToken;
-            String roleName = login.roleName;
+            String roleName = login.userRole.name();
             return new Response(userId, accessToken, refreshToken, roleName);
         }
     }
