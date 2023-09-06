@@ -36,18 +36,18 @@ public class UserController {
     }
 
     @GetMapping("/switch/mentee")
-    public ResponseEntity<ResponseUtils.ApiResponse<MenteeDto>> switchToMentee() {
+    public ResponseEntity<ResponseUtils.ApiResponse<Login.Response>> switchToMentee() {
         Long userId = AuthUtils.getUserId();
-        Mentee mentee = oauth2Service.switchToMentee(userId);
-        MenteeDto response = MenteeDto.from(mentee);
+        Login login = oauth2Service.switchToMentee(userId);
+        Login.Response response = Login.Response.from(login);
         return ResponseUtils.ok("멘티로 성공적으로 전환했습니다.", response);
     }
 
     @GetMapping("/switch/mentor")
-    public ResponseEntity<ResponseUtils.ApiResponse<MentorDto>> switchToMentor() {
+    public ResponseEntity<ResponseUtils.ApiResponse<Login.Response>> switchToMentor() {
         Long userId = AuthUtils.getUserId();
-        Mentor mentor = oauth2Service.switchToMentor(userId);
-        MentorDto response = MentorDto.fromEntity(mentor);
+        Login login = oauth2Service.switchToMentor(userId);
+        Login.Response response = Login.Response.from(login);
         return ResponseUtils.ok("멘토로 성공적으로 전환했습니다.", response);
     }
 }
