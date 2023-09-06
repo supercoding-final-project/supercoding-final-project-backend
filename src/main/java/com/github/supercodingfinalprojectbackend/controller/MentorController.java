@@ -2,11 +2,11 @@ package com.github.supercodingfinalprojectbackend.controller;
 
 import com.github.supercodingfinalprojectbackend.dto.MentorDto;
 import com.github.supercodingfinalprojectbackend.dto.MentorDto.MentorInfoResponse;
-import com.github.supercodingfinalprojectbackend.dto.response.ResponseUtils;
-import com.github.supercodingfinalprojectbackend.dto.response.ResponseUtils.ApiResponse;
 import com.github.supercodingfinalprojectbackend.service.MentorService;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,7 @@ public class MentorController {
 	private final MentorService mentorService;
 
 	@GetMapping
-	public ResponseEntity<ApiResponse<List<MentorInfoResponse>>> getMentors(
+	public ResponseEntity<ResponseUtils.ApiResponse<List<MentorInfoResponse>>> getMentors(
 			@RequestParam String keyWord,
 			@RequestParam List<String> skillStack,
 			@RequestParam(defaultValue = "0") Long cursor,
