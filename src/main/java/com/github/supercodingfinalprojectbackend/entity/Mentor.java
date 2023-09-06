@@ -1,5 +1,7 @@
 package com.github.supercodingfinalprojectbackend.entity;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +20,9 @@ public class Mentor extends CommonEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "mentor_id", nullable = false)
 	private Long mentorId;
+
+	@OneToMany(mappedBy = "mentor")
+	private List<MentorSkillStack> mentorSkillStacks = new ArrayList<>();
 
 	@OneToOne
 	@JoinColumn(name = "user_id")
