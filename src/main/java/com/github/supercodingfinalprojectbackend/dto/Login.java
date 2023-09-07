@@ -10,7 +10,6 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class Login {
-    private Long userId;
     private String accessToken;
     private String refreshToken;
     private UserRole userRole;
@@ -26,17 +25,15 @@ public class Login {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Response {
-        private Long userId;
         private String accessToken;
         private String refreshToken;
         private String roleName;
 
         public static Response from(Login login) {
-            Long userId = login.userId;
             String accessToken = "Bearer " + login.accessToken;
             String refreshToken = "Bearer " + login.refreshToken;
             String roleName = login.userRole.name();
-            return new Response(userId, accessToken, refreshToken, roleName);
+            return new Response(accessToken, refreshToken, roleName);
         }
     }
 }
