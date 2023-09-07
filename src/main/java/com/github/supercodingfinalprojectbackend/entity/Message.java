@@ -11,6 +11,7 @@ import java.sql.Timestamp;
 @Getter
 @Builder
 @Entity
+@Setter
 @Table(name = "messages")
 public class Message {
 
@@ -30,7 +31,13 @@ public class Message {
     @Column(name = "send_at")
     private Timestamp sendAt;
 
+    @Column(name = "sender_idx")
+    private Long senderIdx;
+
     @Column(name = "is_check")
     private Boolean isCheck;
+
+    @Column(name = "send_at_front")
+    private String sendAtFront;
 
 }

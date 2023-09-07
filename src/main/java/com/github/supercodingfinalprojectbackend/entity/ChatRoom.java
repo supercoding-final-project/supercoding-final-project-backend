@@ -1,9 +1,6 @@
 package com.github.supercodingfinalprojectbackend.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -12,30 +9,32 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 @Builder
 @Entity
 @Table(name = "chat_rooms")
 public class ChatRoom {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "chat_room_id",nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "chat_room_id", nullable = false)
     private Long chatRoomId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mentor_id")
-    private Mentor mentor;
+    @JoinColumn(name = "user1_id")
+    private User user1;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mentee_id")
-    private Mentee mentee;
+    @JoinColumn(name = "user2_id")
+    private User user2;
 
     @Column(name = "chat_name")
-    private String  chatName;
+    private String chatName;
 
-    @Column(name = "is_chat")
+    @Column(name = "is_chat", columnDefinition = "tinyint default 0")
     private Boolean isChat;
 
-    @CreationTimestamp
     @Column(name = "created_at")
+    @CreationTimestamp
     private Timestamp createdAt;
 }
