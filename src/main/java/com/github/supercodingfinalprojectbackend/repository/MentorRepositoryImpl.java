@@ -62,7 +62,7 @@ public class MentorRepositoryImpl implements MentorRepositoryCustom {
 		// 대체 방법으로 해결
 
 		List<MentorInfoResponse> content = jpaQueryFactory
-				.selectDistinct(new QMentor_MentorInfoResponse(
+				.selectDistinct(new QMentorDto_MentorInfoResponse(
 						mentor.mentorId,
 						mentor.user.name,
 						mentor.introduction,
