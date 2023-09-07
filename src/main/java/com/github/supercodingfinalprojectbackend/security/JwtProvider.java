@@ -101,7 +101,7 @@ public class JwtProvider implements AuthenticationProvider {
                 .compact();
         String refreshToken = Jwts.builder()
                 .setSubject(userId)
-                .claim("access_token", accessToken)
+                .claim("authorities", authorities)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + oneMonth))
                 .signWith(secretKey)
