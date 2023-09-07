@@ -12,7 +12,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         config.enableSimpleBroker("/user"); // 메시지 브로커를 설정 ("/topic"으로 시작하는 주제를 사용)
-        config.setApplicationDestinationPrefixes("/ws"); // 클라이언트가 메시지를 송신할 엔드포인트의 접두사
+        config.setApplicationDestinationPrefixes("/ws"); // 클라이언트가 메시지를 송신할 엔드포인트의 접두사입니다.
     }
 
     @Override
