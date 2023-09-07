@@ -91,7 +91,7 @@ public class JwtProvider implements AuthenticationProvider {
     public TokenHolder createToken(String userId, Set<String> authorities) {
         Date now = new Date();
         final long oneHour = 3_600_000L;
-        final long oneMonth = oneHour * 24 * 30;
+        final long twoMonth = oneHour * 24 * 30;
         String accessToken = Jwts.builder()
                 .setSubject(userId)
                 .claim("authorities", authorities)
@@ -103,7 +103,7 @@ public class JwtProvider implements AuthenticationProvider {
                 .setSubject(userId)
                 .claim("authorities", authorities)
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + oneMonth))
+                .setExpiration(new Date(now.getTime() + twoMonth))
                 .signWith(secretKey)
                 .compact();
 
