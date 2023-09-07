@@ -83,7 +83,6 @@ public class Oauth2Service {
 
         // 메모리에 로그인 정보 저장
         Login login = Login.builder()
-                .userId(userId)
                 .userRole(userRole)
                 .accessToken(tokenHolder.getAccessToken())
                 .refreshToken(tokenHolder.getRefreshToken())
@@ -252,7 +251,6 @@ public class Oauth2Service {
         if (!login.getUserRole().equals(UserRole.MENTOR)) {
             TokenHolder tokenHolder = switchLogin(user, login, UserRole.MENTOR);
             login = Login.builder()
-                    .userId(userId)
                     .accessToken(tokenHolder.getAccessToken())
                     .refreshToken(tokenHolder.getRefreshToken())
                     .userRole(UserRole.MENTOR)
@@ -272,7 +270,6 @@ public class Oauth2Service {
         if (!login.getUserRole().equals(UserRole.MENTEE)) {
             TokenHolder tokenHolder = switchLogin(user, login, UserRole.MENTEE);
             login = Login.builder()
-                    .userId(userId)
                     .accessToken(tokenHolder.getAccessToken())
                     .refreshToken(tokenHolder.getRefreshToken())
                     .userRole(UserRole.MENTEE)
@@ -289,7 +286,6 @@ public class Oauth2Service {
         TokenHolder tokenHolder = jwtProvider.createToken(user.getUserId().toString(), authorities);
 
         Login newLogin = Login.builder()
-                .userId(user.getUserId())
                 .accessToken(tokenHolder.getAccessToken())
                 .refreshToken(tokenHolder.getRefreshToken())
                 .userRole(userRole)
