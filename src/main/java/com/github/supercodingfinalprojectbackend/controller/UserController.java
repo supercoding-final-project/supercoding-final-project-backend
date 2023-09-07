@@ -33,7 +33,7 @@ public class UserController {
         return ResponseUtils.noContent("로그아웃에 성공했습니다.", null);
     }
 
-    @GetMapping("/switch/{roleName}}")
+    @GetMapping("/switch/{roleName}")
     public ResponseEntity<ResponseUtils.ApiResponse<Login.Response>> switchRole(@PathVariable String roleName) {
         UserRole userRole;
         try {
