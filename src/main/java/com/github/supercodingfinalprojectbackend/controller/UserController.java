@@ -1,6 +1,8 @@
 package com.github.supercodingfinalprojectbackend.controller;
 
 import com.github.supercodingfinalprojectbackend.dto.Login;
+import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
+import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.service.Oauth2Service;
 import com.github.supercodingfinalprojectbackend.util.AuthUtils;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
@@ -31,19 +33,17 @@ public class UserController {
         return ResponseUtils.noContent("로그아웃에 성공했습니다.", null);
     }
 
-    @GetMapping("/switch/mentee")
-    public ResponseEntity<ResponseUtils.ApiResponse<Login.Response>> switchToMentee() {
+    @GetMapping("/switch/{roleName}}")
+    public ResponseEntity<ResponseUtils.ApiResponse<Login.Response>> switchRole(@PathVariable String roleName) {
+        UserRole userRole;
+        try {
+            userRole = UserRole.valueOf(roleName.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw ApiErrorCode.INVALID_PATH_VARIABLE.exception();
+        }
         Long userId = AuthUtils.getUserId();
-        Login login = oauth2Service.switchToMentee(userId);
+        Login login = oauth2Service.switchRole(userId, userRole);
         Login.Response response = Login.Response.from(login);
-        return ResponseUtils.ok("멘티로 성공적으로 전환했습니다.", response);
-    }
-
-    @GetMapping("/switch/mentor")
-    public ResponseEntity<ResponseUtils.ApiResponse<Login.Response>> switchToMentor() {
-        Long userId = AuthUtils.getUserId();
-        Login login = oauth2Service.switchToMentor(userId);
-        Login.Response response = Login.Response.from(login);
-        return ResponseUtils.ok("멘토로 성공적으로 전환했습니다.", response);
+        return ResponseUtils.ok("역할을 성공적으로 전환했습니다.", response);
     }
 }
