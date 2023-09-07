@@ -13,11 +13,15 @@ public class Login {
     private String accessToken;
     private String refreshToken;
     private UserRole userRole;
-    private SocialPlatformType socialPlatformType;
     private String socialAccessToken;
+    private String socialRefreshToken;
+    private SocialPlatformType socialPlatformType;
 
-    public String getKakaoToken() {
+    public String getKakaoAccessToken() {
         return socialPlatformType.equals(SocialPlatformType.KAKAO) ? socialAccessToken : null;
+    }
+    public String getKakaoRefreshToken() {
+        return socialPlatformType.equals(SocialPlatformType.GOOGLE) ? socialRefreshToken : null;
     }
 
     @Getter
