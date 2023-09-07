@@ -1,10 +1,6 @@
 package com.github.supercodingfinalprojectbackend.controller;
 
 import com.github.supercodingfinalprojectbackend.dto.Login;
-import com.github.supercodingfinalprojectbackend.dto.MenteeDto;
-import com.github.supercodingfinalprojectbackend.dto.MentorDto;
-import com.github.supercodingfinalprojectbackend.entity.Mentee;
-import com.github.supercodingfinalprojectbackend.entity.Mentor;
 import com.github.supercodingfinalprojectbackend.service.Oauth2Service;
 import com.github.supercodingfinalprojectbackend.util.AuthUtils;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
