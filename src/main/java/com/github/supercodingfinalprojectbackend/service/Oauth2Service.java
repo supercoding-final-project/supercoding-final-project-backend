@@ -63,31 +63,31 @@ public class Oauth2Service {
 
         // 회원이 존재하지 않으면 회원 가입
         Long kakaoId = kakaoUserInfo.getId();
-        UserSocialInfo userSocialInfo = userSocialInfoRepository.findBySocialIdAndSocialPlatformNameAndIsDeletedIsFalse(kakaoId, SocialPlatformType.KAKAO)
+        UserSocialInfo userSocialInfo = userSocialInfoRepository.findBySocialIdAndSocialPlatformNameAndIsDeletedIsFalse(kakaoId, SocialPlatformType.KAKAO.name())
                 .orElseGet(()->signupWithKakao(kakaoUserInfo));
 
         return serviceLogin(userSocialInfo, kakaoOauthToken.getAccessToken(), SocialPlatformType.KAKAO);
     }
 
-    public Login serviceLogin(UserSocialInfo userSocialInfo, String socialPlatformName, String socialAccessToken) {
+    public Login serviceLogin(UserSocialInfo userSocialInfo, String socialAccessToken, SocialPlatformType socialPlatformType) {
         // 이전 로그인 기록을 뒤져서 어떤 역할로 로그인할 것인지 선택
         User user = userSocialInfo.getUser();
         LoginRecord loginRecord = loginRecordRepository.findFirstByUserAndIsDeletedIsFalseOrderByCreatedAtDesc(user).orElse(null);
-        String roleName = loginRecord == null ? UserRole.MENTEE.name() : loginRecord.getRoleName();
+        UserRole userRole = loginRecord == null ? UserRole.MENTEE : UserRole.valueOf(loginRecord.getRoleName());
 
         // 토큰 생성
         Long userId = user.getUserId();
         String userIdString = userId.toString();
-        Set<String> authorities = Set.of(roleName);
+        Set<String> authorities = Set.of(userRole.name());
         TokenHolder tokenHolder = jwtProvider.createToken(userIdString, authorities);
 
         // 메모리에 로그인 정보 저장
         Login login = Login.builder()
                 .userId(userId)
-                .roleName(roleName)
+                .userRole(userRole)
                 .accessToken(tokenHolder.getAccessToken())
                 .refreshToken(tokenHolder.getRefreshToken())
-                .socialPlatformName(socialPlatformName)
+                .socialPlatformType(socialPlatformType)
                 .socialAccessToken(socialAccessToken)
                 .build();
         authHolder.put(userId, login);
@@ -95,7 +95,7 @@ public class Oauth2Service {
         // DB에 로그인 기록 저장
         LoginRecord newloginRecord = LoginRecord.builder()
                 .user(user)
-                .roleName(roleName)
+                .roleName(userRole.name())
                 .build();
         loginRecordRepository.save(newloginRecord);
 
@@ -109,11 +109,10 @@ public class Oauth2Service {
         String nickname = profile.getNickName();
         String thumbnailImageUrl = profile.getThumbnailImageUrl();
         Long socialId = kakaoUserInfo.getId();
-        String socialPlatformName = SocialPlatformType.KAKAO;
 
         UserAbstractAccount savedAbstractAccount = createAndSaveUserAbstractAccount();
         User savedUser = createAndSaveUser(savedAbstractAccount, name, nickname, thumbnailImageUrl);
-        UserSocialInfo savedUserSocialInfo = createAndSaveUserSocialInfo(savedUser, socialId, socialPlatformName);
+        UserSocialInfo savedUserSocialInfo = createAndSaveUserSocialInfo(savedUser, socialId, SocialPlatformType.KAKAO);
         createAndSaveMentee(savedUser);
 
         return savedUserSocialInfo;
@@ -127,11 +126,11 @@ public class Oauth2Service {
         return userAbstractAccountRepository.save(newAbstractAccount);
     }
 
-    private UserSocialInfo createAndSaveUserSocialInfo(User user, Long socialId, String socialPlatformName) {
+    private UserSocialInfo createAndSaveUserSocialInfo(User user, Long socialId, SocialPlatformType socialPlatformType) {
         UserSocialInfo newUserSocialInfo = UserSocialInfo.builder()
                 .user(user)
                 .socialId(socialId)
-                .socialPlatformName(socialPlatformName)
+                .socialPlatformName(socialPlatformType.name())
                 .build();
         return userSocialInfoRepository.save(newUserSocialInfo);
     }
@@ -168,7 +167,7 @@ public class Oauth2Service {
         return num1 + "-" + num2 + "-" + num3 + "-" + num4;
     }
 
-    public Kakao.OauthToken getKakaoToken(String code) {
+    private Kakao.OauthToken getKakaoToken(String code) {
         RestTemplate restTemplate = new RestTemplate();
         RequestEntity<?> request = createKakaoTokenRequest(code);
         ResponseEntity<Kakao.OauthToken> response = restTemplate.exchange(request, Kakao.OauthToken.class);
@@ -193,7 +192,7 @@ public class Oauth2Service {
         return RequestEntity.post(uri).headers(headers).body(body);
     }
 
-    public Kakao.UserInfo getKakaoUserInfo(Kakao.OauthToken kakaoOauthToken) {
+    private Kakao.UserInfo getKakaoUserInfo(Kakao.OauthToken kakaoOauthToken) {
         RequestEntity<?> request = createKakaoUserInfoRequest(kakaoOauthToken);
 
         RestTemplate restTemplate = new RestTemplate();
@@ -245,54 +244,66 @@ public class Oauth2Service {
         authHolder.remove(userId);
     }
 
-    public void joinMentor(Long userId) {
-        // todo: 멘토 등록이 안 되어 있으면 멘토 생성
-
-
-        // todo: 멘토 정보 반환
-    }
-
-    public Mentor switchToMentor(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(UserErrorCode.NOT_FOUND_USER::exception);
+    public Login switchToMentor(Long userId) {
+        User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(UserErrorCode.NOT_FOUND_USER::exception);
         Mentor mentor = mentorRepository.findByUserAndIsDeletedIsFalse(user).orElseThrow(UserErrorCode.NOT_FOUND_MENTOR::exception);
 
-        Login existsLogin = authHolder.get(userId);
-        if (!existsLogin.getRoleName().equals(UserRole.MENTOR.name())) {
-            String roleName = UserRole.MENTOR.name();
-            switchLogin(user, existsLogin, roleName);
+        Login login = authHolder.get(userId);
+        if (!login.getUserRole().equals(UserRole.MENTOR)) {
+            TokenHolder tokenHolder = switchLogin(user, login, UserRole.MENTOR);
+            login = Login.builder()
+                    .userId(userId)
+                    .accessToken(tokenHolder.getAccessToken())
+                    .refreshToken(tokenHolder.getRefreshToken())
+                    .userRole(UserRole.MENTOR)
+                    .socialPlatformType(login.getSocialPlatformType())
+                    .socialAccessToken(login.getSocialAccessToken())
+                    .build();
         }
 
-        return mentor;
+        return login;
     }
 
-    public Mentee switchToMentee(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(UserErrorCode.NOT_FOUND_USER::exception);
-        Mentee mentee = menteeRepository.findByUser(user).orElseThrow(UserErrorCode.NOT_FOUND_MENTEE::exception);
+    public Login switchToMentee(Long userId) {
+        User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(UserErrorCode.NOT_FOUND_USER::exception);
+        Mentee mentee = menteeRepository.findByUserAndIsDeletedIsFalse(user).orElseThrow(UserErrorCode.NOT_FOUND_MENTEE::exception);
 
-        Login existsLogin = authHolder.get(userId);
-        if (!existsLogin.getRoleName().equals(UserRole.MENTEE.name())) {
-            String roleName = UserRole.MENTOR.name();
-            switchLogin(user, existsLogin, roleName);
+        Login login = authHolder.get(userId);
+        if (!login.getUserRole().equals(UserRole.MENTEE)) {
+            TokenHolder tokenHolder = switchLogin(user, login, UserRole.MENTEE);
+            login = Login.builder()
+                    .userId(userId)
+                    .accessToken(tokenHolder.getAccessToken())
+                    .refreshToken(tokenHolder.getRefreshToken())
+                    .userRole(UserRole.MENTEE)
+                    .socialPlatformType(login.getSocialPlatformType())
+                    .socialAccessToken(login.getSocialAccessToken())
+                    .build();
         }
 
-        return mentee;
+        return login;
     }
 
-    private void switchLogin(User user, Login existsLogin, String roleName) {
+    private TokenHolder switchLogin(User user, Login existsLogin, UserRole userRole) {
+        Set<String> authorities = Set.of(userRole.name());
+        TokenHolder tokenHolder = jwtProvider.createToken(user.getUserId().toString(), authorities);
+
         Login newLogin = Login.builder()
-                .userId(existsLogin.getUserId())
-                .accessToken(existsLogin.getAccessToken())
-                .refreshToken(existsLogin.getRefreshToken())
-                .roleName(roleName)
+                .userId(user.getUserId())
+                .accessToken(tokenHolder.getAccessToken())
+                .refreshToken(tokenHolder.getRefreshToken())
+                .userRole(userRole)
                 .socialAccessToken(existsLogin.getSocialAccessToken())
-                .socialPlatformName(existsLogin.getSocialPlatformName())
+                .socialPlatformType(existsLogin.getSocialPlatformType())
                 .build();
         authHolder.put(user.getUserId(), newLogin);
 
         LoginRecord newloginRecord = LoginRecord.builder()
                 .user(user)
-                .roleName(roleName)
+                .roleName(userRole.name())
                 .build();
         loginRecordRepository.save(newloginRecord);
+
+        return tokenHolder;
     }
 }
