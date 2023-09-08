@@ -21,7 +21,6 @@ public class MentorCareerDto {
     public boolean equals(Object obj) {
         if (!(obj instanceof MentorCareerDto)) return false;
         MentorCareerDto other = (MentorCareerDto) obj;
-
         return getFullString().equals(other.getFullString());
     }
 
