@@ -7,8 +7,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
+@RequiredArgsConstructor
 public enum SkillStackType {
-	SPRING("Spring", 1, SkillStackCategoryType.BACKEND, SkillStackCategoryType.FRAMEWORK),
+	SPRING("Spring", 1),
 	PYTHON("Python", 2),
 	KOTLIN("Kotlin", 3),
 	NETWORK("Network", 4),
@@ -63,13 +64,6 @@ public enum SkillStackType {
 
 	private final String skillStackName;
 	private final Integer skillStackCode;
-	private final Set<SkillStackCategoryType> skillStackCategoryTypeSet;
-
-	SkillStackType(String skillStackName, Integer skillStackCode, SkillStackCategoryType... skillStackCategoryTypes) {
-		this.skillStackName = skillStackName;
-		this.skillStackCode = skillStackCode;
-		this.skillStackCategoryTypeSet = skillStackCategoryTypes != null ? Set.of(skillStackCategoryTypes) : Set.of();
-	}
 
 	// 커스텀 에러 Refactoring 필요
 	public static SkillStackType findBySkillStackType (String inputSkillStack){
