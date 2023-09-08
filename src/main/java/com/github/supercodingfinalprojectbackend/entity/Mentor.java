@@ -47,4 +47,6 @@ public class Mentor extends CommonEntity {
 				.company(company)
 				.build();
 	}
+
+	public void setMentorSkillStacks(List<MentorSkillStack> mentorSkillStacks) { this.mentorSkillStacks = mentorSkillStacks; }
 }
