@@ -28,7 +28,7 @@ public class MentorCareerDto {
 
     public static MentorCareerDto from(Request request) throws IllegalArgumentException {
         return MentorCareerDto.builder()
-                .dutyType(DutyType.valueOf(request.dutyName.toUpperCase()))
+                .dutyType(DutyType.valueOf(request.dutyName.toUpperCase()).resolve())
                 .period(request.period)
                 .build();
     }
