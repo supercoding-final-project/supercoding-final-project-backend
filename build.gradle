@@ -38,6 +38,8 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
+    implementation 'io.openvidu:openvidu-java-client:2.28.0'
+
     //querydsl
     implementation 'com.querydsl:querydsl-jpa'
     annotationProcessor "com.querydsl:querydsl-apt:5.0.0"
