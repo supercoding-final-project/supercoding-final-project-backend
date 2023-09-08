@@ -62,8 +62,8 @@ public class UserController {
     public void joinMentor(
             @RequestParam(name = "company") @Parameter(name = "현재 다니는 회사", required = true) String company,
             @RequestParam(name = "introduction") @Parameter(name = "멘토 소개글", required = true) String introduction,
-            @RequestParam(name = "careers", required = false) @Parameter(name = "커리어") List<MentorCareer> careers,
-            @RequestParam(name = "")
+            @RequestParam(name = "careers", required = false) @Parameter(name = "커리어들") List<MentorCareer> careers,
+            @RequestParam(name = "skills", required = false) @Parameter(name = "기술스택들") List<String> skills
     ){
 
     }
