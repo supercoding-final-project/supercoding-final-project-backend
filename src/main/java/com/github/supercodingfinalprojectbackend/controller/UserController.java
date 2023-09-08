@@ -1,7 +1,9 @@
 package com.github.supercodingfinalprojectbackend.controller;
 
 import com.github.supercodingfinalprojectbackend.dto.Login;
-import com.github.supercodingfinalprojectbackend.entity.MentorCareer;
+import com.github.supercodingfinalprojectbackend.dto.MentorCareerDto;
+import com.github.supercodingfinalprojectbackend.dto.MentorDto;
+import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
 import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.service.Oauth2Service;
@@ -14,7 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -57,14 +60,23 @@ public class UserController {
         return ResponseUtils.ok("역할을 성공적으로 전환했습니다.", response);
     }
 
-    @PostMapping(value = "/role/join/mentor", consumes = {"application/x-www-form-urlencoded; charset=utf-8"})
+    @PostMapping(value = "/role/join/mentor")
     @Operation(summary = "멘토 등록")
-    public void joinMentor(
-            @RequestParam(name = "company") @Parameter(name = "현재 다니는 회사", required = true) String company,
-            @RequestParam(name = "introduction") @Parameter(name = "멘토 소개글", required = true) String introduction,
-            @RequestParam(name = "careers", required = false) @Parameter(name = "커리어들") List<MentorCareer> careers,
-            @RequestParam(name = "skills", required = false) @Parameter(name = "기술스택들") List<String> skills
-    ){
+    public ResponseEntity<ResponseUtils.ApiResponse<MentorDto.MentorInfoResponse>> joinMentor(@RequestBody MentorDto.JoinRequest request){
+        System.out.println(request.toString());
+        String company = request.getCompany();
+        String introduction = request.getIntroduction();
+        Set<MentorCareerDto.Request> careers = request.getCareers();
+        Set<String> skillStackNames = request.getSkillStackNames();
+        Set<MentorCareerDto> careerDtoSet;
+        Set<SkillStackType> skillStackTypeSet;
+        try {
+            careerDtoSet = careers != null ? careers.stream().map(MentorCareerDto::from).collect(Collectors.toSet()) : null;
+            skillStackTypeSet = skillStackNames != null ? skillStackNames.stream().map(SkillStackType::findBySkillStackType).collect(Collectors.toSet()) : null;
+        } catch (IllegalArgumentException e) {
+            throw ApiErrorCode.INVALID_PATH_VARIABLE.exception();
+        }
 
+        return oauth2Service.joinMentor(company, introduction, careerDtoSet, skillStackTypeSet);
     }
 }
