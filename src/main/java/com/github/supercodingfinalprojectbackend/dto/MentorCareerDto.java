@@ -38,6 +38,7 @@ public class MentorCareerDto {
     @AllArgsConstructor
     @Builder
     @ToString
+    @EqualsAndHashCode(of = {"dutyName", "period"})
     public static class Request {
         private String dutyName;
         private String period;
