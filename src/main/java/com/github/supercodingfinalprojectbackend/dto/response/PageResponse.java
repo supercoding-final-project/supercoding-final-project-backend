@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -23,4 +24,14 @@ public class PageResponse<T> {
     private long totalElements;
     @Schema(title = "조회된 데이터 리스트")
     private List<T> contents;
+
+    public static <T> PageResponse<T> from(Page<T> page) {
+        return PageResponse.<T>builder()
+                .hasNext(page.hasNext())
+                .hasPrevious(page.hasPrevious())
+                .totalPages(page.getTotalPages())
+                .totalElements(page.getTotalElements())
+                .contents(page.getContent())
+                .build();
+    }
 }

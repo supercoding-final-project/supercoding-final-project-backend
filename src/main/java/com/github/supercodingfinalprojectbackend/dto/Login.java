@@ -1,5 +1,7 @@
 package com.github.supercodingfinalprojectbackend.dto;
 
+import com.github.supercodingfinalprojectbackend.entity.type.SocialPlatformType;
+import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
 import lombok.*;
 
 @Getter
@@ -8,28 +10,34 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class Login {
-    private Long userId;
     private String accessToken;
     private String refreshToken;
-    private String roleName;
-    private Kakao.OauthToken kakaoToken;
+    private UserRole userRole;
+    private String socialAccessToken;
+    private String socialRefreshToken;
+    private SocialPlatformType socialPlatformType;
+
+    public String getKakaoAccessToken() {
+        return socialPlatformType.equals(SocialPlatformType.KAKAO) ? socialAccessToken : null;
+    }
+    public String getKakaoRefreshToken() {
+        return socialPlatformType.equals(SocialPlatformType.GOOGLE) ? socialRefreshToken : null;
+    }
 
     @Getter
     @ToString
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Response {
-        private Long userId;
         private String accessToken;
         private String refreshToken;
         private String roleName;
 
         public static Response from(Login login) {
-            Long userId = login.getUserId();
-            String accessToken = "Bearer " + login.getAccessToken();
-            String refreshToken = "Bearer " + login.getRefreshToken();
-            String roleName = login.getRoleName();
-            return new Response(userId, accessToken, refreshToken, roleName);
+            String accessToken = "Bearer " + login.accessToken;
+            String refreshToken = "Bearer " + login.refreshToken;
+            String roleName = login.userRole.name();
+            return new Response(accessToken, refreshToken, roleName);
         }
     }
 }

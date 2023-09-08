@@ -43,7 +43,7 @@ public class MentorRepositoryImpl implements MentorRepositoryCustom {
 		return jpaQueryFactory
 				.selectDistinct(new QMentorDto_MentorInfoResponse(
 						mentor.mentorId,
-						mentor.name,
+						mentor.user.name,
 						mentor.introduction,
 						mentor.company
 				))
@@ -64,7 +64,7 @@ public class MentorRepositoryImpl implements MentorRepositoryCustom {
 		List<MentorInfoResponse> content = jpaQueryFactory
 				.selectDistinct(new QMentorDto_MentorInfoResponse(
 						mentor.mentorId,
-						mentor.name,
+						mentor.user.name,
 						mentor.introduction,
 						mentor.company
 				))
@@ -93,7 +93,7 @@ public class MentorRepositoryImpl implements MentorRepositoryCustom {
 		List<MentorInfoResponse> content = jpaQueryFactory
 				.selectDistinct(new QMentorDto_MentorInfoResponse(
 						mentor.mentorId,
-						mentor.name,
+						mentor.user.name,
 						mentor.introduction,
 						mentor.company
 				))
@@ -127,7 +127,7 @@ public class MentorRepositoryImpl implements MentorRepositoryCustom {
 	}
 
 	private BooleanExpression mentorNameLike(String keyword){
-		return keyword != null ? mentor.name.like("%" + keyword + "%") : null;
+		return keyword != null ? mentor.user.name.like("%" + keyword + "%") : null;
 	}
 
 	private BooleanExpression skillStackFiltering(List<String> skillStackList){

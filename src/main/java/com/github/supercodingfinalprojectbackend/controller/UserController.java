@@ -1,15 +1,15 @@
 package com.github.supercodingfinalprojectbackend.controller;
 
 import com.github.supercodingfinalprojectbackend.dto.Login;
+import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
+import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.service.Oauth2Service;
+import com.github.supercodingfinalprojectbackend.util.AuthUtils;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,6 +30,20 @@ public class UserController {
         oauth2Service.kakaoLogout();
         oauth2Service.serviceLogout();
 
-        return ResponseUtils.ok("로그아웃에 성공했습니다.", null);
+        return ResponseUtils.noContent("로그아웃에 성공했습니다.", null);
+    }
+
+    @GetMapping("/switch/{roleName}")
+    public ResponseEntity<ResponseUtils.ApiResponse<Login.Response>> switchRole(@PathVariable String roleName) {
+        UserRole userRole;
+        try {
+            userRole = UserRole.valueOf(roleName.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw ApiErrorCode.INVALID_PATH_VARIABLE.exception();
+        }
+        Long userId = AuthUtils.getUserId();
+        Login login = oauth2Service.switchRole(userId, userRole);
+        Login.Response response = Login.Response.from(login);
+        return ResponseUtils.ok("역할을 성공적으로 전환했습니다.", response);
     }
 }

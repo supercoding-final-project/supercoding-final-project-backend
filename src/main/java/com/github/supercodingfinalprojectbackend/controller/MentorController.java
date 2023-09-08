@@ -2,6 +2,7 @@ package com.github.supercodingfinalprojectbackend.controller;
 
 import com.github.supercodingfinalprojectbackend.dto.MentorDto.MentorInfoResponse;
 import com.github.supercodingfinalprojectbackend.service.MentorService;
+import java.util.List;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/v1/api/mentors")
@@ -25,6 +24,7 @@ public class MentorController {
 	private final MentorService mentorService;
 
 	@GetMapping
+
 	public ResponseEntity<ApiResponse<Page<MentorInfoResponse>>> getMentors(
 			@RequestParam(required = false, defaultValue = "") String keyWord,
 			@RequestParam(required = false) List<String> skillStack,
