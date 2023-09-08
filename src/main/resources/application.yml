@@ -4,7 +4,7 @@ spring:
       client:
         registration:
           kakao:
-            client-id: ENC(uNAxhIKqrBffW2Xci1t7Nt3e0W0OcifYfkwFsm3we7+6v5ucclxxO/EVpUo2obly)
+            client-id:  ENC(uNAxhIKqrBffW2Xci1t7Nt3e0W0OcifYfkwFsm3we7+6v5ucclxxO/EVpUo2obly)
             client-secret: ENC(4ASqJYZAwcKLj2LqzvKmPSGEe65kzIpU1KQpENpZ6dpg6zuqRXekyvSRVPaUJXuZ)
             redirect-uri: ENC(aKIB3/sc3AAnUG4Jcwdneh7Z03HpzgZnnP9tSLbSZkxFL2rAYIInZGdcve7FTEIUhyRLojBlpASopTN5C0RjAw==)
             authorization-grant-type: authorization_code

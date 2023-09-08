@@ -18,6 +18,7 @@ public class MentorDto {
 	private String name;
 	private String nickname;
 	private String email;
+	private String thumbnailImageUrl;
 	private String introduction;
 	private String company;
 	private Boolean searchable;
@@ -28,21 +29,26 @@ public class MentorDto {
 //				Test 때 mentor 계좌가 없이 테스트 하느라 임시 주석
 //				.mentorAbstractAccountId(
 //						mentor.getMentorAbstractAccount().getMentorAbstractAccountId())
-				.name(mentor.getName())
-//				.nickname(mentor.getNickname())
+				.name(mentor.getUser().getName())
+				.nickname(mentor.getUser().getNickname())
 				.introduction(mentor.getIntroduction())
-//				.email(mentor.getEmail())
+				.email(mentor.getUser().getEmail())
 				.company(mentor.getCompany())
+				.thumbnailImageUrl(mentor.getUser().getThumbnailImageUrl())
 				.build();
 	}
 
 	@Getter
 	@NoArgsConstructor
+	@AllArgsConstructor
 	@Builder
 	public static class MentorInfoResponse {
 
 		private Long mentorId;
 		private String name;
+		private String nickname;
+		private String email;
+		private String thumbnailImageUrl;
 		private String introduction;
 		private String company;
 
@@ -60,8 +66,8 @@ public class MentorDto {
 					.name(mentorDto.getName())
 					.introduction(mentorDto.getIntroduction())
 					.company(mentorDto.getCompany())
+					.thumbnailImageUrl(mentorDto.getThumbnailImageUrl())
 					.build();
 		}
 	}
-
 }

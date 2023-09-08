@@ -19,6 +19,8 @@ public class User extends CommonEntity {
     @OneToOne
     @JoinColumn(name = "abstract_account_id")
     private UserAbstractAccount abstractAccount;
+    @Column(name = "email")
+    private String email;
     @Column(name = "name")
     private String name;
     @Column(name = "nickname")

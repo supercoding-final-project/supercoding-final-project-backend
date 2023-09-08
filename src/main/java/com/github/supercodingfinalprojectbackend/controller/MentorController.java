@@ -2,9 +2,9 @@ package com.github.supercodingfinalprojectbackend.controller;
 
 import com.github.supercodingfinalprojectbackend.dto.MentorDto.MentorInfoResponse;
 import com.github.supercodingfinalprojectbackend.service.MentorService;
+import java.util.List;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils.ApiResponse;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -24,6 +24,7 @@ public class MentorController {
 	private final MentorService mentorService;
 
 	@GetMapping
+
 	public ResponseEntity<ApiResponse<Page<MentorInfoResponse>>> getMentors(
 			@RequestParam(required = false, defaultValue = "") String keyWord,
 			@RequestParam(required = false) List<String> skillStack,

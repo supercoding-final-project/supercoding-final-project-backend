@@ -30,7 +30,7 @@ public class AuthorizationDetailsService implements UserDetailsService {
         Login login = authHolder.get(userIdLong);
         if (login == null) throw JwtErrorCode.UNRELIABLE_JWT.exception();
         String accessToken = login.getAccessToken();
-        Set<SimpleGrantedAuthority> authorities = Set.of(new SimpleGrantedAuthority(login.getRoleName()));
+        Set<SimpleGrantedAuthority> authorities = Set.of(new SimpleGrantedAuthority(login.getUserRole().name()));
 
         return AuthorizationDetails.builder()
                 .userId(userId)

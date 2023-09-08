@@ -20,15 +20,10 @@ public class OrderSheet extends CommonEntity {
     @JoinColumn(name = "mentee_id")
     private Mentee mentee;
     @ManyToOne
-    @JoinColumn(name = "mentor_id")
-    private Mentor mentor;
-    @ManyToOne
     @JoinColumn(name = "post_id")
     private Posts post;
     @Column(name = "total_price")
     private Integer totlaPrice;
     @Column(name = "is_completed")
     private Boolean isCompleted;
-    @Column(name = "transaction_type")
-    private String transactionType;
 }
