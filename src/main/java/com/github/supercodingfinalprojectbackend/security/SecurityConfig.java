@@ -41,7 +41,7 @@ public class SecurityConfig {
                 // 접근 권한 설정
                 .authorizeHttpRequests(matcherRegistry -> matcherRegistry
                         .antMatchers("/api/v1/test/**").authenticated()
-                        .antMatchers("/api/v1/user/oauth2/kakao/logout", "/api/v1/user/switch/**").authenticated()
+                        .antMatchers("/api/v1/user/oauth2/kakao/logout", "/api/v1/user/switch/**", "/api/v1/user/role/join/mentor").authenticated()
                         .anyRequest().permitAll() // 다른 모든 요청을 허용하도록 설정
                 )
                 // 필터 추가
