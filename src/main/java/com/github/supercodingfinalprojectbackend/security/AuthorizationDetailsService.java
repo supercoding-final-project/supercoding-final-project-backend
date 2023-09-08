@@ -2,7 +2,7 @@ package com.github.supercodingfinalprojectbackend.security;
 
 import com.github.supercodingfinalprojectbackend.dto.AuthHolder;
 import com.github.supercodingfinalprojectbackend.dto.Login;
-import com.github.supercodingfinalprojectbackend.exception.errorcode.JwtErrorCode;
+import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,10 +25,10 @@ public class AuthorizationDetailsService implements UserDetailsService {
         try {
             userIdLong = Long.parseLong(userId);
         } catch (NumberFormatException e) {
-            throw JwtErrorCode.UNRELIABLE_JWT.exception();
+            throw ApiErrorCode.UNRELIABLE_JWT.exception();
         }
         Login login = authHolder.get(userIdLong);
-        if (login == null) throw JwtErrorCode.UNRELIABLE_JWT.exception();
+        if (login == null) throw ApiErrorCode.UNRELIABLE_JWT.exception();
         String accessToken = login.getAccessToken();
         Set<SimpleGrantedAuthority> authorities = Set.of(new SimpleGrantedAuthority(login.getUserRole().name()));
 

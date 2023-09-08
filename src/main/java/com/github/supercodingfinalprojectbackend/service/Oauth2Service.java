@@ -7,8 +7,6 @@ import com.github.supercodingfinalprojectbackend.entity.type.SocialPlatformType;
 import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
 import com.github.supercodingfinalprojectbackend.exception.ApiException;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
-import com.github.supercodingfinalprojectbackend.exception.errorcode.KakaoErrorCode;
-import com.github.supercodingfinalprojectbackend.exception.errorcode.UserErrorCode;
 import com.github.supercodingfinalprojectbackend.repository.*;
 import com.github.supercodingfinalprojectbackend.security.JwtProvider;
 import com.github.supercodingfinalprojectbackend.util.AuthUtils;
@@ -178,7 +176,7 @@ public class Oauth2Service {
         RequestEntity<?> request = createKakaoTokenRequest(code);
         ResponseEntity<Kakao.OauthToken> response = restTemplate.exchange(request, Kakao.OauthToken.class);
         Kakao.OauthToken kakaoOauthToken = response.getBody();
-        if (kakaoOauthToken == null) throw KakaoErrorCode.FAIL_TO_RECEIVE_TOKEN.exception();
+        if (kakaoOauthToken == null) throw ApiErrorCode.FAIL_TO_RECEIVE_KAKAO_TOKEN.exception();
         return kakaoOauthToken;
     }
 
@@ -205,7 +203,7 @@ public class Oauth2Service {
         ResponseEntity<Kakao.UserInfo> response = restTemplate.exchange(request, Kakao.UserInfo.class);
 
         Kakao.UserInfo kakaoUserInfo = response.getBody();
-        if (kakaoUserInfo == null) throw KakaoErrorCode.NOT_FOUND_USER_INFO.exception();
+        if (kakaoUserInfo == null) throw ApiErrorCode.NOT_FOUND_USER_INFO.exception();
         return kakaoUserInfo;
     }
 
@@ -227,11 +225,11 @@ public class Oauth2Service {
 
         Long userId = Long.valueOf((String) auth.getPrincipal());
         Login login = authHolder.get(userId);
-        if (login == null) throw UserErrorCode.ALREADY_LOGGED_OUT.exception();
+        if (login == null) throw ApiErrorCode.ALREADY_LOGGED_OUT.exception();
 
         URI uri = URI.create(kakaoLogoutUri);
         String kakaoAccessToken = login.getKakaoAccessToken();
-        if (kakaoAccessToken == null) throw UserErrorCode.IS_NOT_LOGGED_IN_KAKAO.exception();
+        if (kakaoAccessToken == null) throw ApiErrorCode.IS_NOT_LOGGED_IN_KAKAO.exception();
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/x-www-form-urlencoded");
@@ -251,8 +249,8 @@ public class Oauth2Service {
     }
 
     public Login switchRole(Long userId, UserRole userRole) {
-        User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(UserErrorCode.NOT_FOUND_USER::exception);
-        Mentor mentor = mentorRepository.findByUserAndIsDeletedIsFalse(user).orElseThrow(UserErrorCode.NOT_FOUND_MENTOR::exception);
+        User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
+        Mentor mentor = mentorRepository.findByUserAndIsDeletedIsFalse(user).orElseThrow(ApiErrorCode.NOT_FOUND_MENTOR::exception);
 
         Login login = authHolder.get(userId);
         if (!login.getUserRole().equals(userRole)) {
@@ -286,7 +284,7 @@ public class Oauth2Service {
 
     public ResponseEntity<ResponseUtils.ApiResponse<MentorDto.MentorInfoResponse>> joinMentor(@NotNull String company, @NotNull String introduction, Set<MentorCareerDto> careerDtoSet, Set<SkillStackType> skillStackTypeSet) {
         Long userId = AuthUtils.getUserId();
-        User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(UserErrorCode.NOT_FOUND_USER::exception);
+        User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
 
         Mentor newMentor = Mentor.from(user, company, introduction);
         Mentor savedMentor = mentorRepository.save(newMentor);
