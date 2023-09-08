@@ -1,8 +1,10 @@
 package com.github.supercodingfinalprojectbackend.service;
 
-import com.github.supercodingfinalprojectbackend.dto.Post.PostCreateDto;
+import com.github.supercodingfinalprojectbackend.dto.PostDto;
+import com.github.supercodingfinalprojectbackend.dto.PostDto.PostResponse;
 import com.github.supercodingfinalprojectbackend.entity.*;
 import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
+import com.github.supercodingfinalprojectbackend.exception.errorcode.PostErrorCode;
 import com.github.supercodingfinalprojectbackend.repository.*;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils.ApiResponse;
@@ -28,14 +30,14 @@ public class PostService {
     private final SkillStackRepository skillStackRepository;
 
     @Transactional
-    public ResponseEntity<ApiResponse<Void>> createPost(PostCreateDto postCreateDto, Long userId) {
+    public ResponseEntity<ApiResponse<Void>> createPost(PostDto postDto, Long userId) {
         User user = userRepository.findByUserId(userId);
         Mentor mentor = mentorRepository.findByUserAndIsDeletedIsFalse(user).get();
-        Posts entity = Posts.fromDto(postCreateDto,mentor);
+        Posts entity = Posts.fromDto(postDto,mentor);
         Posts post = postsRepository.save(entity);
 
-        List<String> textList = postCreateDto.getText();
-        List<MultipartFile> imgList = postCreateDto.getImg();
+        List<String> textList = postDto.getText();
+        List<MultipartFile> imgList = postDto.getImg();
 
         for (int i=0; i<=textList.size(); i++) {
             PostsContent postsContent = PostsContent.fromPost(textList.get(i),i,post);
@@ -46,11 +48,19 @@ public class PostService {
             postsContentRepository.save(postsContent);
         }
 
-        SkillStackType skillStackType = SkillStackType.findBySkillStackType(postCreateDto.getPost_stack());
+        SkillStackType skillStackType = SkillStackType.findBySkillStackType(postDto.getPost_stack());
         SkillStack skillStack = skillStackRepository.findBySkillStackName(skillStackType.getSkillStackName());
         PostsSkillStack postsSkillStack = PostsSkillStack.fromPost(post,skillStack);
         postsSkillStackRepository.save(postsSkillStack);
 
         return ResponseUtils.created("포스트가 정상적으로 등록되었습니다.",null);
+    }
+
+    public ResponseEntity<ApiResponse<PostResponse>> getPost(Integer postId) {
+        Posts posts = postsRepository.findById(postId).orElseThrow(PostErrorCode.POST_NOT_POST_ID::exception);
+        List<PostsContent> contentList = postsContentRepository.findAllByPosts(posts);
+        String stack = postsSkillStackRepository.findByPosts(posts).getSkillStack().getSkillStackName();
+
+        return ResponseUtils.ok("정상적으로 포스트 조회 되었습니다.", PostResponse.PostInfoResponse(posts,contentList,stack));
     }
 }
