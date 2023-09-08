@@ -11,7 +11,7 @@ public enum DutyType implements CustomEnum {
     DutyType() { this.redirect = null; }
     DutyType(DutyType redirect) { this.redirect = redirect; }
 
-    // get 메서드를 반드시 호출해야 합니다!
+    // resole 호출 반드시 필요
     @Override
     public DutyType resolve() { return redirect != null ? redirect : this; }
 }
