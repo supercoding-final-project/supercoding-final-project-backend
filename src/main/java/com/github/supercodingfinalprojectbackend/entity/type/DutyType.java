@@ -8,15 +8,9 @@ public enum DutyType {
     ;
     private final DutyType redirect;
 
-    DutyType() {
-        this.redirect = null;
-    }
-    DutyType(DutyType redirect) {
-        this.redirect = redirect;
-    }
+    DutyType() { this.redirect = null; }
+    DutyType(DutyType redirect) { this.redirect = redirect; }
 
     // get 메서드를 반드시 호출해야 합니다!
-    public DutyType get() {
-        return redirect != null ? redirect : this;
-    }
+    public DutyType get() { return redirect != null ? redirect : this; }
 }
