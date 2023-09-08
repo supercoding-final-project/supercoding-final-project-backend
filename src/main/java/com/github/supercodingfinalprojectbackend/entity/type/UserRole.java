@@ -11,5 +11,5 @@ public enum UserRole implements CustomEnum {
     UserRole(UserRole redirect) { this.redirect = redirect; }
 
     @Override
-    public UserRole resolve() { return redirect != null ? redirect : this; }
+    public UserRole resolve() { return redirect != null ? redirect.resolve() : this; }
 }
