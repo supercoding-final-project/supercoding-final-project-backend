@@ -8,6 +8,7 @@ import com.github.supercodingfinalprojectbackend.dto.response.ResponseEnterChatR
 import com.github.supercodingfinalprojectbackend.entity.ChatRoom;
 import com.github.supercodingfinalprojectbackend.entity.Message;
 import com.github.supercodingfinalprojectbackend.entity.User;
+import com.github.supercodingfinalprojectbackend.exception.errorcode.UserErrorCode;
 import com.github.supercodingfinalprojectbackend.repository.ChatRoomRepository;
 import com.github.supercodingfinalprojectbackend.repository.MessageRepository;
 import com.github.supercodingfinalprojectbackend.repository.UserRepository;
@@ -47,7 +48,7 @@ public class ChatRoomService {
 
 
 
-        User user = userRepository.findByUserId(userid);
+        User user = userRepository.findByUserIdAndIsDeletedIsFalse(userid).orElseThrow(UserErrorCode.NOT_FOUND_USER::exception);
         List<ChatRoom> chatRooms = chatRoomRepository.findByUser1OrUser2(user, user);
 
         List<ResponseChatRoomInfo> chatRoomInfoList = new ArrayList<>();
