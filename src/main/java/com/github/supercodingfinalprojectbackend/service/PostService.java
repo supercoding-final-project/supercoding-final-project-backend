@@ -20,6 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class PostService {
+    private final UserRepository userRepository;
     private final MentorRepository mentorRepository;
     private final PostsRepository postsRepository;
     private final PostsContentRepository postsContentRepository;
@@ -28,7 +29,8 @@ public class PostService {
 
     @Transactional
     public ResponseEntity<ApiResponse<Void>> createPost(PostCreateDto postCreateDto, Long userId) {
-        Mentor mentor = mentorRepository.findByUserUserIdAndIsDeleted(userId,false);
+        User user = userRepository.findByUserId(userId);
+        Mentor mentor = mentorRepository.findByUserAndIsDeletedIsFalse(user).get();
         Posts entity = Posts.fromDto(postCreateDto,mentor);
         Posts post = postsRepository.save(entity);
 
