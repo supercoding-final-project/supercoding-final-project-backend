@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MentorRepository extends JpaRepository<Mentor, Long>, MentorRepositoryCustom {
-
+    Mentor findByUserUserIdAndIsDeleted(Long userId, boolean isDeleted);
 }

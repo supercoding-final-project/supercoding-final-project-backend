@@ -28,6 +28,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .httpBasic(AbstractHttpConfigurer::disable)
+                .csrf().disable()
 //                .csrf(csrf -> csrf
 //                        .ignoringRequestMatchers("/api/v1/**")
 //                )
