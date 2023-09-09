@@ -112,6 +112,9 @@ public class TestController {
 
         // 7. 메서드가 실행 가능한지 검사합니다.
         String numStr = "123456";
-        Integer numInt = ValidateUtils.requireApply(numStr, Integer::parseInt, 500, "해당 문자를 정수로 변환할 수 없습니다.");
+        Integer numInt1 = ValidateUtils.requireApply(numStr, Integer::parseInt, 500, "해당 문자를 정수로 변환할 수 없습니다.");
+
+        // 8. 모든 메서드는 status와 message를 직접 받는 것 대신 ErrorCode를 받을 수도 있도록 오버로딩되어 있습니다.
+        Integer numInt2 = ValidateUtils.requireApply(numStr, Integer::parseInt, ApiErrorCode.INTERNAL_SERVER_ERROR);
     }
 }
