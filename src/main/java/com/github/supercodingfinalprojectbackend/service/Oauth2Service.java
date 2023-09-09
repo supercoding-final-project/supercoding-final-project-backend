@@ -5,12 +5,14 @@ import com.github.supercodingfinalprojectbackend.entity.*;
 import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
 import com.github.supercodingfinalprojectbackend.entity.type.SocialPlatformType;
 import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
-import com.github.supercodingfinalprojectbackend.exception.ApiException;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.repository.*;
-import com.github.supercodingfinalprojectbackend.security.JwtProvider;
-import com.github.supercodingfinalprojectbackend.util.AuthUtils;
-import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
+import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
+import com.github.supercodingfinalprojectbackend.util.auth.AuthHolder;
+import com.github.supercodingfinalprojectbackend.util.auth.AuthUtils;
+import com.github.supercodingfinalprojectbackend.util.jwt.JwtUtils;
+import com.github.supercodingfinalprojectbackend.util.jwt.TokenHolder;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +24,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import javax.crypto.SecretKey;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
@@ -57,9 +60,9 @@ public class Oauth2Service {
     private final SkillStackRepository skillStackRepository;
     private final MentorSkillStackRepository mentorSkillStackRepository;
     private final MentorCareerRepository mentorCareerRepository;
-    private final JwtProvider jwtProvider;
+    private final SecretKey secretKey;
     @Qualifier("AuthHolder")
-    private final AuthHolder<Long, Login> authHolder;
+    private final AuthHolder authHolder;
 
     public Login kakaoLogin(String code) {
         Kakao.OauthToken kakaoOauthToken = getKakaoToken(code);
@@ -83,7 +86,7 @@ public class Oauth2Service {
         Long userId = user.getUserId();
         String userIdString = userId.toString();
         Set<String> authorities = Set.of(userRole.name());
-        TokenHolder tokenHolder = jwtProvider.createToken(userIdString, authorities);
+        TokenHolder tokenHolder = JwtUtils.createTokens(userIdString, authorities, secretKey);
 
         // 메모리에 로그인 정보 저장
         Login login = Login.builder()
@@ -268,7 +271,7 @@ public class Oauth2Service {
         loginRecordRepository.save(newloginRecord);
 
         Set<String> authorities = Set.of(userRole.name());
-        TokenHolder tokenHolder = jwtProvider.createToken(user.getUserId().toString(), authorities);
+        TokenHolder tokenHolder = JwtUtils.createTokens(user.getUserId().toString(), authorities, secretKey);
         Login newLogin = Login.builder()
                 .accessToken(tokenHolder.getAccessToken())
                 .refreshToken(tokenHolder.getRefreshToken())
@@ -282,7 +285,7 @@ public class Oauth2Service {
         return newLogin;
     }
 
-    public ResponseEntity<ResponseUtils.ApiResponse<MentorDto.MentorInfoResponse>> joinMentor(@NotNull String company, @NotNull String introduction, Set<MentorCareerDto> careerDtoSet, Set<SkillStackType> skillStackTypeSet) {
+    public MentorDto joinMentor(@NotNull String company, @NotNull String introduction, Set<MentorCareerDto> careerDtoSet, Set<SkillStackType> skillStackTypeSet) {
         Long userId = AuthUtils.getUserId();
         User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
 
@@ -293,8 +296,11 @@ public class Oauth2Service {
             List<MentorSkillStack> mentorSkillStacks = skillStackTypeSet.stream()
                     .map(skillStackType -> {
                         SkillStack skillStack = skillStackRepository.findBySkillStackId(Long.valueOf(skillStackType.getSkillStackCode()))
-                                .orElseThrow(()->new ApiException(500, "서버 측의 문제로 요청에 실패했습니다."));
-                        MentorSkillStack mentorSkillStack = MentorSkillStack.builder().mentor(savedMentor).skillStack(skillStack).build();
+                                .orElseThrow(ApiErrorCode.INTERNAL_SERVER_ERROR::exception);
+                        MentorSkillStack mentorSkillStack = MentorSkillStack.builder()
+                                .mentor(savedMentor)
+                                .skillStack(skillStack)
+                                .build();
                         return mentorSkillStackRepository.save(mentorSkillStack);
                     })
                     .collect(Collectors.toList());
@@ -314,7 +320,23 @@ public class Oauth2Service {
             });
         }
 
-        MentorDto.MentorInfoResponse mentorInfoResponse = MentorDto.MentorInfoResponse.from(MentorDto.fromEntity(savedMentor));
-        return ResponseUtils.created("멘토등록에 성공했습니다.", mentorInfoResponse);
+        return MentorDto.fromEntity(savedMentor);
+    }
+
+    public Login renewTokens(String refreshToken) {
+        String userIdStr = ValidateUtils.requireApply(refreshToken, t->JwtUtils.getSubject(t, secretKey), ApiErrorCode.UNRELIABLE_JWT);
+        Long userId = ValidateUtils.requireApply(userIdStr, Long::parseLong, ApiErrorCode.UNRELIABLE_JWT);
+        Login login = ValidateUtils.requireNotNull(authHolder.get(userId), 404, "로그인 기록이 없습니다.");
+        TokenHolder tokenHolder = JwtUtils.createTokens(userIdStr, Set.of(login.getUserRole().name()), secretKey);
+        Login newLogin = Login.builder()
+                .userRole(login.getUserRole())
+                .accessToken(tokenHolder.getAccessToken())
+                .refreshToken(tokenHolder.getRefreshToken())
+                .socialAccessToken(login.getSocialAccessToken())
+                .socialRefreshToken(login.getSocialRefreshToken())
+                .socialPlatformType(login.getSocialPlatformType())
+                .build();
+        authHolder.put(userId, newLogin);
+        return newLogin;
     }
 }

@@ -4,6 +4,7 @@ import com.github.supercodingfinalprojectbackend.dto.response.PageResponse;
 import com.github.supercodingfinalprojectbackend.exception.ApiException;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
+import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+import java.util.Comparator;
 import java.util.Optional;
 
 
@@ -75,5 +78,43 @@ public class TestController {
         //    아무래도 재사용할 에러코드와 메세지가 생각보다 많지 않고
         //    또 ErrorCode를 새로 만드는 과정이 번거롭다보니 접근성이 떨어지는 것 같습니다.
         //    그래서 이제 ApiErrorCode만 사용하는 걸로 하겠습니다.
+    }
+
+    private void validateUtilsExample() {
+        // ValidateUtils는 여러분이 각종 유효성 검사를 편리하게 할 수 있도록 여러 메서드를 제공합니다.
+        // 유효성 검사에서 실패할 경우 ApiException을 던지며, 여러분이 상태코드와 메세지를 자유롭게 지정해줄 수 있습니다.
+        // 7번은 꼭 봐주세요.
+
+        // 1. null 검사를 수행합니다.
+        String str = null;
+        String validStr1 = ValidateUtils.requireNotNull(str, 500, "str은 null이 될 수 없습니다.");
+
+        // 2. null 검사를 수행하여 실패할 경우 other를 반환합니다.
+        //    other는 null일 수 없습니다.
+        String other = "hello, world";
+        String validStr2 = ValidateUtils.requireNotNullElse(str, other);
+
+        // 3. null 검사를 수행하여 실패할 경우 람다를 수행하여 얻습니다.
+        String validStr3 = ValidateUtils.requireNotNullElseGet(str, ()->"Hello, World!");
+
+        // 4. 조건이 true인지 검사합니다.
+        int number = 200;
+        ValidateUtils.requireTrue(number <= 100, 500, "number는 100이하여야 합니다.");
+
+        // 5. 람다식을 이용하여 조건이 true인지 검사합니다.
+        String helloWorld = "hello, world";
+        String validStr4 = ValidateUtils.requireTrue(helloWorld, (s)->s.startsWith("hello"), 500, "hello로 시작해야 합니다.");
+
+        // 6. 두 값을 비교합니다.
+        int num1 = 11;
+        int num2 = 22;
+        int result = ValidateUtils.compare(num1, num2, Integer::compareTo);
+
+        // 7. 메서드가 실행 가능한지 검사합니다.
+        String numStr = "123456";
+        Integer numInt1 = ValidateUtils.requireApply(numStr, Integer::parseInt, 500, "해당 문자를 정수로 변환할 수 없습니다.");
+
+        // 8. 모든 메서드는 status와 message를 직접 받는 것 대신 ErrorCode를 받을 수도 있도록 오버로딩되어 있습니다.
+        Integer numInt2 = ValidateUtils.requireApply(numStr, Integer::parseInt, ApiErrorCode.INTERNAL_SERVER_ERROR);
     }
 }

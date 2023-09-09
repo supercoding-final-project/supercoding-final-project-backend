@@ -1,4 +1,4 @@
-package com.github.supercodingfinalprojectbackend.dto;
+package com.github.supercodingfinalprojectbackend.util.jwt;
 
 import java.util.HashMap;
 import java.util.Map;

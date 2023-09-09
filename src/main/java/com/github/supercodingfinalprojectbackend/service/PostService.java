@@ -3,6 +3,7 @@ package com.github.supercodingfinalprojectbackend.service;
 import com.github.supercodingfinalprojectbackend.dto.Post.PostCreateDto;
 import com.github.supercodingfinalprojectbackend.entity.*;
 import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
+import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.repository.*;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils.ApiResponse;
@@ -29,8 +30,8 @@ public class PostService {
 
     @Transactional
     public ResponseEntity<ApiResponse<Void>> createPost(PostCreateDto postCreateDto, Long userId) {
-        User user = userRepository.findByUserId(userId);
-        Mentor mentor = mentorRepository.findByUserAndIsDeletedIsFalse(user).get();
+        User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
+        Mentor mentor = mentorRepository.findByUserAndIsDeletedIsFalse(user).orElseThrow(ApiErrorCode.NOT_FOUND_MENTOR::exception);
         Posts entity = Posts.fromDto(postCreateDto,mentor);
         Posts post = postsRepository.save(entity);
 

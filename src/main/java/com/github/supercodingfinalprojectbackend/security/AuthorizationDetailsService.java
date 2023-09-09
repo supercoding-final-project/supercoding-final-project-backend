@@ -1,6 +1,6 @@
 package com.github.supercodingfinalprojectbackend.security;
 
-import com.github.supercodingfinalprojectbackend.dto.AuthHolder;
+import com.github.supercodingfinalprojectbackend.util.auth.AuthHolder;
 import com.github.supercodingfinalprojectbackend.dto.Login;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ import java.util.Set;
 public class AuthorizationDetailsService implements UserDetailsService {
 
     @Qualifier("AuthHolder")
-    private final AuthHolder<Long, Login> authHolder;
+    private final AuthHolder authHolder;
 
     @Override
     public AuthorizationDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
