@@ -37,4 +37,16 @@ public class Mentor extends CommonEntity {
 
 	@Column(name = "searchable")
 	private Boolean searchable;
+
+	public static Mentor from(User user, String company, String introduction) {
+		return Mentor.builder()
+				.mentorSkillStacks(null)
+				.user(user)
+				.introduction(introduction)
+				.searchable(false)
+				.company(company)
+				.build();
+	}
+
+	public void setMentorSkillStacks(List<MentorSkillStack> mentorSkillStacks) { this.mentorSkillStacks = mentorSkillStacks; }
 }

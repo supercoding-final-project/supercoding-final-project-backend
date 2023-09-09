@@ -58,6 +58,9 @@ dependencies {
     implementation 'org.webjars:jquery:3.1.1-1'
     implementation 'org.springframework:spring-messaging:5.3.10' // 또는 원하는 Spring Framework 버전 사용
 
+
+    //유효성 검증에 사용되는 @Valid
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 
 tasks.named('test') {
