@@ -1,10 +1,7 @@
 package com.github.supercodingfinalprojectbackend.service;
 
 
-import com.github.supercodingfinalprojectbackend.dto.response.ResponseChatLog;
-import com.github.supercodingfinalprojectbackend.dto.response.ResponseChatRoomInfo;
-import com.github.supercodingfinalprojectbackend.dto.response.ResponseChatRoom;
-import com.github.supercodingfinalprojectbackend.dto.response.ResponseEnterChatRoom;
+import com.github.supercodingfinalprojectbackend.dto.MessageDto;
 import com.github.supercodingfinalprojectbackend.entity.ChatRoom;
 import com.github.supercodingfinalprojectbackend.entity.Message;
 import com.github.supercodingfinalprojectbackend.entity.User;
@@ -13,7 +10,6 @@ import com.github.supercodingfinalprojectbackend.repository.ChatRoomRepository;
 import com.github.supercodingfinalprojectbackend.repository.MessageRepository;
 import com.github.supercodingfinalprojectbackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +28,7 @@ public class ChatRoomService {
     public ChatRoom createChatroom(User user1, User user2) {
 
 
-        List<ChatRoom> chatRooms = chatRoomRepository.findByUser1OrUser2(user1, user2);
+        List<ChatRoom> chatRooms = chatRoomRepository.findByUser1OrUser2(user1, user2).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
 
         for (ChatRoom chatRoom : chatRooms) {
             if (chatRoom.getUser1().equals(user1) && chatRoom.getUser2().equals(user2)) {
@@ -40,21 +36,20 @@ public class ChatRoomService {
                 return chatRoom;
             }
         }
-        ChatRoom chatRoom = ChatRoom.builder().isChat(true).user1(user1).user2(user2).chatName(createChatName(user1, user2)).build();
+        ChatRoom chatRoom = ChatRoom.builder().user1(user1).user2(user2).chatName(createChatName(user1, user2)).build();
         return chatRoomRepository.save(chatRoom);
     }
     // User 에 관련된 채팅방 목록 조회
-    public ResponseChatRoom getChatList(Long userid) {
-
+    public MessageDto.ResponseChatRoom getChatList(Long userid) {
 
 
         User user = userRepository.findByUserIdAndIsDeletedIsFalse(userid).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
-        List<ChatRoom> chatRooms = chatRoomRepository.findByUser1OrUser2(user, user);
+        List<ChatRoom> chatRooms = chatRoomRepository.findByUser1OrUser2(user, user).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
 
-        List<ResponseChatRoomInfo> chatRoomInfoList = new ArrayList<>();
+        List<MessageDto.ResponseChatRoomInfo> chatRoomInfoList = new ArrayList<>();
 
         for (ChatRoom chatRoom : chatRooms){
-            ResponseChatRoomInfo chatRoomInfo = new ResponseChatRoomInfo();
+            MessageDto.ResponseChatRoomInfo chatRoomInfo = new MessageDto.ResponseChatRoomInfo();
 
             // 채팅방 정보 설정
             chatRoomInfo.setChatroomId(chatRoom.getChatRoomId());
@@ -74,7 +69,7 @@ public class ChatRoomService {
 
             chatRoomInfoList.add(chatRoomInfo);
         }
-        ResponseChatRoom chatRoomResponse = new ResponseChatRoom();
+        MessageDto.ResponseChatRoom chatRoomResponse = new MessageDto.ResponseChatRoom();
         chatRoomResponse.setChatRoom(chatRoomInfoList);
         return  chatRoomResponse;
     }
@@ -82,25 +77,25 @@ public class ChatRoomService {
         return user1.getName() + " " + user2.getName();
     }
 
-    public ResponseEnterChatRoom getEnterChatRoom(Long chatRoomId) {
-        ChatRoom chatRoom = chatRoomRepository.findByChatRoomId(chatRoomId);
+ /*   public MessageDto.ResponseEnterChatRoom getEnterChatRoom(Long chatRoomId) {
+        ChatRoom chatRoom = chatRoomRepository.findByChatRoomIdAndIsChatIsFalse(chatRoomId).orElseThrow(ApiErrorCode.ChatRoomId_NOT_FOUND::exception);
 
-        List<Message> messages = messageRepository.findByChatRoom(chatRoom, Sort.by(Sort.Order.desc("sendAt")));
-        List<ResponseChatLog> chatMessages = new ArrayList<>();
+        List<Message> messages = messageRepository.findByChatRoom(chatRoom, Sort.by(Sort.Order.asc("sendAt")));
+        List<MessageDto.ResponseChatLog> chatMessages = new ArrayList<>();
 
         for (Message message : messages) {
-            ResponseChatLog chatMessageDto = new ResponseChatLog();
+            MessageDto.ResponseChatLog chatMessageDto = new MessageDto.ResponseChatLog();
             chatMessageDto.setChatContent(message.getMessageContext());
-            chatMessageDto.setSenderId(message.getSenderIdx());
+            chatMessageDto.setSenderId(message.getSenderId());
             chatMessageDto.setSendAt(String.valueOf(message.getSendAtFront()));
             chatMessageDto.setChatroomId(chatRoom.getChatRoomId());
             chatMessages.add(chatMessageDto);
         }
 
-        ResponseEnterChatRoom enterChatRoom = ResponseEnterChatRoom.builder()
+        MessageDto.ResponseEnterChatRoom enterChatRoom = MessageDto.ResponseEnterChatRoom.builder()
                 .chatLog(chatMessages)
                 .build();
 
         return enterChatRoom;
-    }
+    }페이지 네이션 기능 구현으로 인한 주석처리!(혹시 모르니 냅두겠습니다) */
 }
