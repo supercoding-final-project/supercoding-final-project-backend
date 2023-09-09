@@ -5,6 +5,7 @@ import com.github.supercodingfinalprojectbackend.entity.*;
 import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
 import com.github.supercodingfinalprojectbackend.entity.type.SocialPlatformType;
 import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
+import com.github.supercodingfinalprojectbackend.exception.ApiException;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.repository.*;
 import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
@@ -252,12 +253,25 @@ public class Oauth2Service {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.exchange(request, Object.class);
     }
+    public void googleLogout() {
+        // TODO: 구글 로그아웃 구현
+    }
 
-    public void serviceLogout() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    public void logout(Long userId) {
+        ValidateUtils.requireNotNull(userId, 500, "userId는 null일 수 없습니다.");
+        Login login = authHolder.get(userId);
 
-        ValidateUtils.requireNotNull(auth, ApiErrorCode.NOT_AUTHENTICATED);
-        Long userId = Long.valueOf((String) auth.getPrincipal());
+        ValidateUtils.requireNotNull(login, ApiErrorCode.ALREADY_LOGGED_OUT);
+        SocialPlatformType socialPlatformType = login.getSocialPlatformType();
+        switch (socialPlatformType) {
+            case KAKAO:
+                kakaoLogout();
+                break;
+            case GOOGLE:
+                googleLogout();
+                break;
+        }
+
         authHolder.remove(userId);
     }
 
