@@ -1,11 +1,13 @@
 package com.github.supercodingfinalprojectbackend.entity.type;
 
 import java.util.Arrays;
+import java.util.Set;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 @Getter
+@RequiredArgsConstructor
 public enum SkillStackType {
 	SPRING("Spring", 1),
 	PYTHON("Python", 2),
