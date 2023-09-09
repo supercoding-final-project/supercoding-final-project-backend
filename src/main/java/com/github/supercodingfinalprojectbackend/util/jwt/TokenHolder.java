@@ -1,6 +1,4 @@
-package com.github.supercodingfinalprojectbackend.dto;
-
-import lombok.*;
+package com.github.supercodingfinalprojectbackend.util.jwt;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,13 +20,4 @@ public class TokenHolder {
     }
     public String getAccessToken() { return tokenMap.get(ACCESS_TOKEN_KEY_NAME); }
     public String getRefreshToken() { return tokenMap.get(REFRESH_TOKEN_KEY_NAME); }
-
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    @ToString
-    public static class RefreshTokenRequest {
-        private String refreshToken;
-    }
 }
