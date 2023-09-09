@@ -5,12 +5,11 @@ import com.github.supercodingfinalprojectbackend.entity.*;
 import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
 import com.github.supercodingfinalprojectbackend.entity.type.SocialPlatformType;
 import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
-import com.github.supercodingfinalprojectbackend.exception.ApiException;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.repository.*;
-import com.github.supercodingfinalprojectbackend.security.JwtProvider;
 import com.github.supercodingfinalprojectbackend.util.AuthUtils;
-import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
+import com.github.supercodingfinalprojectbackend.util.jwt.JwtUtils;
+import com.github.supercodingfinalprojectbackend.util.jwt.TokenHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +21,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import javax.crypto.SecretKey;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
@@ -57,7 +57,7 @@ public class Oauth2Service {
     private final SkillStackRepository skillStackRepository;
     private final MentorSkillStackRepository mentorSkillStackRepository;
     private final MentorCareerRepository mentorCareerRepository;
-    private final JwtProvider jwtProvider;
+    private final SecretKey secretKey;
     @Qualifier("AuthHolder")
     private final AuthHolder<Long, Login> authHolder;
 
@@ -83,7 +83,7 @@ public class Oauth2Service {
         Long userId = user.getUserId();
         String userIdString = userId.toString();
         Set<String> authorities = Set.of(userRole.name());
-        TokenHolder tokenHolder = jwtProvider.createToken(userIdString, authorities);
+        TokenHolder tokenHolder = JwtUtils.createTokens(userIdString, authorities, secretKey);
 
         // 메모리에 로그인 정보 저장
         Login login = Login.builder()
@@ -268,7 +268,7 @@ public class Oauth2Service {
         loginRecordRepository.save(newloginRecord);
 
         Set<String> authorities = Set.of(userRole.name());
-        TokenHolder tokenHolder = jwtProvider.createToken(user.getUserId().toString(), authorities);
+        TokenHolder tokenHolder = JwtUtils.createTokens(user.getUserId().toString(), authorities, secretKey);
         Login newLogin = Login.builder()
                 .accessToken(tokenHolder.getAccessToken())
                 .refreshToken(tokenHolder.getRefreshToken())
