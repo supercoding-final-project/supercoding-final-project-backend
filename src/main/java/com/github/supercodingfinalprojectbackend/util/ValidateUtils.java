@@ -1,6 +1,7 @@
 package com.github.supercodingfinalprojectbackend.util;
 
 import com.github.supercodingfinalprojectbackend.exception.ApiException;
+import com.github.supercodingfinalprojectbackend.exception.errorcode.ErrorCode;
 
 import java.util.Comparator;
 import java.util.function.Function;
@@ -21,6 +22,10 @@ public class ValidateUtils {
         if (obj == null) throw new ApiException(validateStatus(status), validateMessage(message));
         return obj;
     }
+    public static <T> T requireNotNull(T obj, ErrorCode errorCode) {
+        if (obj == null) throw errorCode.exception();
+        return obj;
+    }
     public static <T> T requireNotNullElse(T obj, T other) {
         requireNotNull(other, 500, "other는 null일 수 없습니다.");
 
@@ -36,10 +41,19 @@ public class ValidateUtils {
 
         if (!condition) throw new ApiException(validateStatus(status), validateMessage(message));
     }
+    public static void requireTrue(boolean condition, ErrorCode errorCode) {
+        if (!condition) throw errorCode.exception();
+    }
     public static <T> T requireTrue(T obj, Predicate<T> predicate, int status, String message) {
         requireNotNull(obj, 500, "obj는 null이 될 수 없습니다.");
 
         if (!predicate.test(obj)) throw new ApiException(validateStatus(status), validateMessage(message));
+        return obj;
+    }
+    public static <T> T requireTrue(T obj, Predicate<T> predicate, ErrorCode errorCode) {
+        requireNotNull(obj, 500, "obj는 null이 될 수 없습니다.");
+
+        if (!predicate.test(obj)) throw errorCode.exception();
         return obj;
     }
     public static <T> int compare(T o1, T o2, Comparator<T> comparator) {
@@ -56,6 +70,16 @@ public class ValidateUtils {
             return function.apply(obj);
         } catch (Exception e) {
             throw new ApiException(validateStatus(status), validateMessage(message));
+        }
+    }
+    public static <T, R> R requireApply(T obj, Function<T, R> function, ErrorCode errorCode) {
+        requireNotNull(obj, 500, "obj는 null일 수 없습니다.");
+        requireNotNull(function, 500, "function은 null일 수 없습니다.");
+
+        try {
+            return function.apply(obj);
+        } catch (Exception e) {
+            throw errorCode.exception();
         }
     }
 }
