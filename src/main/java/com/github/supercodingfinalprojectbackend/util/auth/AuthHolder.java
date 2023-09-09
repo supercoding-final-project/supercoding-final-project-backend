@@ -1,13 +1,22 @@
 package com.github.supercodingfinalprojectbackend.util.auth;
 
+import com.github.supercodingfinalprojectbackend.dto.Login;
+
 import java.util.concurrent.ConcurrentHashMap;
 
-public class AuthHolder<K, V> {
-    private final ConcurrentHashMap<K, V> authMap = new ConcurrentHashMap<>();
+public class AuthHolder {
+    private final ConcurrentHashMap<Long, Login> authMap = new ConcurrentHashMap<>();
 
-    public V put(K key, V value) { return authMap.put(key, value); }
-    public V remove(K key) { return authMap.remove(key); }
-    public V get(K key) { return authMap.get(key); }
+    public Login put(Long key, Login value) { return authMap.put(key, value); }
+    public Login remove(Long key) { return authMap.remove(key); }
+    public Login get(Long key) { return authMap.get(key); }
 
     public AuthHolder() {}
+
+    public Login findByRefreshToken(String refreshToken) {
+        for (Login value : authMap.values()) {
+            if (value.getRefreshToken().equals(refreshToken)) return value;
+        }
+        return null;
+    }
 }

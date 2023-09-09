@@ -1,7 +1,6 @@
 package com.github.supercodingfinalprojectbackend.config;
 
 import com.github.supercodingfinalprojectbackend.util.auth.AuthHolder;
-import com.github.supercodingfinalprojectbackend.dto.Login;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -9,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 public class AuthHolderConfig {
 
     @Bean("AuthHolder")
-    public AuthHolder<Long, Login> authHolder() {
-        return new AuthHolder<>();
+    public AuthHolder authHolder() {
+        return new AuthHolder();
     }
 }

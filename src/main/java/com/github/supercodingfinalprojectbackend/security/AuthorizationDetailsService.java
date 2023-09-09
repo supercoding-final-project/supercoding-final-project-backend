@@ -17,7 +17,7 @@ import java.util.Set;
 public class AuthorizationDetailsService implements UserDetailsService {
 
     @Qualifier("AuthHolder")
-    private final AuthHolder<Long, Login> authHolder;
+    private final AuthHolder authHolder;
 
     @Override
     public AuthorizationDetails loadUserByUsername(String userId) throws UsernameNotFoundException {

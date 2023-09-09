@@ -7,6 +7,7 @@ import com.github.supercodingfinalprojectbackend.entity.type.SocialPlatformType;
 import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.repository.*;
+import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
 import com.github.supercodingfinalprojectbackend.util.auth.AuthHolder;
 import com.github.supercodingfinalprojectbackend.util.auth.AuthUtils;
 import com.github.supercodingfinalprojectbackend.util.jwt.JwtUtils;
@@ -60,7 +61,7 @@ public class Oauth2Service {
     private final MentorCareerRepository mentorCareerRepository;
     private final SecretKey secretKey;
     @Qualifier("AuthHolder")
-    private final AuthHolder<Long, Login> authHolder;
+    private final AuthHolder authHolder;
 
     public Login kakaoLogin(String code) {
         Kakao.OauthToken kakaoOauthToken = getKakaoToken(code);
@@ -319,5 +320,9 @@ public class Oauth2Service {
         }
 
         return MentorDto.fromEntity(savedMentor);
+    }
+
+    public void renewTokens(String refreshToken) {
+        Login login = authHolder.findByRefreshToken(refreshToken);
     }
 }
