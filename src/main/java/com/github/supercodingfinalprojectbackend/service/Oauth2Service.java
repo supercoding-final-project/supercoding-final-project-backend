@@ -1,17 +1,18 @@
 package com.github.supercodingfinalprojectbackend.service;
 
-import com.github.supercodingfinalprojectbackend.dto.AuthHolder;
-import com.github.supercodingfinalprojectbackend.dto.Kakao;
-import com.github.supercodingfinalprojectbackend.dto.Login;
-import com.github.supercodingfinalprojectbackend.dto.TokenHolder;
+import com.github.supercodingfinalprojectbackend.dto.*;
 import com.github.supercodingfinalprojectbackend.entity.*;
+import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
 import com.github.supercodingfinalprojectbackend.entity.type.SocialPlatformType;
 import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
+import com.github.supercodingfinalprojectbackend.exception.ApiException;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.KakaoErrorCode;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.UserErrorCode;
 import com.github.supercodingfinalprojectbackend.repository.*;
 import com.github.supercodingfinalprojectbackend.security.JwtProvider;
+import com.github.supercodingfinalprojectbackend.util.AuthUtils;
+import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,11 +25,13 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.transaction.Transactional;
+import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -53,6 +56,9 @@ public class Oauth2Service {
     private final UserSocialInfoRepository userSocialInfoRepository;
     private final UserAbstractAccountRepository userAbstractAccountRepository;
     private final MentorRepository mentorRepository;
+    private final SkillStackRepository skillStackRepository;
+    private final MentorSkillStackRepository mentorSkillStackRepository;
+    private final MentorCareerRepository mentorCareerRepository;
     private final JwtProvider jwtProvider;
     @Qualifier("AuthHolder")
     private final AuthHolder<Long, Login> authHolder;
@@ -276,5 +282,41 @@ public class Oauth2Service {
         authHolder.put(user.getUserId(), newLogin);
 
         return newLogin;
+    }
+
+    public ResponseEntity<ResponseUtils.ApiResponse<MentorDto.MentorInfoResponse>> joinMentor(@NotNull String company, @NotNull String introduction, Set<MentorCareerDto> careerDtoSet, Set<SkillStackType> skillStackTypeSet) {
+        Long userId = AuthUtils.getUserId();
+        User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(UserErrorCode.NOT_FOUND_USER::exception);
+
+        Mentor newMentor = Mentor.from(user, company, introduction);
+        Mentor savedMentor = mentorRepository.save(newMentor);
+
+        if (skillStackTypeSet != null) {
+            List<MentorSkillStack> mentorSkillStacks = skillStackTypeSet.stream()
+                    .map(skillStackType -> {
+                        SkillStack skillStack = skillStackRepository.findBySkillStackId(Long.valueOf(skillStackType.getSkillStackCode()))
+                                .orElseThrow(()->new ApiException(500, "서버 측의 문제로 요청에 실패했습니다."));
+                        MentorSkillStack mentorSkillStack = MentorSkillStack.builder().mentor(savedMentor).skillStack(skillStack).build();
+                        return mentorSkillStackRepository.save(mentorSkillStack);
+                    })
+                    .collect(Collectors.toList());
+
+            savedMentor.setMentorSkillStacks(mentorSkillStacks);
+        }
+
+        if (careerDtoSet != null) {
+            careerDtoSet.forEach(careerDto->{
+                MentorCareer newMentorCareer = MentorCareer.builder()
+                        .mentor(savedMentor)
+                        .duty(careerDto.getDutyType().name())
+                        // TODO: period 타입변경 Integer -> String
+//                        .period(careerDto.getPeriod())
+                        .build();
+                mentorCareerRepository.save(newMentorCareer);
+            });
+        }
+
+        MentorDto.MentorInfoResponse mentorInfoResponse = MentorDto.MentorInfoResponse.from(MentorDto.fromEntity(savedMentor));
+        return ResponseUtils.created("멘토등록에 성공했습니다.", mentorInfoResponse);
     }
 }

@@ -2,10 +2,11 @@ package com.github.supercodingfinalprojectbackend.dto;
 
 import com.github.supercodingfinalprojectbackend.entity.Mentor;
 import com.querydsl.core.annotations.QueryProjection;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 @Getter
 @NoArgsConstructor
@@ -69,5 +70,17 @@ public class MentorDto {
 					.thumbnailImageUrl(mentorDto.getThumbnailImageUrl())
 					.build();
 		}
+	}
+
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	@ToString
+	public static class JoinRequest {
+		private String company;
+		private String introduction;
+		private Set<MentorCareerDto.Request> careers;
+		private Set<String> skillStackNames;
 	}
 }
