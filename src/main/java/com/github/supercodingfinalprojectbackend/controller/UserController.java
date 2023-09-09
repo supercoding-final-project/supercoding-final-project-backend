@@ -68,15 +68,17 @@ public class UserController {
         String introduction = request.getIntroduction();
         Set<MentorCareerDto.Request> careers = request.getCareers();
         Set<String> skillStackNames = request.getSkillStackNames();
+        Set<SkillStackType> skillStackTypeSet = skillStackNames != null ? skillStackNames.stream().map(SkillStackType::findBySkillStackType).collect(Collectors.toSet()) : null;
         Set<MentorCareerDto> careerDtoSet;
-        Set<SkillStackType> skillStackTypeSet;
+
         try {
             careerDtoSet = careers != null ? careers.stream().map(MentorCareerDto::from).collect(Collectors.toSet()) : null;
-            skillStackTypeSet = skillStackNames != null ? skillStackNames.stream().map(SkillStackType::findBySkillStackType).collect(Collectors.toSet()) : null;
         } catch (IllegalArgumentException e) {
             throw ApiErrorCode.INVALID_PATH_VARIABLE.exception();
         }
+        MentorDto mentorDto = oauth2Service.joinMentor(company, introduction, careerDtoSet, skillStackTypeSet);
+        MentorDto.MentorInfoResponse response = MentorDto.MentorInfoResponse.from(mentorDto);
+        return ResponseUtils.created("멘토 등록에 성공했습니다.", response);
 
-        return oauth2Service.joinMentor(company, introduction, careerDtoSet, skillStackTypeSet);
     }
 }

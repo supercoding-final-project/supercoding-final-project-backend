@@ -282,7 +282,7 @@ public class Oauth2Service {
         return newLogin;
     }
 
-    public ResponseEntity<ResponseUtils.ApiResponse<MentorDto.MentorInfoResponse>> joinMentor(@NotNull String company, @NotNull String introduction, Set<MentorCareerDto> careerDtoSet, Set<SkillStackType> skillStackTypeSet) {
+    public MentorDto joinMentor(@NotNull String company, @NotNull String introduction, Set<MentorCareerDto> careerDtoSet, Set<SkillStackType> skillStackTypeSet) {
         Long userId = AuthUtils.getUserId();
         User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
 
@@ -293,8 +293,11 @@ public class Oauth2Service {
             List<MentorSkillStack> mentorSkillStacks = skillStackTypeSet.stream()
                     .map(skillStackType -> {
                         SkillStack skillStack = skillStackRepository.findBySkillStackId(Long.valueOf(skillStackType.getSkillStackCode()))
-                                .orElseThrow(()->new ApiException(500, "서버 측의 문제로 요청에 실패했습니다."));
-                        MentorSkillStack mentorSkillStack = MentorSkillStack.builder().mentor(savedMentor).skillStack(skillStack).build();
+                                .orElseThrow(ApiErrorCode.INTERNAL_SERVER_ERROR::exception);
+                        MentorSkillStack mentorSkillStack = MentorSkillStack.builder()
+                                .mentor(savedMentor)
+                                .skillStack(skillStack)
+                                .build();
                         return mentorSkillStackRepository.save(mentorSkillStack);
                     })
                     .collect(Collectors.toList());
@@ -314,7 +317,6 @@ public class Oauth2Service {
             });
         }
 
-        MentorDto.MentorInfoResponse mentorInfoResponse = MentorDto.MentorInfoResponse.from(MentorDto.fromEntity(savedMentor));
-        return ResponseUtils.created("멘토등록에 성공했습니다.", mentorInfoResponse);
+        return MentorDto.fromEntity(savedMentor);
     }
 }
