@@ -1,4 +1,4 @@
-package com.github.supercodingfinalprojectbackend.dto;
+package com.github.supercodingfinalprojectbackend.util.auth;
 
 import java.util.concurrent.ConcurrentHashMap;
 

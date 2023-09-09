@@ -1,6 +1,6 @@
 package com.github.supercodingfinalprojectbackend.security;
 
-import com.github.supercodingfinalprojectbackend.dto.AuthHolder;
+import com.github.supercodingfinalprojectbackend.util.auth.AuthHolder;
 import com.github.supercodingfinalprojectbackend.dto.Login;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import lombok.RequiredArgsConstructor;

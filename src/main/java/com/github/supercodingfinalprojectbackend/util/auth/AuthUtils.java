@@ -1,4 +1,4 @@
-package com.github.supercodingfinalprojectbackend.util;
+package com.github.supercodingfinalprojectbackend.util.auth;
 
 import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;

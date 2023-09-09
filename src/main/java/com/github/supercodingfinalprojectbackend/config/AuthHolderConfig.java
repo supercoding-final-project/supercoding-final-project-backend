@@ -1,6 +1,6 @@
 package com.github.supercodingfinalprojectbackend.config;
 
-import com.github.supercodingfinalprojectbackend.dto.AuthHolder;
+import com.github.supercodingfinalprojectbackend.util.auth.AuthHolder;
 import com.github.supercodingfinalprojectbackend.dto.Login;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

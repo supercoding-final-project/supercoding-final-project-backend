@@ -7,7 +7,7 @@ import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
 import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.service.Oauth2Service;
-import com.github.supercodingfinalprojectbackend.util.AuthUtils;
+import com.github.supercodingfinalprojectbackend.util.auth.AuthUtils;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
