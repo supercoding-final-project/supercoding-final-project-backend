@@ -1,7 +1,8 @@
 package com.github.supercodingfinalprojectbackend.util;
 
 import com.github.supercodingfinalprojectbackend.exception.ApiException;
-import com.github.supercodingfinalprojectbackend.exception.errorcode.ErrorCode;
+
+import java.util.function.Predicate;
 
 public class ValidateUtils {
     private ValidateUtils() {}
@@ -10,9 +11,10 @@ public class ValidateUtils {
         if (obj == null) throw new ApiException(status, message);
         return obj;
     }
-
-    public static <T> T notNull(T obj, ErrorCode errorCode) {
-        if (obj == null) throw errorCode.exception();
-        return obj;
+    public static void predicate(boolean condition, int status, String message) {
+        if (!condition) throw new ApiException(status, message);
+    }
+    public static <T> void predicate(T obj, Predicate<T> predicate, int status, String message) {
+        if (predicate.test(obj)) throw new ApiException(status, message);
     }
 }
