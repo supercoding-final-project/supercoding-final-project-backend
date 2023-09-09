@@ -71,7 +71,7 @@ public class JwtUtils {
         return cutPrefix(jwt);
     }
 
-    private static Claims parseClaims(String jwt, SecretKey secretKey) {
+    public static Claims parseClaims(String jwt, SecretKey secretKey) {
         ValidateUtils.requireNotNull(jwt, 500, "jwt는 null일 수 없습니다.");
         ValidateUtils.requireNotNull(secretKey, 500, "secretKey는 null일 수 없습니다.");
 
@@ -100,5 +100,13 @@ public class JwtUtils {
                 .collect(Collectors.toSet());
 
         return new UsernamePasswordAuthenticationToken(userId, jwt, grantedAuthorities);
+    }
+
+    public static String getSubject(String jwt, SecretKey secretKey) {
+        ValidateUtils.requireNotNull(jwt, 500, "jwt는 null이 될 수 없습니다.");
+        ValidateUtils.requireNotNull(secretKey, 500, "secreKey는 null이 될 수 없습니다.");
+
+        Claims claims = ValidateUtils.requireApply(jwt, t->JwtUtils.parseClaims(t, secretKey), 500, "jwt가 유효하지 않습니다.");
+        return claims.getSubject();
     }
 }
