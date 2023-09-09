@@ -5,6 +5,7 @@ import com.github.supercodingfinalprojectbackend.dto.RefreshTokenDTO;
 import com.github.supercodingfinalprojectbackend.service.Oauth2Service;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
+import com.github.supercodingfinalprojectbackend.util.jwt.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,9 +22,10 @@ public class AuthController {
 
     @PostMapping("/token/refresh")
     public ResponseEntity<ResponseUtils.ApiResponse<Login.Response>> renewTokens(@RequestBody RefreshTokenDTO request) {
-        String refreshToken = request.getRefreshToken();
+        String bearerToken = request.getRefreshToken();
 
-        ValidateUtils.requireNotNull(refreshToken, 401, "리프레쉬 토큰이 존재하지 않습니다.");
+        ValidateUtils.requireNotNull(bearerToken, 401, "리프레쉬 토큰이 존재하지 않습니다.");
+        String refreshToken = JwtUtils.cutPrefix(bearerToken);
 
         Login login =  oauth2Service.renewTokens(refreshToken);
         Login.Response response = Login.Response.from(login);
