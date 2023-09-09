@@ -26,14 +26,6 @@ public class UserController {
 
     private final Oauth2Service oauth2Service;
 
-    @GetMapping("/oauth2/kakao/logout")
-    public ResponseEntity<ResponseUtils.ApiResponse<Void>> kakaoLogout() {
-        oauth2Service.kakaoLogout();
-        oauth2Service.serviceLogout();
-
-        return ResponseUtils.noContent("로그아웃에 성공했습니다.", null);
-    }
-
     @GetMapping("/switch/{roleName}")
     @Operation(summary = "역할 전환")
     public ResponseEntity<ResponseUtils.ApiResponse<Login.Response>> switchRole(

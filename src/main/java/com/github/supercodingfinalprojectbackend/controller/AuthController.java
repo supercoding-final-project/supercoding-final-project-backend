@@ -29,6 +29,14 @@ public class AuthController {
         return ResponseUtils.ok("로그인에 성공했습니다.", response);
     }
 
+    @GetMapping("/logout/kakao")
+    public ResponseEntity<ResponseUtils.ApiResponse<Void>> kakaoLogout() {
+        oauth2Service.kakaoLogout();
+        oauth2Service.serviceLogout();
+
+        return ResponseUtils.noContent("로그아웃에 성공했습니다.", null);
+    }
+
     @PostMapping("/token/refresh")
     public ResponseEntity<ResponseUtils.ApiResponse<TokenDto.Response>> renewTokens(@RequestBody TokenDto.RefreshTokenRequest request) {
         String bearerToken = request.getRefreshToken();
