@@ -2,6 +2,7 @@ package com.github.supercodingfinalprojectbackend.dto;
 
 import com.github.supercodingfinalprojectbackend.entity.type.SocialPlatformType;
 import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
+import com.github.supercodingfinalprojectbackend.util.jwt.JwtUtils;
 import lombok.*;
 
 @Getter
@@ -34,8 +35,8 @@ public class Login {
         private String roleName;
 
         public static Response from(Login login) {
-            String accessToken = "Bearer " + login.accessToken;
-            String refreshToken = "Bearer " + login.refreshToken;
+            String accessToken = JwtUtils.prefix(login.accessToken);
+            String refreshToken = JwtUtils.prefix(login.refreshToken);
             String roleName = login.userRole.name();
             return new Response(accessToken, refreshToken, roleName);
         }
