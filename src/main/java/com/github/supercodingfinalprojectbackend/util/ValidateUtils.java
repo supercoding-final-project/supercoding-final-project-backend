@@ -15,6 +15,6 @@ public class ValidateUtils {
         if (!condition) throw new ApiException(status, message);
     }
     public static <T> void predicate(T obj, Predicate<T> predicate, int status, String message) {
-        if (predicate.test(obj)) throw new ApiException(status, message);
+        if (predicate.test(notNull(obj, 500, "ValidateUtils.predicate(obj,...)의 obj는 null이 될 수 없습니다."))) throw new ApiException(status, message);
     }
 }
