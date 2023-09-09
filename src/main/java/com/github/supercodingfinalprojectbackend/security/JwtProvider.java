@@ -1,7 +1,7 @@
 package com.github.supercodingfinalprojectbackend.security;
 
 import com.github.supercodingfinalprojectbackend.dto.TokenHolder;
-import com.github.supercodingfinalprojectbackend.exception.errorcode.JwtErrorCode;
+import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -43,7 +43,7 @@ public class JwtProvider implements AuthenticationProvider {
                 details.getAuthorities().size() != authorities.size() ||
                 !details.getAuthorities().containsAll(authorities)
         ) {
-            throw JwtErrorCode.UNRELIABLE_JWT.exception();
+            throw ApiErrorCode.UNRELIABLE_JWT.exception();
         };
 
         return new UsernamePasswordAuthenticationToken(details.getUsername(), details.getPassword(), details.getAuthorities());
@@ -67,11 +67,11 @@ public class JwtProvider implements AuthenticationProvider {
         try {
             return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(jwt).getBody();
         } catch (ExpiredJwtException e) {
-            throw JwtErrorCode.EXPIRED_JWT.exception();
+            throw ApiErrorCode.EXPIRED_JWT.exception();
         } catch (UnsupportedJwtException | MalformedJwtException | SignatureException e) {
-            throw JwtErrorCode.INVALID_SIGNATURE.exception();
+            throw ApiErrorCode.INVALID_SIGNATURE_JWT.exception();
         } catch (IllegalArgumentException e) {
-            throw JwtErrorCode.EMPTY_JWT.exception();
+            throw ApiErrorCode.EMPTY_JWT.exception();
         }
     }
 
@@ -79,7 +79,7 @@ public class JwtProvider implements AuthenticationProvider {
         Claims claims = parseClaims(accessToken);
         String userId = claims.getSubject();
         List<?> authorities = claims.get("authorities", List.class);
-        if (authorities == null ) throw JwtErrorCode.INVALID_SIGNATURE.exception();
+        if (authorities == null ) throw ApiErrorCode.INVALID_SIGNATURE_JWT.exception();
         Set<SimpleGrantedAuthority> grantedAuthorities = authorities.stream()
                 .map(String::valueOf)
                 .map(SimpleGrantedAuthority::new)

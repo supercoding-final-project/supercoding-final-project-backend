@@ -1,6 +1,8 @@
 package com.github.supercodingfinalprojectbackend.controller;
 
 import com.github.supercodingfinalprojectbackend.dto.response.PageResponse;
+import com.github.supercodingfinalprojectbackend.exception.ApiException;
+import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -10,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Optional;
 
 
 @RestController()
@@ -46,5 +50,30 @@ public class TestController {
                 .body(data);
 
         return response6;
+    }
+
+    private void exceptionExample() {
+        // 1. 여러분이 코드를 작성하는 중에 컨트롤 가능한 모든 예외는 ApiException으로 던져주셔야 합니다.
+
+        // 2. ApiException을 던질 때는 '상태코드'와 '메세지'를 매개변수로 넣어줄 수 있습니다.
+        //    '상태코드'는 HttpStatus와 int 둘 다 사용 가능합니다.
+        ApiException exception1 = new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "서버의 문제~~");
+        ApiException exception2 = new ApiException(500, "서버의 문제~~~~");
+
+        // 3. 만약 자주 사용하게 되는 상태코드와 메세지가 있다면 ErrorCode에 추가하여 재사용할 수 있습니다.
+        ApiException exception3 = new ApiException(ApiErrorCode.FAIL_TO_SAVE);
+
+        // 4. ErrorCode를 사용해서 바로 예외를 던질 수도 있습니다.
+        ApiException exception4 = ApiErrorCode.FAIL_TO_SAVE.exception();
+
+        // 5. ErrorCode를 사용해서 예외를 바로 던지는 방식은 Optional과 결합했을 때 꽤 편합니다.
+        //    아래의 두 코드를 비교해보세요
+        String str1 = Optional.ofNullable("hello, world").orElseThrow(()->new ApiException(ApiErrorCode.FAIL_TO_SAVE));
+        String str2 = Optional.ofNullable("hello, world").orElseThrow(ApiErrorCode.FAIL_TO_SAVE::exception);
+
+        // 6. 마지막으로 원래 의도는 ErrorCode를 다양하게 만들어서 사용하려고 했는데
+        //    아무래도 재사용할 에러코드와 메세지가 생각보다 많지 않고
+        //    또 ErrorCode를 새로 만드는 과정이 번거롭다보니 접근성이 떨어지는 것 같습니다.
+        //    그래서 이제 ApiErrorCode만 사용하는 걸로 하겠습니다.
     }
 }
