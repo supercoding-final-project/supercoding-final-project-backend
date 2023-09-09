@@ -79,6 +79,5 @@ public class UserController {
         MentorDto mentorDto = oauth2Service.joinMentor(company, introduction, careerDtoSet, skillStackTypeSet);
         MentorDto.MentorInfoResponse response = MentorDto.MentorInfoResponse.from(mentorDto);
         return ResponseUtils.created("멘토 등록에 성공했습니다.", response);
-
     }
 }
