@@ -26,16 +26,6 @@ public class UserController {
 
     private final Oauth2Service oauth2Service;
 
-    @GetMapping("/oauth2/kakao/login")
-    @Operation(summary = "카카오 로그인")
-    public ResponseEntity<ResponseUtils.ApiResponse<Login.Response>> kakaoLogin(
-            @RequestParam(name = "code") @Parameter(name = "카카오 인가 코드", required = true) String code
-    ){
-        Login login = oauth2Service.kakaoLogin(code);
-        Login.Response response = Login.Response.from(login);
-        return ResponseUtils.ok("로그인에 성공했습니다.", response);
-    }
-
     @GetMapping("/oauth2/kakao/logout")
     public ResponseEntity<ResponseUtils.ApiResponse<Void>> kakaoLogout() {
         oauth2Service.kakaoLogout();
