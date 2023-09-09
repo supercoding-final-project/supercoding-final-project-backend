@@ -12,7 +12,6 @@ import com.github.supercodingfinalprojectbackend.util.auth.AuthHolder;
 import com.github.supercodingfinalprojectbackend.util.auth.AuthUtils;
 import com.github.supercodingfinalprojectbackend.util.jwt.JwtUtils;
 import com.github.supercodingfinalprojectbackend.util.jwt.TokenHolder;
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -323,7 +322,7 @@ public class Oauth2Service {
         return MentorDto.fromEntity(savedMentor);
     }
 
-    public Login renewTokens(String refreshToken) {
+    public TokenDto renewTokens(String refreshToken) {
         String userIdStr = ValidateUtils.requireApply(refreshToken, t->JwtUtils.getSubject(t, secretKey), ApiErrorCode.UNRELIABLE_JWT);
         Long userId = ValidateUtils.requireApply(userIdStr, Long::parseLong, ApiErrorCode.UNRELIABLE_JWT);
         Login login = ValidateUtils.requireNotNull(authHolder.get(userId), 404, "로그인 기록이 없습니다.");
@@ -337,6 +336,6 @@ public class Oauth2Service {
                 .socialPlatformType(login.getSocialPlatformType())
                 .build();
         authHolder.put(userId, newLogin);
-        return newLogin;
+        return TokenDto.from(tokenHolder);
     }
 }
