@@ -16,7 +16,18 @@ public class PostsSkillStack extends CommonEntity{
     @Column(name = "stack_id", nullable = false)
     private Long stackId;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
+    private Posts posts;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "skill_stack_id")
     private SkillStack skillStack;
+
+    public static PostsSkillStack fromPost(Posts posts,SkillStack skillStack){
+        return PostsSkillStack.builder()
+                .posts(posts)
+                .skillStack(skillStack)
+                .build();
+    }
 }

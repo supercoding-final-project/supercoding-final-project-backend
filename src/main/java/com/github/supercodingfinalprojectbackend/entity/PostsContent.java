@@ -1,6 +1,9 @@
 package com.github.supercodingfinalprojectbackend.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
@@ -25,4 +28,12 @@ public class PostsContent extends CommonEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Posts posts;
+
+    public static PostsContent fromPost(String text, Integer location, Posts posts ){
+        return PostsContent.builder()
+                .text(text)
+                .location(String.valueOf(location))
+                .posts(posts)
+                .build();
+    }
 }

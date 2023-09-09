@@ -1,5 +1,6 @@
 package com.github.supercodingfinalprojectbackend.entity;
 
+import com.github.supercodingfinalprojectbackend.dto.Post.PostCreateDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,8 +23,6 @@ public class Posts extends CommonEntity{
     private String title;
     @Column(name = "level")
     private String level;
-    @Column(name = "review_objective")
-    private String reviewObjective;
     @Column(name = "price")
     private Integer price;
 
@@ -31,5 +30,13 @@ public class Posts extends CommonEntity{
     @JoinColumn(name = "mentor_id")
     private Mentor mentor;
 
+    public static Posts fromDto(PostCreateDto postCreateDto, Mentor mentor){
+        return Posts.builder()
+                .title(postCreateDto.getTitle())
+                .level(postCreateDto.getLevel())
+                .price(postCreateDto.getPrice())
+                .mentor(mentor)
+                .build();
+    }
 
 }
