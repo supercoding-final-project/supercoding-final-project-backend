@@ -3,7 +3,6 @@ package com.github.supercodingfinalprojectbackend.util.jwt;
 import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
-import com.nimbusds.oauth2.sdk.auth.Secret;
 import io.jsonwebtoken.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,10 +21,10 @@ public class JwtUtils {
     private JwtUtils() {}
 
     public static String createToken(String subject, Set<String> authorities, long lifeMillis, SecretKey secretKey) {
-        ValidateUtils.requireNotNull(subject, 500, "JwtUtils.createToken(subject, ...) subject는 null일 수 없습니다.");
-        ValidateUtils.requireNotNull(authorities, 500, "JwtUtils.createToken(authorities, ...) authorities는 null일 수 없습니다.");
-        ValidateUtils.requireNotNull(secretKey, 500, "JwtUtils.createToken(secretKey, ...) secretKey는 null일 수 없습니다.");
-        ValidateUtils.requireTrue(lifeMillis > 0L, 500, "JwtUtils.createToken(lifeMillis, ...) lifeMillis는 0이하일 수 없습니다.");
+        ValidateUtils.requireNotNull(subject, 500, "subject는 null일 수 없습니다.");
+        ValidateUtils.requireNotNull(authorities, 500, "authorities는 null일 수 없습니다.");
+        ValidateUtils.requireNotNull(secretKey, 500, "secretKey는 null일 수 없습니다.");
+        ValidateUtils.requireTrue(lifeMillis > 0L, 500, "lifeMillis는 0이하일 수 없습니다.");
 
         Date now = new Date();
         return Jwts.builder()
