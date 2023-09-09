@@ -8,6 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface SkillStackRepository extends JpaRepository<SkillStack, Long> {
-
     Optional<SkillStack> findBySkillStackId(Long skillStackCode);
+    SkillStack findBySkillStackName(String skillName);
 }
