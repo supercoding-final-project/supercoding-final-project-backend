@@ -2,9 +2,10 @@ package com.github.supercodingfinalprojectbackend.repository;
 
 import com.github.supercodingfinalprojectbackend.dto.MentorDto.MentorInfoResponse;
 import com.github.supercodingfinalprojectbackend.entity.Mentor;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 public interface MentorRepositoryCustom {
 
