@@ -21,7 +21,9 @@ public enum ApiErrorCode implements ErrorCode {
     NOT_FOUND_MENTOR(HttpStatus.NOT_FOUND, "존재하지 않는 멘토입니다."),
     IS_ALREADY_MENTOR(HttpStatus.OK, "이미 멘토로 로그인 중입니다."),
     NOT_FOUND_MENTEE(HttpStatus.NOT_FOUND, "존재하지 않는 멘티입니다."),
-    IS_ALREADY_MENTEE(HttpStatus.OK, "이미 멘티로 로그인 중입니다.")
+    IS_ALREADY_MENTEE(HttpStatus.OK, "이미 멘티로 로그인 중입니다."),
+
+    ChatRoomId_NOT_FOUND(HttpStatus.NOT_FOUND,"해당 채팅방을 찾을 수 없습니다.")
     ;
 
     ApiErrorCode(HttpStatus status, String message) {

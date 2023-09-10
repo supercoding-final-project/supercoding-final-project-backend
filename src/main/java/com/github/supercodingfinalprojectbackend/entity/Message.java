@@ -31,11 +31,11 @@ public class Message {
     @Column(name = "send_at")
     private Timestamp sendAt;
 
-    @Column(name = "sender_idx")
-    private Long senderIdx;
+    @Column(name = "sender_id")
+    private Long senderId;
 
-    @Column(name = "is_check")
-    private Boolean isCheck;
+    @Column(name = "is_check",  columnDefinition = "tinyint default 0")
+    private Boolean isCheck = false;
 
     @Column(name = "send_at_front")
     private String sendAtFront;
