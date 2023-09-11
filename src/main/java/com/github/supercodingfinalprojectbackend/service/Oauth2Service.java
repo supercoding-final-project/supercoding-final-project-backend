@@ -1,34 +1,33 @@
 package com.github.supercodingfinalprojectbackend.service;
 
-import com.github.supercodingfinalprojectbackend.dto.AuthHolder;
-import com.github.supercodingfinalprojectbackend.dto.Kakao;
-import com.github.supercodingfinalprojectbackend.dto.Login;
-import com.github.supercodingfinalprojectbackend.dto.TokenHolder;
+import com.github.supercodingfinalprojectbackend.dto.*;
 import com.github.supercodingfinalprojectbackend.entity.*;
+import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
 import com.github.supercodingfinalprojectbackend.entity.type.SocialPlatformType;
 import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
-import com.github.supercodingfinalprojectbackend.exception.errorcode.KakaoErrorCode;
-import com.github.supercodingfinalprojectbackend.exception.errorcode.UserErrorCode;
 import com.github.supercodingfinalprojectbackend.repository.*;
-import com.github.supercodingfinalprojectbackend.security.JwtProvider;
+import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
+import com.github.supercodingfinalprojectbackend.util.auth.AuthHolder;
+import com.github.supercodingfinalprojectbackend.util.jwt.JwtUtils;
+import com.github.supercodingfinalprojectbackend.util.jwt.TokenHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import javax.crypto.SecretKey;
 import javax.transaction.Transactional;
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -53,25 +52,42 @@ public class Oauth2Service {
     private final UserSocialInfoRepository userSocialInfoRepository;
     private final UserAbstractAccountRepository userAbstractAccountRepository;
     private final MentorRepository mentorRepository;
-    private final JwtProvider jwtProvider;
+    private final SkillStackRepository skillStackRepository;
+    private final MentorSkillStackRepository mentorSkillStackRepository;
+    private final MentorCareerRepository mentorCareerRepository;
+    private final SecretKey secretKey;
     @Qualifier("AuthHolder")
-    private final AuthHolder<Long, Login> authHolder;
+    private final AuthHolder authHolder;
 
     public Login kakaoLogin(String code) {
+        ValidateUtils.requireNotNull(code, 401, "카카오 로그인에 실패했습니다.");
+
         Kakao.OauthToken kakaoOauthToken = getKakaoToken(code);
         Kakao.UserInfo kakaoUserInfo = getKakaoUserInfo(kakaoOauthToken);
 
         // 회원이 존재하지 않으면 회원 가입
         Long kakaoId = kakaoUserInfo.getId();
         UserSocialInfo userSocialInfo = userSocialInfoRepository.findBySocialIdAndSocialPlatformNameAndIsDeletedIsFalse(kakaoId, SocialPlatformType.KAKAO.name())
-                .orElseGet(()->signupWithKakao(kakaoUserInfo));
+                .orElseGet(()->{
+                    Kakao.Account kakaoAccount = kakaoUserInfo.getKakaoAccount();
+                    Kakao.Profile kakaoProfile = kakaoAccount.getProfile();
 
-        return serviceLogin(userSocialInfo, kakaoOauthToken.getAccessToken(), kakaoOauthToken.getRefreshToken(), SocialPlatformType.KAKAO);
+                    UserAbstractAccount userAbstractAccount = createAndSaveUserAbstractAccount();
+                    User user = createAndSaveUser(userAbstractAccount, kakaoAccount.getEmail(), kakaoProfile.getNickname(), kakaoProfile.getThumbnailImageUrl());
+                    createAndSaveMentee(user);
+                    return createAndSaveUserSocialInfo(user, kakaoUserInfo.getId(), SocialPlatformType.KAKAO);
+                });
+
+        Login login = serviceLogin(userSocialInfo.getUser());
+        kakaoLogout(kakaoOauthToken.getAccessToken());
+
+        return login;
     }
 
-    public Login serviceLogin(UserSocialInfo userSocialInfo, String socialAccessToken, String socialRefreshToken, SocialPlatformType socialPlatformType) {
+    public Login serviceLogin(User user) {
+        ValidateUtils.requireNotNull(user, 500, "user는 null일 수 없습니다.");
+
         // 이전 로그인 기록을 뒤져서 어떤 역할로 로그인할 것인지 선택
-        User user = userSocialInfo.getUser();
         LoginRecord loginRecord = loginRecordRepository.findFirstByUserAndIsDeletedIsFalseOrderByCreatedAtDesc(user).orElse(null);
         UserRole userRole = loginRecord == null ? UserRole.MENTEE : UserRole.valueOf(loginRecord.getRoleName());
 
@@ -79,16 +95,13 @@ public class Oauth2Service {
         Long userId = user.getUserId();
         String userIdString = userId.toString();
         Set<String> authorities = Set.of(userRole.name());
-        TokenHolder tokenHolder = jwtProvider.createToken(userIdString, authorities);
+        TokenHolder tokenHolder = JwtUtils.createTokens(userIdString, authorities, secretKey);
 
         // 메모리에 로그인 정보 저장
         Login login = Login.builder()
                 .userRole(userRole)
                 .accessToken(tokenHolder.getAccessToken())
                 .refreshToken(tokenHolder.getRefreshToken())
-                .socialPlatformType(socialPlatformType)
-                .socialAccessToken(socialAccessToken)
-                .socialRefreshToken(socialRefreshToken)
                 .build();
         authHolder.put(userId, login);
 
@@ -100,22 +113,6 @@ public class Oauth2Service {
         loginRecordRepository.save(newloginRecord);
 
         return login;
-    }
-
-    private UserSocialInfo signupWithKakao(Kakao.UserInfo kakaoUserInfo) {
-        Kakao.Account account = kakaoUserInfo.getKakaoAccount();
-        Kakao.Profile profile = account.getProfile();
-        String name = account.getName();
-        String nickname = profile.getNickName();
-        String thumbnailImageUrl = profile.getThumbnailImageUrl();
-        Long socialId = kakaoUserInfo.getId();
-
-        UserAbstractAccount savedAbstractAccount = createAndSaveUserAbstractAccount();
-        User savedUser = createAndSaveUser(savedAbstractAccount, name, nickname, thumbnailImageUrl);
-        UserSocialInfo savedUserSocialInfo = createAndSaveUserSocialInfo(savedUser, socialId, SocialPlatformType.KAKAO);
-        createAndSaveMentee(savedUser);
-
-        return savedUserSocialInfo;
     }
 
     private UserAbstractAccount createAndSaveUserAbstractAccount() {
@@ -142,10 +139,10 @@ public class Oauth2Service {
         return menteeRepository.save(newMentee);
     }
 
-    private User createAndSaveUser(UserAbstractAccount abstractAccount, String name, String nickname, String thumbnailImageUrl) {
+    private User createAndSaveUser(UserAbstractAccount abstractAccount, String email, String nickname, String thumbnailImageUrl) {
         User newUser = User.builder()
                 .abstractAccount(abstractAccount)
-                .name(name)
+                .email(email)
                 .nickname(nickname)
                 .thumbnailImageUrl(thumbnailImageUrl)
                 .build();
@@ -168,17 +165,19 @@ public class Oauth2Service {
     }
 
     private Kakao.OauthToken getKakaoToken(String code) {
+        ValidateUtils.requireNotNull(code, 500, "code는 null일 수 없습니다.");
+
         RestTemplate restTemplate = new RestTemplate();
-        RequestEntity<?> request = createKakaoTokenRequest(code);
-        ResponseEntity<Kakao.OauthToken> response = restTemplate.exchange(request, Kakao.OauthToken.class);
+        RequestEntity<MultiValueMap<String, String>> request = createKakaoTokenRequest(code);
+        ResponseEntity<Kakao.OauthToken> response = ValidateUtils.requireApply(request, o->restTemplate.exchange(o, Kakao.OauthToken.class), 500, "카카오 토큰 요청에 실패했습니다.");
         Kakao.OauthToken kakaoOauthToken = response.getBody();
-        if (kakaoOauthToken == null) throw KakaoErrorCode.FAIL_TO_RECEIVE_TOKEN.exception();
-        return kakaoOauthToken;
+        return ValidateUtils.requireNotNull(kakaoOauthToken, 500, "카카오 토큰 요청에 실패했습니다.");
     }
 
     private RequestEntity<MultiValueMap<String, String>> createKakaoTokenRequest(String code) {
-        URI uri = URI.create(kakaoTokenUri);
+        ValidateUtils.requireNotNull(code, 500, "code는 null일 수 없습니다.");
 
+        URI uri = ValidateUtils.requireApply(kakaoTokenUri, URI::create, 500,"카카오 토큰 요청에 실패했습니다.");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
@@ -196,18 +195,18 @@ public class Oauth2Service {
         RequestEntity<?> request = createKakaoUserInfoRequest(kakaoOauthToken);
 
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Kakao.UserInfo> response = restTemplate.exchange(request, Kakao.UserInfo.class);
+        ResponseEntity<Kakao.UserInfo> response = ValidateUtils.requireApply(request, r->restTemplate.exchange(r, Kakao.UserInfo.class), 500, "카카오 유저 정보 요청에 실패했습니다.");
 
         Kakao.UserInfo kakaoUserInfo = response.getBody();
-        if (kakaoUserInfo == null) throw KakaoErrorCode.NOT_FOUND_USER_INFO.exception();
-        return kakaoUserInfo;
+        if (kakaoUserInfo == null) throw ApiErrorCode.NOT_FOUND_USER_INFO.exception();
+        return ValidateUtils.requireNotNull(kakaoUserInfo, 500, "카카오 유저 정보를 불러오는 데 실패했습니다.");
     }
 
     private RequestEntity<Void> createKakaoUserInfoRequest(Kakao.OauthToken kakaoOauthToken) {
-        URI uri = URI.create(kakaoUserInfoUri);
 
+        URI uri = ValidateUtils.requireApply(kakaoUserInfoUri, URI::create, 500, "카카오 유저 정보 요청 uri를 생성하지 못했습니다.");
+        ValidateUtils.requireNotNull(kakaoOauthToken, 500, "kakaoOauthToken은 null일 수 없습니다.");
         String accessToken = kakaoOauthToken.getAccessToken();
-
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -215,17 +214,8 @@ public class Oauth2Service {
         return RequestEntity.get(uri).headers(headers).build();
     }
 
-    public void kakaoLogout() {
-        Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) throw ApiErrorCode.NOT_AUTHENTICATED.exception();
-
-        Long userId = Long.valueOf((String) auth.getPrincipal());
-        Login login = authHolder.get(userId);
-        if (login == null) throw UserErrorCode.ALREADY_LOGGED_OUT.exception();
-
-        URI uri = URI.create(kakaoLogoutUri);
-        String kakaoAccessToken = login.getKakaoAccessToken();
-        if (kakaoAccessToken == null) throw UserErrorCode.IS_NOT_LOGGED_IN_KAKAO.exception();
+    public void kakaoLogout(String kakaoAccessToken) {
+        URI uri = ValidateUtils.requireApply(kakaoLogoutUri, URI::create, 500, "카카오 로그아웃 요청 uri를 생성하지 못했습니다.");
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/x-www-form-urlencoded");
@@ -235,18 +225,17 @@ public class Oauth2Service {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.exchange(request, Object.class);
     }
+    public void googleLogout() {
+        // TODO: 구글 로그아웃 구현
+    }
 
-    public void serviceLogout() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) throw ApiErrorCode.NOT_AUTHENTICATED.exception();
-
-        Long userId = Long.valueOf((String) auth.getPrincipal());
+    public void logout(Long userId) {
+        ValidateUtils.requireNotNull(userId, 500, "userId는 null일 수 없습니다.");
         authHolder.remove(userId);
     }
 
     public Login switchRole(Long userId, UserRole userRole) {
-        User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(UserErrorCode.NOT_FOUND_USER::exception);
-        Mentor mentor = mentorRepository.findByUserAndIsDeletedIsFalse(user).orElseThrow(UserErrorCode.NOT_FOUND_MENTOR::exception);
+        User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
 
         Login login = authHolder.get(userId);
         if (!login.getUserRole().equals(userRole)) {
@@ -257,6 +246,10 @@ public class Oauth2Service {
     }
 
     private Login switchLogin(User user, Login existsLogin, UserRole userRole) {
+        ValidateUtils.requireNotNull(user, 500, "user는 null일 수 없습니다.");
+        ValidateUtils.requireNotNull(existsLogin, 500, "existsLogin은 null일 수 없습니다.");
+        ValidateUtils.requireNotNull(userRole, 500, "userRole은 null일 수 없습니다.");
+
         LoginRecord newloginRecord = LoginRecord.builder()
                 .user(user)
                 .roleName(userRole.name())
@@ -264,17 +257,70 @@ public class Oauth2Service {
         loginRecordRepository.save(newloginRecord);
 
         Set<String> authorities = Set.of(userRole.name());
-        TokenHolder tokenHolder = jwtProvider.createToken(user.getUserId().toString(), authorities);
+        TokenHolder tokenHolder = JwtUtils.createTokens(user.getUserId().toString(), authorities, secretKey);
         Login newLogin = Login.builder()
                 .accessToken(tokenHolder.getAccessToken())
                 .refreshToken(tokenHolder.getRefreshToken())
                 .userRole(userRole)
-                .socialAccessToken(existsLogin.getSocialAccessToken())
-                .socialRefreshToken(existsLogin.getSocialRefreshToken())
-                .socialPlatformType(existsLogin.getSocialPlatformType())
                 .build();
         authHolder.put(user.getUserId(), newLogin);
 
         return newLogin;
+    }
+
+    public MentorDto joinMentor(Long userId, MentorDto mentorDto) {
+        ValidateUtils.requireNotNull(mentorDto, 500, "mentorDto는 null일 수 없습니다.");
+        User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
+
+        Mentor newMentor = Mentor.from(user, mentorDto);
+        Mentor savedMentor = mentorRepository.save(newMentor);
+
+        Set<SkillStackType> skillStackTypeSet = mentorDto.getSkillStackTypeSet();
+        if (skillStackTypeSet != null) {
+            List<MentorSkillStack> mentorSkillStacks = skillStackTypeSet.stream()
+                    .map(skillStackType -> {
+                        SkillStack skillStack = skillStackRepository.findBySkillStackId(Long.valueOf(skillStackType.getSkillStackCode()))
+                                .orElseThrow(ApiErrorCode.INTERNAL_SERVER_ERROR::exception);
+
+                        MentorSkillStack mentorSkillStack = MentorSkillStack.builder()
+                                .mentor(savedMentor)
+                                .skillStack(skillStack)
+                                .build();
+
+                        return mentorSkillStackRepository.save(mentorSkillStack);
+                    })
+                    .collect(Collectors.toList());
+
+            savedMentor.setMentorSkillStacks(mentorSkillStacks);
+        }
+
+        Set<MentorCareerDto> careerDtoSet = mentorDto.getCareerDtoSet();
+        if (careerDtoSet != null) {
+            careerDtoSet.forEach(careerDto->{
+                MentorCareer newMentorCareer = MentorCareer.builder()
+                        .mentor(savedMentor)
+                        .duty(careerDto.getDutyType().name())
+                        // TODO: period 타입변경 Integer -> String
+//                        .period(careerDto.getPeriod())
+                        .build();
+                mentorCareerRepository.save(newMentorCareer);
+            });
+        }
+
+        return MentorDto.from(savedMentor);
+    }
+
+    public TokenDto renewTokens(String refreshToken) {
+        String userIdStr = ValidateUtils.requireApply(refreshToken, t->JwtUtils.getSubject(t, secretKey), ApiErrorCode.UNRELIABLE_JWT);
+        Long userId = ValidateUtils.requireApply(userIdStr, Long::parseLong, ApiErrorCode.UNRELIABLE_JWT);
+        Login login = ValidateUtils.requireNotNull(authHolder.get(userId), 404, "로그인 기록이 없습니다.");
+        TokenHolder tokenHolder = JwtUtils.createTokens(userIdStr, Set.of(login.getUserRole().name()), secretKey);
+        Login newLogin = Login.builder()
+                .userRole(login.getUserRole())
+                .accessToken(tokenHolder.getAccessToken())
+                .refreshToken(tokenHolder.getRefreshToken())
+                .build();
+        authHolder.put(userId, newLogin);
+        return TokenDto.from(tokenHolder);
     }
 }

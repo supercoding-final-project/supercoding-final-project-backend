@@ -1,12 +1,10 @@
 package com.github.supercodingfinalprojectbackend.controller;
 
 
-import com.github.supercodingfinalprojectbackend.dto.request.ChatRoomListRequest;
-import com.github.supercodingfinalprojectbackend.dto.request.CreateChatRoomRequest;
-import com.github.supercodingfinalprojectbackend.dto.response.ResponseChatRoom;
-import com.github.supercodingfinalprojectbackend.dto.response.ResponseEnterChatRoom;
+import com.github.supercodingfinalprojectbackend.dto.MessageDto;
 import com.github.supercodingfinalprojectbackend.entity.ChatRoom;
 import com.github.supercodingfinalprojectbackend.entity.User;
+import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.repository.UserRepository;
 import com.github.supercodingfinalprojectbackend.service.ChatRoomService;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
@@ -31,23 +29,23 @@ public class ChatRoomController {
 
 
     @PostMapping("/createchat")
-    public ResponseEntity<?> createChatRoom(@RequestBody CreateChatRoomRequest chatRoomRequest) {
+    public ResponseEntity<?> createChatRoom(@RequestBody MessageDto.CreateChatRoomRequest chatRoomRequest) {
         // 현재 로그인한 사용자 확인
-        User user1 = userRepository.findByUserId(chatRoomRequest.getUser1Idx());
-        User user2 = userRepository.findByUserId(chatRoomRequest.getUser2Idx());
+        User user1 = userRepository.findByUserIdAndIsDeletedIsFalse(chatRoomRequest.getUser1Idx()).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
+        User user2 = userRepository.findByUserIdAndIsDeletedIsFalse(chatRoomRequest.getUser2Idx()).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
         ChatRoom chatRoom = chatRoomService.createChatroom(user1, user2);
         return ResponseUtils.ok("성공적으로 채팅방이 생성 되었습니다", chatRoom.getChatRoomId());
     }
 
     @GetMapping("/chatrooms")
-    public ResponseEntity<?> getChatRoomList(@RequestBody ChatRoomListRequest chatRoomListRequest) {
-        ResponseChatRoom chatRoomResponse = chatRoomService.getChatList(chatRoomListRequest.getUserId());
+    public ResponseEntity<?> getChatRoomList(@RequestParam Long userId) {
+        MessageDto.ResponseChatRoom chatRoomResponse = chatRoomService.getChatList(userId);
         return ResponseUtils.ok("채팅 리스트 반환에 성공하였습니다",chatRoomResponse);
     }
 
-    @GetMapping("chatroom/{chatroom_id}")
-    public ResponseEntity<?> enterChatRoom(@PathVariable("chatroom_id") Long chatRoomId) {
-        ResponseEnterChatRoom chatRoom = chatRoomService.getEnterChatRoom(chatRoomId);
-        return ResponseUtils.ok("채팅에 참여하였습니다",chatRoom);
-    }
+    /*@GetMapping("/chatlog")
+    public ResponseEntity<?> enterChatRoom(@RequestParam Long chatRoomId) {
+        MessageDto.ResponseEnterChatRoom chatRoom = chatRoomService.getEnterChatRoom(chatRoomId);
+        return ResponseUtils.ok("채팅에 참여하였습니다",chatRoom); 페이지 네이션 기능 구현으로 인한 주석처리!(혹시 모르니 냅두겠습니다)
+    } */
 }

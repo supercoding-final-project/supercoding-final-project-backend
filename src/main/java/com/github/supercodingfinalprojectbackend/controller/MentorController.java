@@ -24,23 +24,15 @@ public class MentorController {
 	private final MentorService mentorService;
 
 	@GetMapping
-
 	public ResponseEntity<ApiResponse<Page<MentorInfoResponse>>> getMentors(
-			@RequestParam(required = false, defaultValue = "") String keyWord,
+			@RequestParam(required = false, defaultValue = "") String keyword,
 			@RequestParam(required = false) List<String> skillStack,
 			@RequestParam(defaultValue = "0") Long cursor,
 			@RequestParam(defaultValue = "10") Integer pageSize
 	){
-//			return ResponseUtils.ok(
-//					"Mentor 리스트를 성공적으로 가져왔습니다.",
-//					mentorService.getMentors(keyWord, skillStack).stream()
-//							.map(MentorDto.MentorInfoResponse::from)
-//							.collect(Collectors.toList())
-//			);
-
 			return ResponseUtils.ok(
 					"Mentor 리스트를 성공적으로 가져왔습니다.",
-					mentorService.getMentors(keyWord, skillStack, cursor, PageRequest.of(0, pageSize))
+					mentorService.getMentors(keyword, skillStack, cursor, PageRequest.of(0, pageSize))
 			);
 	}
 }

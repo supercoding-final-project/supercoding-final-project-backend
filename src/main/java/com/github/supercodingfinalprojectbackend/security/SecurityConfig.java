@@ -1,5 +1,6 @@
 package com.github.supercodingfinalprojectbackend.security;
 
+import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
 import com.github.supercodingfinalprojectbackend.exception.FilterExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -41,7 +42,8 @@ public class SecurityConfig {
                 // 접근 권한 설정
                 .authorizeHttpRequests(matcherRegistry -> matcherRegistry
                         .antMatchers("/api/v1/test/**").authenticated()
-                        .antMatchers("/api/v1/user/oauth2/kakao/logout", "/api/v1/user/switch/**").authenticated()
+                        .antMatchers("/api/v1/auth/logout/kakao/", "/api/v1/user/switch/**", "/api/v1/user/role/join/mentor").authenticated()
+                        .antMatchers(HttpMethod.POST, "/api/v1/order/approve").hasRole(UserRole.MENTOR.resolve().name())
                         .anyRequest().permitAll() // 다른 모든 요청을 허용하도록 설정
                 )
                 // 필터 추가

@@ -3,6 +3,7 @@ package com.github.supercodingfinalprojectbackend.repository;
 import static com.github.supercodingfinalprojectbackend.entity.QMentor.mentor;
 import static com.github.supercodingfinalprojectbackend.entity.QMentorSkillStack.mentorSkillStack;
 import static com.github.supercodingfinalprojectbackend.entity.QSkillStack.skillStack;
+import static com.github.supercodingfinalprojectbackend.entity.QUser.user;
 
 import com.github.supercodingfinalprojectbackend.dto.MentorDto.MentorInfoResponse;
 import com.github.supercodingfinalprojectbackend.dto.QMentorDto_MentorInfoResponse;
@@ -43,9 +44,12 @@ public class MentorRepositoryImpl implements MentorRepositoryCustom {
 		return jpaQueryFactory
 				.selectDistinct(new QMentorDto_MentorInfoResponse(
 						mentor.mentorId,
-						mentor.user.name,
+						mentor.user.nickname,
 						mentor.introduction,
-						mentor.company
+						mentor.company,
+						mentor.currentDuty,
+						mentor.currentPeriod,
+						mentor.user.thumbnailImageUrl
 				))
 				.from(mentor)
 				.leftJoin(mentor.mentorSkillStacks, mentorSkillStack)
@@ -64,9 +68,12 @@ public class MentorRepositoryImpl implements MentorRepositoryCustom {
 		List<MentorInfoResponse> content = jpaQueryFactory
 				.selectDistinct(new QMentorDto_MentorInfoResponse(
 						mentor.mentorId,
-						mentor.user.name,
+						mentor.user.nickname,
 						mentor.introduction,
-						mentor.company
+						mentor.company,
+						mentor.currentDuty,
+						mentor.currentPeriod,
+						mentor.user.thumbnailImageUrl
 				))
 				.from(mentor)
 				.leftJoin(mentor.mentorSkillStacks, mentorSkillStack)
@@ -93,15 +100,21 @@ public class MentorRepositoryImpl implements MentorRepositoryCustom {
 		List<MentorInfoResponse> content = jpaQueryFactory
 				.selectDistinct(new QMentorDto_MentorInfoResponse(
 						mentor.mentorId,
-						mentor.user.name,
+						mentor.user.nickname,
 						mentor.introduction,
-						mentor.company
+						mentor.company,
+						mentor.currentDuty,
+						mentor.currentPeriod,
+						mentor.user.thumbnailImageUrl
 				))
 				.from(mentor)
 				.leftJoin(mentor.mentorSkillStacks, mentorSkillStack)
 				.leftJoin(mentorSkillStack.skillStack, skillStack)
+				.leftJoin(mentor.user, user)
 				.where(
 						getRecordsWithCursorId(cursorId),
+						mentor.searchable.eq(true),
+						mentor.isDeleted.eq(false),
 						mentorNameLike(keyword).or(conMentorSkillStack(keyword)),
 						skillStackFiltering(skillStacks)
 				)
@@ -113,8 +126,11 @@ public class MentorRepositoryImpl implements MentorRepositoryCustom {
 				.from(mentor)
 				.leftJoin(mentor.mentorSkillStacks, mentorSkillStack)
 				.leftJoin(mentorSkillStack.skillStack, skillStack)
+				.leftJoin(mentor.user, user)
 				.where(
 						getRecordsWithCursorId(cursorId),
+						mentor.searchable.eq(true),
+						mentor.isDeleted.eq(false),
 						mentorNameLike(keyword).or(conMentorSkillStack(keyword)),
 						skillStackFiltering(skillStacks)
 				);
@@ -127,7 +143,7 @@ public class MentorRepositoryImpl implements MentorRepositoryCustom {
 	}
 
 	private BooleanExpression mentorNameLike(String keyword){
-		return keyword != null ? mentor.user.name.like("%" + keyword + "%") : null;
+		return keyword != null ? user.nickname.like("%" + keyword + "%") : null;
 	}
 
 	private BooleanExpression skillStackFiltering(List<String> skillStackList){
@@ -137,5 +153,4 @@ public class MentorRepositoryImpl implements MentorRepositoryCustom {
 	private BooleanExpression getRecordsWithCursorId(Long cursorId){
 		return cursorId != null ? mentor.mentorId.gt(cursorId) : null;
 	}
-
 }

@@ -12,8 +12,8 @@ import org.springframework.http.HttpHeaders;
 @Configuration
 @OpenAPIDefinition(
         info = @Info(
-                title = "나중에 변경될 타이틀",
-                description = "API 명세서 설명",
+                title = "CODEVELOP",
+                description = "API 명세서",
                 version = "v1.0.0"
         )
 )

@@ -1,9 +1,7 @@
 package com.github.supercodingfinalprojectbackend.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.github.supercodingfinalprojectbackend.dto.MentorDto;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -14,6 +12,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(of = "mentorId", callSuper = false)
 @Builder
 public class Mentor extends CommonEntity {
 
@@ -37,4 +36,24 @@ public class Mentor extends CommonEntity {
 
 	@Column(name = "searchable")
 	private Boolean searchable;
+
+	@Column(name = "current_duty")
+	private String currentDuty;
+
+	@Column(name = "current_period")
+	private String currentPeriod;
+
+	public static Mentor from(User user, MentorDto mentorDto) {
+		return Mentor.builder()
+				.mentorSkillStacks(null)
+				.user(user)
+				.introduction(mentorDto.getIntroduction())
+				.searchable(false)
+				.company(mentorDto.getCompany())
+				.currentDuty(mentorDto.getCurrentDuty().resolve().name())
+				.currentPeriod(mentorDto.getCurrentPeriod())
+				.build();
+	}
+
+	public void setMentorSkillStacks(List<MentorSkillStack> mentorSkillStacks) { this.mentorSkillStacks = mentorSkillStacks; }
 }

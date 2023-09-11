@@ -28,5 +28,5 @@ public class MentorCareer {
 	private String duty;
 
 	@Column(name = "period")
-	private Integer period;
+	private String period;
 }
