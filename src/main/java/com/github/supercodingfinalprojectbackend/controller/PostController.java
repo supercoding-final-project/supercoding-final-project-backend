@@ -4,6 +4,7 @@ import com.github.supercodingfinalprojectbackend.dto.PostDto;
 import com.github.supercodingfinalprojectbackend.dto.PostDto.PostResponse;
 import com.github.supercodingfinalprojectbackend.service.PostService;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils.ApiResponse;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,8 @@ public class PostController {
 
     private final PostService postService;
     @PostMapping
-    public ResponseEntity<ApiResponse<Void>> createPost(@ModelAttribute @Valid PostDto postDto) {
+    public ResponseEntity<ApiResponse<Void>> createPost(@RequestBody @Valid PostDto postDto) {
+//        Long userId = AuthUtils.getUserId();
         Long userId = 1L;
         return postService.createPost(postDto,userId);
     }

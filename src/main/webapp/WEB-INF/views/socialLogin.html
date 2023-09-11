@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>kakao login test</title>
+</head>
+<body>
+<a href="javascript:kakaologin();">
+    <img
+            src="https://developers.kakao.com/tool/resource/static/img/button/login/full/ko/kakao_login_medium_narrow.png"
+            alt=""
+    />
+</a>
+<script
+        src="https://t1.kakaocdn.net/kakao_js_sdk/2.3.0/kakao.min.js"
+        integrity="sha384-70k0rrouSYPWJt7q9rSTKpiTfX6USlMYjZUtr1Du+9o4cGvhPAWxngdtVZDdErlh"
+        crossorigin="anonymous"
+></script>
+<script>
+    Kakao.init("d4c1508770b1a0cd80b8c8fd3b1b5112");
+</script>
+<script>
+    function kakaologin() {
+        Kakao.Auth.authorize({
+            redirectUri: "http://localhost:8080/api/v1/user/oauth2/kakao/login",
+        });
+    }
+</script>
+</body>
+</html>

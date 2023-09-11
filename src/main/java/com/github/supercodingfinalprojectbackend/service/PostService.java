@@ -3,6 +3,7 @@ package com.github.supercodingfinalprojectbackend.service;
 import com.github.supercodingfinalprojectbackend.dto.PostDto;
 import com.github.supercodingfinalprojectbackend.dto.PostDto.PostResponse;
 import com.github.supercodingfinalprojectbackend.entity.*;
+import com.github.supercodingfinalprojectbackend.entity.type.PostContentType;
 import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.PostErrorCode;
 import com.github.supercodingfinalprojectbackend.repository.*;
@@ -12,9 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 
@@ -31,20 +31,26 @@ public class PostService {
 
     @Transactional
     public ResponseEntity<ApiResponse<Void>> createPost(PostDto postDto, Long userId) {
-        User user = userRepository.findByUserId(userId);
+        User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).get();
         Mentor mentor = mentorRepository.findByUserAndIsDeletedIsFalse(user).get();
         Posts entity = Posts.fromDto(postDto,mentor);
         Posts post = postsRepository.save(entity);
 
-        List<String> textList = postDto.getText();
-        List<MultipartFile> imgList = postDto.getImg();
+        List<String> workCareerList = postDto.getWork_career();
+        List<String> educateCareerList = postDto.getEducate_career();
+        List<String> reviewStyleList = postDto.getReview_style();
 
-        for (int i=0; i<=textList.size(); i++) {
-            PostsContent postsContent = PostsContent.fromPost(textList.get(i),i,post);
+        for (String workCareer : workCareerList) {
+            PostsContent postsContent = PostsContent.fromPost(workCareer, PostContentType.WORK_CAREER.name(), post);
             postsContentRepository.save(postsContent);
         }
-        for (int i=0; i<=imgList.size(); i++) {
-            PostsContent postsContent = PostsContent.fromPost(String.valueOf(i),i,post);
+
+        for (String educateCareer : educateCareerList) {
+            PostsContent postsContent = PostsContent.fromPost(educateCareer, PostContentType.EDUCATE_CAREER.name(), post);
+            postsContentRepository.save(postsContent);
+        }
+        for (String reviewStyle : reviewStyleList) {
+            PostsContent postsContent = PostsContent.fromPost(reviewStyle, PostContentType.REVIEW_STYLE.name(), post);
             postsContentRepository.save(postsContent);
         }
 
