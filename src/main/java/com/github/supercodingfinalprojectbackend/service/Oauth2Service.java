@@ -5,7 +5,6 @@ import com.github.supercodingfinalprojectbackend.entity.*;
 import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
 import com.github.supercodingfinalprojectbackend.entity.type.SocialPlatformType;
 import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
-import com.github.supercodingfinalprojectbackend.exception.ApiException;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.repository.*;
 import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
@@ -69,11 +68,19 @@ public class Oauth2Service {
 
         Kakao.OauthToken kakaoOauthToken = getKakaoToken(code);
         Kakao.UserInfo kakaoUserInfo = getKakaoUserInfo(kakaoOauthToken);
+        System.out.println(kakaoUserInfo);
 
         // 회원이 존재하지 않으면 회원 가입
         Long kakaoId = kakaoUserInfo.getId();
         UserSocialInfo userSocialInfo = userSocialInfoRepository.findBySocialIdAndSocialPlatformNameAndIsDeletedIsFalse(kakaoId, SocialPlatformType.KAKAO.name())
-                .orElseGet(()->signupWithKakao(kakaoUserInfo));
+                .orElseGet(()->{
+                    Kakao.Account kakaoAccount = kakaoUserInfo.getKakaoAccount();
+                    Kakao.Profile kakaoProfile = kakaoAccount.getProfile();
+
+                    UserAbstractAccount userAbstractAccount = createAndSaveUserAbstractAccount();
+                    User user = createAndSaveUser(userAbstractAccount, kakaoAccount.getEmail(), kakaoProfile.getNickname(), kakaoProfile.getThumbnailImageUrl());
+                    return createAndSaveUserSocialInfo(user, kakaoUserInfo.getId(), SocialPlatformType.KAKAO);
+                });
 
         return serviceLogin(userSocialInfo, kakaoOauthToken.getAccessToken(), kakaoOauthToken.getRefreshToken(), SocialPlatformType.KAKAO);
     }
@@ -113,28 +120,6 @@ public class Oauth2Service {
         return login;
     }
 
-    private UserSocialInfo signupWithKakao(Kakao.UserInfo kakaoUserInfo) {
-        ValidateUtils.requireNotNull(kakaoUserInfo, 500, "kakaoUserInfo는 null일 수 없습니다.");
-        Kakao.Account account = kakaoUserInfo.getKakaoAccount();
-
-        ValidateUtils.requireNotNull(account, 500, "account는 null일 수 없습니다.");
-        Kakao.Profile profile = account.getProfile();
-        String name = account.getName();
-
-        ValidateUtils.requireNotNull(profile, 500, "profile은 null일 수 없습니다.");
-        String nickname = profile.getNickName();
-        String thumbnailImageUrl = profile.getThumbnailImageUrl();
-
-        Long socialId = kakaoUserInfo.getId();
-
-        UserAbstractAccount savedAbstractAccount = createAndSaveUserAbstractAccount();
-        User savedUser = createAndSaveUser(savedAbstractAccount, name, nickname, thumbnailImageUrl);
-        UserSocialInfo savedUserSocialInfo = createAndSaveUserSocialInfo(savedUser, socialId, SocialPlatformType.KAKAO);
-        createAndSaveMentee(savedUser);
-
-        return savedUserSocialInfo;
-    }
-
     private UserAbstractAccount createAndSaveUserAbstractAccount() {
         UserAbstractAccount newAbstractAccount = UserAbstractAccount.builder()
                 .accountNumber(createAccountNumber())
@@ -159,10 +144,10 @@ public class Oauth2Service {
         return menteeRepository.save(newMentee);
     }
 
-    private User createAndSaveUser(UserAbstractAccount abstractAccount, String name, String nickname, String thumbnailImageUrl) {
+    private User createAndSaveUser(UserAbstractAccount abstractAccount, String email, String nickname, String thumbnailImageUrl) {
         User newUser = User.builder()
                 .abstractAccount(abstractAccount)
-                .name(name)
+                .email(email)
                 .nickname(nickname)
                 .thumbnailImageUrl(thumbnailImageUrl)
                 .build();
