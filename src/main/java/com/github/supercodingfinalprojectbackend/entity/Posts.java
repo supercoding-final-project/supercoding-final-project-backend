@@ -39,4 +39,10 @@ public class Posts extends CommonEntity{
                 .build();
     }
 
+    public void postsUpdate(PostDto postDto){
+        this.title = postDto.getTitle();
+        this.level = postDto.getLevel();
+        this.price = postDto.getPrice();
+    }
+
 }
