@@ -67,24 +67,29 @@ public class MentorDto {
 
 	@Getter
 	@NoArgsConstructor
-	@AllArgsConstructor
 	@Builder
 	public static class MentorInfoResponse {
 
 		private Long mentorId;
-		private String name;
 		private String nickname;
-		private String email;
 		private String thumbnailImageUrl;
 		private String introduction;
 		private String company;
+		private String currentDuty;
+		private String currentPeriod;
 
 		@QueryProjection
-		public MentorInfoResponse(Long mentorId, String name, String introduction, String company){
+		public MentorInfoResponse(
+				Long mentorId, String nickname, String introduction, String company,
+				String currentDuty, String currentPeriod, String thumbnailImageUrl
+		) {
 			this.mentorId = mentorId;
-			this.name = name;
+			this.nickname = nickname;
 			this.introduction = introduction;
 			this.company = company;
+			this.currentDuty = currentDuty;
+			this.currentPeriod = currentPeriod;
+			this.thumbnailImageUrl = thumbnailImageUrl;
 		}
 	}
 

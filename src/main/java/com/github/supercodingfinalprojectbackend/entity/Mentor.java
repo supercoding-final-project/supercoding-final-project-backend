@@ -50,7 +50,7 @@ public class Mentor extends CommonEntity {
 				.introduction(mentorDto.getIntroduction())
 				.searchable(false)
 				.company(mentorDto.getCompany())
-				.currentDuty(mentorDto.getCurrentDuty().name())
+				.currentDuty(mentorDto.getCurrentDuty().resolve().name())
 				.currentPeriod(mentorDto.getCurrentPeriod())
 				.build();
 	}
