@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface MentorRepository extends JpaRepository<Mentor, Long>, MentorRepositoryCustom {
 
     Optional<Mentor> findByUserAndIsDeletedIsFalse(User user);
+
+    Optional<Mentor> findByUserUserIdAndIsDeletedIsFalse(Long userId);
 }

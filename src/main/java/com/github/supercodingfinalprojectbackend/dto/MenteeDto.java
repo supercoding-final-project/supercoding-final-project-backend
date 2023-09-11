@@ -11,23 +11,13 @@ import lombok.*;
 @ToString
 public class MenteeDto {
     private Long menteeId;
-    private String accountNumber;
-    private Long paymoney;
-    private String email;
-    private String name;
-    private String nickname;
-    private String thumbnailImageUrl;
+    private UserDto user;
 
     public static MenteeDto from(Mentee mentee) {
         User user = mentee.getUser();
         return MenteeDto.builder()
                 .menteeId(mentee.getMenteeId())
-                .accountNumber(user.getAbstractAccount().getAccountNumber())
-                .paymoney(user.getAbstractAccount().getPaymoney())
-                .email(user.getEmail())
-                .name(user.getName())
-                .nickname(user.getNickname())
-                .thumbnailImageUrl(user.getThumbnailImageUrl())
+                .user(UserDto.from(mentee.getUser()))
                 .build();
     }
 }
