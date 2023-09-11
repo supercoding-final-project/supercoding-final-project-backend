@@ -24,7 +24,7 @@ public class MessageService {
     private final MessageRepository messageRepository;
     public ResponseEntity<?> getMessageByChatroom(ChatRoom chatRoom , Pageable pageable){
 
-        Page<Message> page = messageRepository.findAllByChatRoom(chatRoom,pageable).orElseThrow(ApiErrorCode.ChatRoomId_NOT_FOUND::exception);
+        Page<Message> page = messageRepository.findAllByChatRoom(chatRoom,pageable).orElseThrow(ApiErrorCode.CHATROOMID_NOT_FOUND::exception);
 
         List<MessageDto.ResponseMessage> responseMessages = page.getContent().stream()
                 .map(message -> MessageDto.ResponseMessage.builder()

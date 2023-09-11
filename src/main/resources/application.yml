@@ -49,5 +49,19 @@ openvidu:
   url: ENC(oJgGClBGHddrq80xoxUvi0Mu/mdXWVGVecmE6qr3Qzk=)
   secret: ENC(GRF6XjYIGxdZ70ki0Ei0FjMF9tpfTqEj)
 
+cloud:
+  aws:
+    credentials:
+      access-key: ENC(ViAHopgVSxgZK4bJmBVuZk5DBiHcPnxNImuB9y4QtBY=)
+      secret-key: ENC(yowsaWXRxeXBvE+DL7zsEglC4OjAzowSIh17iT+8z/GobsaYcFnYHjyqFhdmtxkaifMjt5VZs8o=)
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+    s3 :
+      bucket : code-velop
+
+
+
 secret-key-source: ${SECRET_KEY_SOURCE}
 
