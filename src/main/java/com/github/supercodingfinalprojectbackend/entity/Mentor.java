@@ -1,10 +1,7 @@
 package com.github.supercodingfinalprojectbackend.entity;
 
 import com.github.supercodingfinalprojectbackend.dto.MentorDto;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -15,6 +12,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(of = "mentorId", callSuper = false)
 @Builder
 public class Mentor extends CommonEntity {
 

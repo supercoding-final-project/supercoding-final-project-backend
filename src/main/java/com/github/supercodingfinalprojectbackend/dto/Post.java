@@ -1,8 +1,7 @@
 package com.github.supercodingfinalprojectbackend.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import com.github.supercodingfinalprojectbackend.entity.Posts;
+import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
@@ -11,9 +10,27 @@ import javax.validation.constraints.Size;
 import java.util.List;
 
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class Post {
+    private Long postId;
+    private MentorDto mentorDto;
+    private String title;
+    private String level;
+    private Integer price;
+
+    public static Post from(Posts post) {
+        return Post.builder()
+                .postId(post.getPostId())
+                .mentorDto(MentorDto.from(post.getMentor()))
+                .title(post.getTitle())
+                .level(post.getLevel())
+                .price(post.getPrice())
+                .build();
+    }
+
     @Getter
     @AllArgsConstructor
     @Builder
