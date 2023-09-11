@@ -3,12 +3,15 @@ package com.github.supercodingfinalprojectbackend.service;
 import com.github.supercodingfinalprojectbackend.dto.ReviewDto;
 import com.github.supercodingfinalprojectbackend.entity.Mentee;
 import com.github.supercodingfinalprojectbackend.entity.Posts;
+import com.github.supercodingfinalprojectbackend.entity.Review;
 import com.github.supercodingfinalprojectbackend.repository.MenteeRepository;
 import com.github.supercodingfinalprojectbackend.repository.OrderSheetRepository;
 import com.github.supercodingfinalprojectbackend.repository.PostsRepository;
 import com.github.supercodingfinalprojectbackend.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import static com.github.supercodingfinalprojectbackend.entity.Review.toEntity;
@@ -34,7 +37,7 @@ public class ReviewService {
 
         // TODO: 예외처리 생기면 refactoring,
         //  postsRepository Long 타입으로 바뀌면 수정
-        Posts posts = postsRepository.findById(Math.toIntExact(inputPostId))
+        Posts posts = postsRepository.findById(inputPostId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 포스트 입니다."));
 
         // TODO: 결제한 사람만 가능 or 리뷰가 끝난 시점?, 횟수만큼 작성가능?
@@ -46,5 +49,18 @@ public class ReviewService {
                 reviewRepository.save(
                         toEntity(mentee, posts, inputTitle, inputContent, inputStar))
         );
+    }
+
+    public Page<ReviewDto> getReviews(Long postId, Long cursor, Pageable pageable) {
+
+        // TODO: 예외처리 생기면 refactoring,
+        //  postsRepository Long 타입으로 바뀌면 수정
+        Posts posts = postsRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 포스트 입니다."));
+
+        Page<Review> reviews = reviewRepository
+                .findAllByPostIdAndIsDeletedWithCursor(posts.getPostId(), cursor, pageable);
+
+        return reviews.map(ReviewDto :: from);
     }
 }

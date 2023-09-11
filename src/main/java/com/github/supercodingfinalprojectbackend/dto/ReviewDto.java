@@ -13,8 +13,9 @@ import lombok.NoArgsConstructor;
 public class ReviewDto {
 
     private Long reviewId;
-    private Long menteeId;
     private Long postId;
+    private Long menteeId;
+    private String nickname;
     private String title;
     private String content;
     private Integer star;
@@ -22,8 +23,9 @@ public class ReviewDto {
     public static ReviewDto from(Review review) {
         return ReviewDto.builder()
                 .reviewId(review.getReviewId())
-                .menteeId(review.getMentee().getMenteeId())
                 .postId(review.getPost().getPostId())
+                .menteeId(review.getMentee().getMenteeId())
+                .nickname(review.getMentee().getUser().getNickname())
                 .title(review.getTitle())
                 .content(review.getContent())
                 .star(review.getStar())
@@ -66,6 +68,33 @@ public class ReviewDto {
                     .build();
         }
 
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class ReviewResponse {
+
+        private Long reviewId;
+        private Long postId;
+        private Long menteeId;
+        private String nickname;
+        private String title;
+        private String content;
+        private Integer star;
+
+        public static ReviewResponse from(ReviewDto reviewDto) {
+            return ReviewResponse.builder()
+                    .reviewId(reviewDto.getReviewId())
+                    .postId(reviewDto.getPostId())
+                    .menteeId(reviewDto.getMenteeId())
+                    .nickname(reviewDto.getNickname())
+                    .title(reviewDto.getTitle())
+                    .content(reviewDto.getContent())
+                    .star(reviewDto.getStar())
+                    .build();
+        }
     }
 
 }
