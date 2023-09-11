@@ -1,6 +1,6 @@
 package com.github.supercodingfinalprojectbackend.service;
 
-import com.github.supercodingfinalprojectbackend.dto.OrderDto;
+import com.github.supercodingfinalprojectbackend.dto.OrderSheetDto;
 import com.github.supercodingfinalprojectbackend.dto.PaymentDto;
 import com.github.supercodingfinalprojectbackend.entity.Mentor;
 import com.github.supercodingfinalprojectbackend.entity.OrderSheet;
@@ -24,7 +24,7 @@ public class OrderService {
     private final OrderSheetRepository orderSheetRepository;
     private final PaymentRepository paymentRepository;
 
-    public PaymentDto approveOrder(Long userId, OrderDto orderDtoRequest) {
+    public PaymentDto approveOrder(Long userId, OrderSheetDto orderDtoRequest) {
         Mentor mentor = mentorRepository.findByUserUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_MENTOR::exception);
         Long orderSheetId = orderDtoRequest.getOrderSheetId();
 

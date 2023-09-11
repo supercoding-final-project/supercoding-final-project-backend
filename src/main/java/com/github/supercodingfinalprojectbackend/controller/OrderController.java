@@ -1,6 +1,6 @@
 package com.github.supercodingfinalprojectbackend.controller;
 
-import com.github.supercodingfinalprojectbackend.dto.OrderDto;
+import com.github.supercodingfinalprojectbackend.dto.OrderSheetDto;
 import com.github.supercodingfinalprojectbackend.dto.PaymentDto;
 import com.github.supercodingfinalprojectbackend.service.OrderService;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
@@ -22,9 +22,9 @@ public class OrderController {
 
     @PostMapping("/approve")
     @Operation(summary = "주문서 결제 승인")
-    public ResponseEntity<ResponseUtils.ApiResponse<PaymentDto.PaymentIdResponse>> approveOrder(@RequestBody OrderDto.OrderIdRequest request) {
+    public ResponseEntity<ResponseUtils.ApiResponse<PaymentDto.PaymentIdResponse>> approveOrder(@RequestBody OrderSheetDto.OrderSheetIdRequest request) {
         Long userId = AuthUtils.getUserId();
-        OrderDto orderDtoRequest = OrderDto.from(request);
+        OrderSheetDto orderDtoRequest = OrderSheetDto.from(request);
 
         PaymentDto paymentDtoResponse = orderService.approveOrder(userId, orderDtoRequest);
         PaymentDto.PaymentIdResponse response = PaymentDto.PaymentIdResponse.from(paymentDtoResponse);

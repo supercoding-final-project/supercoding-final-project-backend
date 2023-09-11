@@ -24,4 +24,20 @@ public class OrderSheetDto {
                 .isCompleted(orderSheet.getIsCompleted())
                 .build();
     }
+
+    public static OrderSheetDto from(OrderSheetIdRequest request) {
+        return OrderSheetDto.builder()
+                .orderSheetId(request.orderSheetId)
+                .build();
+    }
+
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @ToString
+    public static class OrderSheetIdRequest {
+        private Long orderSheetId;
+    }
 }
