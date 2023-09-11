@@ -45,4 +45,8 @@ public class Posts extends CommonEntity{
         this.price = postDto.getPrice();
     }
 
+    public void postsIsDeleted(){
+        this.isDeleted = true;
+    }
+
 }

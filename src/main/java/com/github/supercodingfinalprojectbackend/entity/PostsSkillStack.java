@@ -37,4 +37,8 @@ public class PostsSkillStack extends CommonEntity{
     public void skillStackUpdate(SkillStack skillStack){
         this.skillStack  = skillStack;
     }
+
+    public void postsSkillStackIsDeleted(){
+        this.isDeleted = true;
+    }
 }

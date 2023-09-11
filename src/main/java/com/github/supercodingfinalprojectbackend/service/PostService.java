@@ -57,7 +57,7 @@ public class PostService {
         PostsSkillStack postsSkillStack = PostsSkillStack.fromPost(post,skillStack);
         postsSkillStackRepository.save(postsSkillStack);
 
-        return ResponseUtils.created("포스트가 정상적으로 등록되었습니다.",null);
+        return ResponseUtils.created("멘티 모집이 정상적으로 등록되었습니다.",null);
     }
     @Transactional(readOnly = true)
     public ResponseEntity<ApiResponse<PostDto>> getPost(Long postId) {
@@ -65,7 +65,7 @@ public class PostService {
         List<PostsContent> contentList = postsContentRepository.findAllByPosts(posts);
         String stack = postsSkillStackRepository.findByPosts(posts).getSkillStack().getSkillStackName();
 
-        return ResponseUtils.ok("정상적으로 포스트 조회 되었습니다.", PostDto.PostInfoResponse(posts,contentList,stack));
+        return ResponseUtils.ok("정상적으로 멘티 모집 조회 되었습니다.", PostDto.PostInfoResponse(posts,contentList,stack));
     }
 
     public ResponseEntity<ApiResponse<Void>> updatePost(Long postId, @Valid PostDto postDto) {
@@ -100,7 +100,23 @@ public class PostService {
         PostsSkillStack postsSkillStack = postsSkillStackRepository.findByPosts(posts);
         SkillStack skillStack = skillStackRepository.findBySkillStackName(postDto.getPost_stack());
         postsSkillStack.skillStackUpdate(skillStack);
-        return ResponseUtils.ok("게시글이 정상적으로 수정되었습니다.",null);
+        return ResponseUtils.ok("멘티 모집이 정상적으로 수정되었습니다.",null);
+    }
+
+    public ResponseEntity<ApiResponse<Void>> deletePost(Long postId) {
+        Posts posts = postsRepository.findById(postId).orElseThrow(PostErrorCode.POST_NOT_POST_ID::exception);
+        posts.postsIsDeleted();
+
+        List<PostsContent> postsContentList = postsContentRepository.findAllByPosts(posts);
+
+        for (PostsContent postsContent : postsContentList) {
+            postsContent.postContentIsDeleted();
+            postsContentRepository.save(postsContent);
+        }
+
+        PostsSkillStack postsSkillStack = postsSkillStackRepository.findByPosts(posts);
+        postsSkillStack.postsSkillStackIsDeleted();
+        return ResponseUtils.noContent("멘티 모집이 정삭적으로 삭제되었습니다.",null);
     }
 }
 
