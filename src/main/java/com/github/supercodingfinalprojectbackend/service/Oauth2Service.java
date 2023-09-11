@@ -9,7 +9,6 @@ import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCod
 import com.github.supercodingfinalprojectbackend.repository.*;
 import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
 import com.github.supercodingfinalprojectbackend.util.auth.AuthHolder;
-import com.github.supercodingfinalprojectbackend.util.auth.AuthUtils;
 import com.github.supercodingfinalprojectbackend.util.jwt.JwtUtils;
 import com.github.supercodingfinalprojectbackend.util.jwt.TokenHolder;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,6 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.crypto.SecretKey;
 import javax.transaction.Transactional;
-import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -270,25 +268,25 @@ public class Oauth2Service {
         return newLogin;
     }
 
-    public MentorDto joinMentor(@NotNull String company, @NotNull String introduction, Set<MentorCareerDto> careerDtoSet, Set<SkillStackType> skillStackTypeSet) {
-        ValidateUtils.requireNotNull(company, 500, "company는 null일 수 없습니다.");
-        ValidateUtils.requireNotNull(introduction, 500, "introduction은 null일 수 없습니다.");
-
-        Long userId = AuthUtils.getUserId();
+    public MentorDto joinMentor(Long userId, MentorDto mentorDto) {
+        ValidateUtils.requireNotNull(mentorDto, 500, "mentorDto는 null일 수 없습니다.");
         User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
 
-        Mentor newMentor = Mentor.from(user, company, introduction);
+        Mentor newMentor = Mentor.from(user, mentorDto);
         Mentor savedMentor = mentorRepository.save(newMentor);
 
+        Set<SkillStackType> skillStackTypeSet = mentorDto.getSkillStackTypeSet();
         if (skillStackTypeSet != null) {
             List<MentorSkillStack> mentorSkillStacks = skillStackTypeSet.stream()
                     .map(skillStackType -> {
                         SkillStack skillStack = skillStackRepository.findBySkillStackId(Long.valueOf(skillStackType.getSkillStackCode()))
                                 .orElseThrow(ApiErrorCode.INTERNAL_SERVER_ERROR::exception);
+
                         MentorSkillStack mentorSkillStack = MentorSkillStack.builder()
                                 .mentor(savedMentor)
                                 .skillStack(skillStack)
                                 .build();
+
                         return mentorSkillStackRepository.save(mentorSkillStack);
                     })
                     .collect(Collectors.toList());
@@ -296,6 +294,7 @@ public class Oauth2Service {
             savedMentor.setMentorSkillStacks(mentorSkillStacks);
         }
 
+        Set<MentorCareerDto> careerDtoSet = mentorDto.getCareerDtoSet();
         if (careerDtoSet != null) {
             careerDtoSet.forEach(careerDto->{
                 MentorCareer newMentorCareer = MentorCareer.builder()
@@ -308,7 +307,7 @@ public class Oauth2Service {
             });
         }
 
-        return MentorDto.fromEntity(savedMentor);
+        return MentorDto.from(savedMentor);
     }
 
     public TokenDto renewTokens(String refreshToken) {
