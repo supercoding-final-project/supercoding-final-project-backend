@@ -40,4 +40,17 @@ public class OrderSheetDto {
     public static class OrderSheetIdRequest {
         private Long orderSheetId;
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @ToString
+    public static class OrderSheetIdResponse {
+        private Long orderSheetId;
+
+        public static OrderSheetIdResponse from(OrderSheetDto orderSheetDto) {
+            return new OrderSheetIdResponse(orderSheetDto.getOrderSheetId());
+        }
+    }
 }

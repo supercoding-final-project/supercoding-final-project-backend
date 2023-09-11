@@ -12,15 +12,15 @@ import java.time.Instant;
 @MappedSuperclass
 public abstract class CommonEntity {
     @Column(name = "is_deleted", nullable = false, columnDefinition = "tinyint default 0")
-    private Boolean isDeleted = false;
+    protected Boolean isDeleted = false;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt;
+    protected Instant createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at", insertable = false)
-    private Instant updatedAt;
+    protected Instant updatedAt;
 
     public boolean isValid() { return !isDeleted; }
 }
