@@ -3,7 +3,6 @@ package com.github.supercodingfinalprojectbackend.controller;
 import com.github.supercodingfinalprojectbackend.dto.Login;
 import com.github.supercodingfinalprojectbackend.dto.TokenDto;
 import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
-import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.service.Oauth2Service;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import com.github.supercodingfinalprojectbackend.util.ValidateUtils;

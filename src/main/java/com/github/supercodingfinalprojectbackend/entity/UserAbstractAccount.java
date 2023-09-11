@@ -20,4 +20,8 @@ public class UserAbstractAccount extends CommonEntity {
     private String accountNumber;
     @Column(name = "paymoney")
     private Long paymoney;
+
+    public Long chargePaymoney(Long chargeAmount) {
+        return this.paymoney += chargeAmount;
+    }
 }

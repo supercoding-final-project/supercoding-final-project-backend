@@ -1,5 +1,6 @@
 package com.github.supercodingfinalprojectbackend.entity;
 
+import com.github.supercodingfinalprojectbackend.dto.MentorDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,13 +39,21 @@ public class Mentor extends CommonEntity {
 	@Column(name = "searchable")
 	private Boolean searchable;
 
-	public static Mentor from(User user, String company, String introduction) {
+	@Column(name = "current_duty")
+	private String currentDuty;
+
+	@Column(name = "current_period")
+	private String currentPeriod;
+
+	public static Mentor from(User user, MentorDto mentorDto) {
 		return Mentor.builder()
 				.mentorSkillStacks(null)
 				.user(user)
-				.introduction(introduction)
+				.introduction(mentorDto.getIntroduction())
 				.searchable(false)
-				.company(company)
+				.company(mentorDto.getCompany())
+				.currentDuty(mentorDto.getCurrentDuty().resolve().name())
+				.currentPeriod(mentorDto.getCurrentPeriod())
 				.build();
 	}
 

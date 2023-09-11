@@ -1,12 +1,14 @@
 package com.github.supercodingfinalprojectbackend.dto;
 
 import com.github.supercodingfinalprojectbackend.entity.Mentor;
+import com.github.supercodingfinalprojectbackend.entity.type.DutyType;
+import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
+import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor
@@ -16,59 +18,78 @@ public class MentorDto {
 
 	private Long mentorId;
 	private Long mentorAbstractAccountId;
-	private String name;
+	private String name;    // TODO: name 제거
 	private String nickname;
 	private String email;
 	private String thumbnailImageUrl;
 	private String introduction;
 	private String company;
 	private Boolean searchable;
+	private DutyType currentDuty;
+	private String currentPeriod;
+	private Set<MentorCareerDto> careerDtoSet;
+	private Set<SkillStackType> skillStackTypeSet;
 
-	public static MentorDto fromEntity(Mentor mentor){
+	public static MentorDto from(Mentor mentor){
 		return MentorDto.builder()
 				.mentorId(mentor.getMentorId())
-//				Test 때 mentor 계좌가 없이 테스트 하느라 임시 주석
-//				.mentorAbstractAccountId(
-//						mentor.getMentorAbstractAccount().getMentorAbstractAccountId())
-				.name(mentor.getUser().getName())
+//				.name(mentor.getUser().getName())
 				.nickname(mentor.getUser().getNickname())
-				.introduction(mentor.getIntroduction())
 				.email(mentor.getUser().getEmail())
-				.company(mentor.getCompany())
 				.thumbnailImageUrl(mentor.getUser().getThumbnailImageUrl())
+				.introduction(mentor.getIntroduction())
+				.company(mentor.getCompany())
+				.currentDuty(DutyType.valueOf(mentor.getCurrentDuty()).resolve())
+				.currentPeriod(mentor.getCurrentPeriod())
+				.build();
+	}
+
+	public static MentorDto from(JoinRequest request) {
+		DutyType currentDuty = ValidateUtils.requireApply(request.currentDuty, s->DutyType.valueOf(s).resolve(), 400, "존재하지 않는 직무입니다.");
+
+		Set<MentorCareerDto> careers = request.careers.stream()
+				.map(MentorCareerDto::from)
+				.collect(Collectors.toSet());
+
+		Set<SkillStackType> skillStackTypes = request.skillStackNames.stream()
+				.map(skillStackName->ValidateUtils.requireApply(skillStackName, SkillStackType::valueOf, 400, "존재하지 않는 기술스택입니다."))
+				.collect(Collectors.toSet());
+
+		return MentorDto.builder()
+				.company(request.company)
+				.introduction(request.introduction)
+				.currentDuty(currentDuty)
+				.currentPeriod(request.currentPeriod)
+				.careerDtoSet(careers)
+				.skillStackTypeSet(skillStackTypes)
 				.build();
 	}
 
 	@Getter
 	@NoArgsConstructor
-	@AllArgsConstructor
 	@Builder
 	public static class MentorInfoResponse {
 
 		private Long mentorId;
-		private String name;
 		private String nickname;
-		private String email;
 		private String thumbnailImageUrl;
 		private String introduction;
 		private String company;
+		private String currentDuty;
+		private String currentPeriod;
 
 		@QueryProjection
-		public MentorInfoResponse(Long mentorId, String name, String introduction, String company){
+		public MentorInfoResponse(
+				Long mentorId, String nickname, String introduction, String company,
+				String currentDuty, String currentPeriod, String thumbnailImageUrl
+		) {
 			this.mentorId = mentorId;
-			this.name = name;
+			this.nickname = nickname;
 			this.introduction = introduction;
 			this.company = company;
-		}
-
-		public static MentorInfoResponse from(MentorDto mentorDto){
-			return MentorInfoResponse.builder()
-					.mentorId(mentorDto.getMentorId())
-					.name(mentorDto.getName())
-					.introduction(mentorDto.getIntroduction())
-					.company(mentorDto.getCompany())
-					.thumbnailImageUrl(mentorDto.getThumbnailImageUrl())
-					.build();
+			this.currentDuty = currentDuty;
+			this.currentPeriod = currentPeriod;
+			this.thumbnailImageUrl = thumbnailImageUrl;
 		}
 	}
 
@@ -80,7 +101,22 @@ public class MentorDto {
 	public static class JoinRequest {
 		private String company;
 		private String introduction;
+		private String currentDuty;
+		private String currentPeriod;
 		private Set<MentorCareerDto.Request> careers;
 		private Set<String> skillStackNames;
+	}
+
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	@ToString
+	public static class JoinResponse {
+		private Long mentorId;
+
+		public static JoinResponse from(MentorDto mentorDto) {
+			return new JoinResponse(mentorDto.getMentorId());
+		}
 	}
 }
