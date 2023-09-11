@@ -22,8 +22,12 @@ public enum ApiErrorCode implements ErrorCode {
     IS_ALREADY_MENTOR(HttpStatus.OK, "이미 멘토로 로그인 중입니다."),
     NOT_FOUND_MENTEE(HttpStatus.NOT_FOUND, "존재하지 않는 멘티입니다."),
     IS_ALREADY_MENTEE(HttpStatus.OK, "이미 멘티로 로그인 중입니다."),
+    CHATROOMID_NOT_FOUND(HttpStatus.NOT_FOUND,"해당 채팅방을 찾을 수 없습니다."),
+    MYPAGE_CHANGEINFO_BAD_REQUEST(HttpStatus.BAD_REQUEST,"이전 닉네임과 중복됩니다."),
 
-    ChatRoomId_NOT_FOUND(HttpStatus.NOT_FOUND,"해당 채팅방을 찾을 수 없습니다.")
+    IMAGE_EXTENSION_BAD_REQUEST(HttpStatus.BAD_REQUEST, "확장자명을 변경해주십시오."),
+
+    IMAGE_INVALID_FORMAT(HttpStatus.BAD_REQUEST,"유효하지 않은 형식입니다")
     ;
 
     ApiErrorCode(HttpStatus status, String message) {

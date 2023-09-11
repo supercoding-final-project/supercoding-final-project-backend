@@ -29,7 +29,7 @@ public class MessageController {
     public ResponseEntity<?> getMessageByChatRoom(
             @RequestParam Long ChatRoomId, @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "20") Integer size){
 
-        ChatRoom chatRoom = chatRoomRepository.findByChatRoomIdAndIsChatIsFalse(ChatRoomId).orElseThrow(ApiErrorCode.ChatRoomId_NOT_FOUND::exception);
+        ChatRoom chatRoom = chatRoomRepository.findByChatRoomIdAndIsChatIsFalse(ChatRoomId).orElseThrow(ApiErrorCode.CHATROOMID_NOT_FOUND::exception);
         Pageable pageable = PageRequest.of(page,size, Sort.by("sendAt").descending());
 
         return messageService.getMessageByChatroom(chatRoom,pageable);
