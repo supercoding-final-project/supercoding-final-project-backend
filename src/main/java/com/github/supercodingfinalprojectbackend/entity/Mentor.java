@@ -38,6 +38,12 @@ public class Mentor extends CommonEntity {
 	@Column(name = "searchable")
 	private Boolean searchable;
 
+	@Column(name = "current_duty")
+	private String currentDuty;
+
+	@Column(name = "current_period")
+	private String currentPeriod;
+
 	public static Mentor from(User user, String company, String introduction) {
 		return Mentor.builder()
 				.mentorSkillStacks(null)
