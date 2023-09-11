@@ -22,6 +22,8 @@ public class MentorDto {
 	private String thumbnailImageUrl;
 	private String introduction;
 	private String company;
+	// private DutyType currentDuty;
+	// private String currentPeriod;
 	private Boolean searchable;
 
 	public static MentorDto fromEntity(Mentor mentor){
@@ -80,6 +82,8 @@ public class MentorDto {
 	public static class JoinRequest {
 		private String company;
 		private String introduction;
+		private String currentDuty;
+		private String currentPeriod;
 		private Set<MentorCareerDto.Request> careers;
 		private Set<String> skillStackNames;
 	}
