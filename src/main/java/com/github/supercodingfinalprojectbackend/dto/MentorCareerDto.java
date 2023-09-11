@@ -1,5 +1,6 @@
 package com.github.supercodingfinalprojectbackend.dto;
 
+import com.github.supercodingfinalprojectbackend.entity.MentorCareer;
 import com.github.supercodingfinalprojectbackend.entity.type.DutyType;
 import lombok.*;
 
@@ -30,6 +31,13 @@ public class MentorCareerDto {
         return MentorCareerDto.builder()
                 .dutyType(DutyType.valueOf(request.dutyName.toUpperCase()).resolve())
                 .period(request.period)
+                .build();
+    }
+
+    public static MentorCareerDto from(MentorCareer mentorCareer) {
+        return MentorCareerDto.builder()
+                .dutyType(DutyType.valueOf(mentorCareer.getDuty()))
+                .period(mentorCareer.getPeriod())
                 .build();
     }
 
