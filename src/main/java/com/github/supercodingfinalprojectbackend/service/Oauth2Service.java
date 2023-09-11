@@ -79,6 +79,7 @@ public class Oauth2Service {
 
                     UserAbstractAccount userAbstractAccount = createAndSaveUserAbstractAccount();
                     User user = createAndSaveUser(userAbstractAccount, kakaoAccount.getEmail(), kakaoProfile.getNickname(), kakaoProfile.getThumbnailImageUrl());
+                    createAndSaveMentee(user);
                     return createAndSaveUserSocialInfo(user, kakaoUserInfo.getId(), SocialPlatformType.KAKAO);
                 });
 
