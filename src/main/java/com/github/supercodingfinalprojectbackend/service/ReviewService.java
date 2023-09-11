@@ -63,4 +63,14 @@ public class ReviewService {
 
         return reviews.map(ReviewDto :: from);
     }
+
+    public Page<ReviewDto> getMyReviews(Long userId, Long cursor, Pageable pageable) {
+
+        Mentee mentee = menteeRepository.findByUserUserId(userId);
+        log.info("menteeId : {}", mentee.getMenteeId());
+        Page<Review> reviews = reviewRepository
+                .findAllByMenteeIdAndIsDeletedWithCursor(mentee.getMenteeId(), cursor, pageable);
+
+        return reviews.map(ReviewDto :: from);
+    }
 }

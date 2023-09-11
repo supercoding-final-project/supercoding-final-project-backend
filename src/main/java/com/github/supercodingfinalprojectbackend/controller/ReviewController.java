@@ -34,16 +34,29 @@ public class ReviewController {
             );
     }
 
-    @GetMapping
+    @GetMapping("/byPostId")
     public ResponseEntity<ResponseUtils.ApiResponse<Page<ReviewResponse>>> getReviews(
             @RequestParam Long postId,
             @RequestParam(defaultValue = "0") Long cursor,
             @RequestParam(defaultValue = "10") Integer pageSize
     ){
-            return ResponseUtils.created(
+            return ResponseUtils.ok(
                     "포스트에 대한 리뷰 조회를 성공하였습니다.",
                     reviewService.getReviews(postId, cursor, PageRequest.of(0, pageSize))
                             .map(ReviewDto.ReviewResponse::from)
+            );
+    }
+
+    @GetMapping("/byUserId")
+    public ResponseEntity<ResponseUtils.ApiResponse<Page<ReviewResponse>>> getMyReviews(
+            @RequestParam(defaultValue = "0") Long cursor,
+            @RequestParam(defaultValue = "10") Integer pageSize
+    ){
+            Long userId = AuthUtils.getUserId();
+            return ResponseUtils.ok(
+                            "포스트에 대한 리뷰 조회를 성공하였습니다.",
+                            reviewService.getMyReviews(userId, cursor, PageRequest.of(0, pageSize))
+                                    .map(ReviewDto.ReviewResponse::from)
             );
     }
 }

@@ -17,4 +17,13 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
                     "ORDER BY r.reviewId ASC "
     )
     Page<Review> findAllByPostIdAndIsDeletedWithCursor(Long postId, Long cursor, Pageable pageable);
+
+
+    @Query(
+            "SELECT r FROM Review r WHERE r.mentee.menteeId = :menteeId " +
+                    "AND r.isDeleted = false " +
+                    "AND r.reviewId > :cursor " +
+                    "ORDER BY r.reviewId ASC "
+    )
+    Page<Review> findAllByMenteeIdAndIsDeletedWithCursor(Long menteeId, Long cursor, Pageable pageable);
 }
