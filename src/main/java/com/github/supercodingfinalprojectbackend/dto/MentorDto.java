@@ -27,9 +27,6 @@ public class MentorDto {
 	public static MentorDto fromEntity(Mentor mentor){
 		return MentorDto.builder()
 				.mentorId(mentor.getMentorId())
-//				Test 때 mentor 계좌가 없이 테스트 하느라 임시 주석
-//				.mentorAbstractAccountId(
-//						mentor.getMentorAbstractAccount().getMentorAbstractAccountId())
 				.name(mentor.getUser().getName())
 				.nickname(mentor.getUser().getNickname())
 				.introduction(mentor.getIntroduction())
@@ -41,30 +38,34 @@ public class MentorDto {
 
 	@Getter
 	@NoArgsConstructor
-	@AllArgsConstructor
 	@Builder
 	public static class MentorInfoResponse {
 
 		private Long mentorId;
-		private String name;
 		private String nickname;
-		private String email;
 		private String thumbnailImageUrl;
 		private String introduction;
 		private String company;
+		private String currentDuty;
+		private String currentPeriod;
 
 		@QueryProjection
-		public MentorInfoResponse(Long mentorId, String name, String introduction, String company){
+		public MentorInfoResponse(
+				Long mentorId, String nickname, String introduction, String company,
+				String currentDuty, String currentPeriod, String thumbnailImageUrl
+		) {
 			this.mentorId = mentorId;
-			this.name = name;
+			this.nickname = nickname;
 			this.introduction = introduction;
 			this.company = company;
+			this.currentDuty = currentDuty;
+			this.currentPeriod = currentPeriod;
+			this.thumbnailImageUrl = thumbnailImageUrl;
 		}
 
 		public static MentorInfoResponse from(MentorDto mentorDto){
 			return MentorInfoResponse.builder()
 					.mentorId(mentorDto.getMentorId())
-					.name(mentorDto.getName())
 					.introduction(mentorDto.getIntroduction())
 					.company(mentorDto.getCompany())
 					.thumbnailImageUrl(mentorDto.getThumbnailImageUrl())
