@@ -38,4 +38,8 @@ public class SelectedClassTime extends CommonEntity {
     @ManyToOne
     @JoinColumn(name = "order_sheet_id")
     private OrderSheet orderSheet;
+
+    public void beRejected() {
+        this.isDeleted = true;
+    }
 }
