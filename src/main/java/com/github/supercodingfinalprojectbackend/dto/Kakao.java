@@ -90,7 +90,7 @@ public class Kakao {
     @ToString
     public static class Profile {
         @JsonProperty("nickname")
-        private String nickName;
+        private String nickname;
         @JsonProperty("thumbnail_image_url")
         private String thumbnailImageUrl;
         @JsonProperty("profile_image_url")
