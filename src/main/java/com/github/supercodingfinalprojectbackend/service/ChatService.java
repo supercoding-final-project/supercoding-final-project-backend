@@ -23,7 +23,7 @@ public class ChatService {
 
     public MessageDto.ResponseMessage createMessage(Long chatroomID , MessageDto message){
 
-        ChatRoom chatRoom = chatRoomRepository.findByChatRoomIdAndIsChatIsFalse(chatroomID).orElseThrow(ApiErrorCode.ChatRoomId_NOT_FOUND::exception);
+        ChatRoom chatRoom = chatRoomRepository.findByChatRoomIdAndIsChatIsFalse(chatroomID).orElseThrow(ApiErrorCode.CHATROOMID_NOT_FOUND::exception);
 
         Message messageEntity = Message.builder()
                 .isCheck(false)
