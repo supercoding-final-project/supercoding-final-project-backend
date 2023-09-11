@@ -1,6 +1,5 @@
 package com.github.supercodingfinalprojectbackend.dto;
 
-import com.github.supercodingfinalprojectbackend.entity.type.SocialPlatformType;
 import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
 import com.github.supercodingfinalprojectbackend.util.jwt.JwtUtils;
 import lombok.*;
@@ -14,16 +13,6 @@ public class Login {
     private String accessToken;
     private String refreshToken;
     private UserRole userRole;
-    private String socialAccessToken;
-    private String socialRefreshToken;
-    private SocialPlatformType socialPlatformType;
-
-    public String getKakaoAccessToken() {
-        return socialPlatformType.equals(SocialPlatformType.KAKAO) ? socialAccessToken : null;
-    }
-    public String getKakaoRefreshToken() {
-        return socialPlatformType.equals(SocialPlatformType.GOOGLE) ? socialRefreshToken : null;
-    }
 
     @Getter
     @ToString
