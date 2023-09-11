@@ -1,7 +1,6 @@
 package com.github.supercodingfinalprojectbackend.controller;
 
 import com.github.supercodingfinalprojectbackend.dto.PostDto;
-import com.github.supercodingfinalprojectbackend.dto.PostDto.PostResponse;
 import com.github.supercodingfinalprojectbackend.service.PostService;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils.ApiResponse;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -27,7 +26,7 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<ApiResponse<PostResponse>> getPost(@PathVariable Integer postId){
+    public ResponseEntity<ApiResponse<PostDto>> getPost(@PathVariable Integer postId){
         return postService.getPost(postId);
     }
 }

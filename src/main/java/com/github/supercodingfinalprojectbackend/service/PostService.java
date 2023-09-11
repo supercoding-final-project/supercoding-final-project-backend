@@ -1,7 +1,6 @@
 package com.github.supercodingfinalprojectbackend.service;
 
 import com.github.supercodingfinalprojectbackend.dto.PostDto;
-import com.github.supercodingfinalprojectbackend.dto.PostDto.PostResponse;
 import com.github.supercodingfinalprojectbackend.entity.*;
 import com.github.supercodingfinalprojectbackend.entity.type.PostContentType;
 import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
@@ -31,8 +30,7 @@ public class PostService {
 
     @Transactional
     public ResponseEntity<ApiResponse<Void>> createPost(PostDto postDto, Long userId) {
-        User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).get();
-        Mentor mentor = mentorRepository.findByUserAndIsDeletedIsFalse(user).get();
+        Mentor mentor = mentorRepository.findByUserUserIdAndIsDeletedIsFalse(userId);
         Posts entity = Posts.fromDto(postDto,mentor);
         Posts post = postsRepository.save(entity);
 
@@ -62,11 +60,11 @@ public class PostService {
         return ResponseUtils.created("포스트가 정상적으로 등록되었습니다.",null);
     }
 
-    public ResponseEntity<ApiResponse<PostResponse>> getPost(Integer postId) {
+    public ResponseEntity<ApiResponse<PostDto>> getPost(Integer postId) {
         Posts posts = postsRepository.findById(postId).orElseThrow(PostErrorCode.POST_NOT_POST_ID::exception);
         List<PostsContent> contentList = postsContentRepository.findAllByPosts(posts);
         String stack = postsSkillStackRepository.findByPosts(posts).getSkillStack().getSkillStackName();
 
-        return ResponseUtils.ok("정상적으로 포스트 조회 되었습니다.", PostResponse.PostInfoResponse(posts,contentList,stack));
+        return ResponseUtils.ok("정상적으로 포스트 조회 되었습니다.", PostDto.PostInfoResponse(posts,contentList,stack));
     }
 }
