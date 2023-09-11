@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "reviews")
@@ -45,5 +46,13 @@ public class Review extends CommonEntity {
                 .content(content)
                 .star(star)
                 .build();
+    }
+
+    public boolean isValid(Long menteeId) {
+        return !this.isDeleted && Objects.equals(this.mentee.getMenteeId(), menteeId);
+    }
+
+    public void delete() {
+        this.isDeleted = true;
     }
 }

@@ -3,6 +3,7 @@ package com.github.supercodingfinalprojectbackend.controller;
 import com.github.supercodingfinalprojectbackend.dto.ReviewDto;
 import com.github.supercodingfinalprojectbackend.service.ReviewService;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
+import com.github.supercodingfinalprojectbackend.util.ResponseUtils.ApiResponse;
 import com.github.supercodingfinalprojectbackend.util.auth.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +23,7 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping
-    public ResponseEntity<ResponseUtils.ApiResponse<CreateReviewResponse>> createReview(
+    public ResponseEntity<ApiResponse<CreateReviewResponse>> createReview(
             @RequestBody CreateReviewRequest request
     ){
             Long userId = AuthUtils.getUserId();
@@ -35,7 +36,7 @@ public class ReviewController {
     }
 
     @GetMapping("/byPostId")
-    public ResponseEntity<ResponseUtils.ApiResponse<Page<ReviewResponse>>> getReviews(
+    public ResponseEntity<ApiResponse<Page<ReviewResponse>>> getReviews(
             @RequestParam Long postId,
             @RequestParam(defaultValue = "0") Long cursor,
             @RequestParam(defaultValue = "10") Integer pageSize
@@ -48,7 +49,7 @@ public class ReviewController {
     }
 
     @GetMapping("/byUserId")
-    public ResponseEntity<ResponseUtils.ApiResponse<Page<ReviewResponse>>> getMyReviews(
+    public ResponseEntity<ApiResponse<Page<ReviewResponse>>> getMyReviews(
             @RequestParam(defaultValue = "0") Long cursor,
             @RequestParam(defaultValue = "10") Integer pageSize
     ){
@@ -57,6 +58,18 @@ public class ReviewController {
                             "포스트에 대한 리뷰 조회를 성공하였습니다.",
                             reviewService.getMyReviews(userId, cursor, PageRequest.of(0, pageSize))
                                     .map(ReviewDto.ReviewResponse::from)
+            );
+    }
+
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<ApiResponse<ReviewResponse>> deleteReview(
+            @PathVariable("reviewId") Long reviewId
+    ){
+            Long userId = AuthUtils.getUserId();
+            return ResponseUtils.ok(
+                    "리뷰 삭제를 성공하였습니다.",
+                    ReviewDto.ReviewResponse.from(
+                            reviewService.deleteReview(userId, reviewId))
             );
     }
 }

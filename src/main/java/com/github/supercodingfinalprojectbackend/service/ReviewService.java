@@ -4,6 +4,7 @@ import com.github.supercodingfinalprojectbackend.dto.ReviewDto;
 import com.github.supercodingfinalprojectbackend.entity.Mentee;
 import com.github.supercodingfinalprojectbackend.entity.Posts;
 import com.github.supercodingfinalprojectbackend.entity.Review;
+import com.github.supercodingfinalprojectbackend.exception.ApiException;
 import com.github.supercodingfinalprojectbackend.repository.MenteeRepository;
 import com.github.supercodingfinalprojectbackend.repository.OrderSheetRepository;
 import com.github.supercodingfinalprojectbackend.repository.PostsRepository;
@@ -13,8 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.github.supercodingfinalprojectbackend.entity.Review.toEntity;
+import static com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode.NOT_FOUND_REVIEW;
+import static com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode.UNABLE_TO_DELETE_REVIEW;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -72,5 +76,21 @@ public class ReviewService {
                 .findAllByMenteeIdAndIsDeletedWithCursor(mentee.getMenteeId(), cursor, pageable);
 
         return reviews.map(ReviewDto :: from);
+    }
+
+    @Transactional
+    public ReviewDto deleteReview(Long userId, Long reviewId) {
+
+        Mentee mentee = menteeRepository.findByUserUserId(userId);
+
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ApiException(NOT_FOUND_REVIEW));
+
+        if (!review.isValid(mentee.getMenteeId())) {
+            throw new ApiException(UNABLE_TO_DELETE_REVIEW);
+        }
+
+        review.delete();
+        return ReviewDto.from(review);
     }
 }
