@@ -41,5 +41,6 @@ public class OrderSheet extends CommonEntity {
 
     public void beRejected() {
         this.isDeleted = true;
+        mentee.getUser().getAbstractAccount().chargePaymoney(totlaPrice.longValue());
     }
 }
