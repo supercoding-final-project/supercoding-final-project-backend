@@ -25,14 +25,14 @@ public class ReviewController {
     @PostMapping
     public ResponseEntity<ApiResponse<CreateReviewResponse>> createReview(
             @RequestBody CreateReviewRequest request
-    ){
-            Long userId = AuthUtils.getUserId();
-            return ResponseUtils.created(
-                    "리뷰 작성을 성공하였습니다.",
-                    ReviewDto.CreateReviewResponse.from(
-                            reviewService.createReview(request, userId)
-                    )
-            );
+    ) {
+        Long userId = AuthUtils.getUserId();
+        return ResponseUtils.created(
+                "리뷰 작성을 성공하였습니다.",
+                ReviewDto.CreateReviewResponse.from(
+                        reviewService.createReview(request, userId)
+                )
+        );
     }
 
     @GetMapping("/byPostId")
@@ -40,7 +40,7 @@ public class ReviewController {
             @RequestParam Long postId,
             @RequestParam(defaultValue = "0") Long cursor,
             @RequestParam(defaultValue = "10") Integer pageSize
-    ){
+    ) {
             return ResponseUtils.ok(
                     "포스트에 대한 리뷰 조회를 성공하였습니다.",
                     reviewService.getReviews(postId, cursor, PageRequest.of(0, pageSize))
@@ -52,19 +52,19 @@ public class ReviewController {
     public ResponseEntity<ApiResponse<Page<ReviewResponse>>> getMyReviews(
             @RequestParam(defaultValue = "0") Long cursor,
             @RequestParam(defaultValue = "10") Integer pageSize
-    ){
+    ) {
             Long userId = AuthUtils.getUserId();
             return ResponseUtils.ok(
-                            "포스트에 대한 리뷰 조회를 성공하였습니다.",
-                            reviewService.getMyReviews(userId, cursor, PageRequest.of(0, pageSize))
-                                    .map(ReviewDto.ReviewResponse::from)
+                    "user가 작성한 리뷰 조회를 성공하였습니다.",
+                    reviewService.getMyReviews(userId, cursor, PageRequest.of(0, pageSize))
+                            .map(ReviewDto.ReviewResponse::from)
             );
     }
 
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<ApiResponse<ReviewResponse>> deleteReview(
             @PathVariable("reviewId") Long reviewId
-    ){
+    ) {
             Long userId = AuthUtils.getUserId();
             return ResponseUtils.ok(
                     "리뷰 삭제를 성공하였습니다.",
