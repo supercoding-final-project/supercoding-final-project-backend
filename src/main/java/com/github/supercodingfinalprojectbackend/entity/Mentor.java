@@ -45,6 +45,9 @@ public class Mentor extends CommonEntity {
 	@Column(name = "current_period")
 	private String currentPeriod;
 
+	@OneToMany(mappedBy = "mentor")
+	private List<MentorCareer> mentorCareerList = new ArrayList<>();
+
 	public static Mentor from(User user, MentorDto mentorDto) {
 		return Mentor.builder()
 				.mentorSkillStacks(null)
@@ -58,4 +61,9 @@ public class Mentor extends CommonEntity {
 	}
 
 	public void setMentorSkillStacks(List<MentorSkillStack> mentorSkillStacks) { this.mentorSkillStacks = mentorSkillStacks; }
+
+	@Override
+	public boolean isValid() {
+		return !this.getIsDeleted() && this.getSearchable();
+	}
 }

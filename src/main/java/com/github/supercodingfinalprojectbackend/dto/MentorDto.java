@@ -7,6 +7,7 @@ import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,6 +30,8 @@ public class MentorDto {
 	private String currentPeriod;
 	private Set<MentorCareerDto> careerDtoSet;
 	private Set<SkillStackType> skillStackTypeSet;
+	private List<MentorCareerDto> mentorCareerList;
+
 
 	public static MentorDto from(Mentor mentor){
 		return MentorDto.builder()
@@ -41,6 +44,18 @@ public class MentorDto {
 				.company(mentor.getCompany())
 				.currentDuty(DutyType.valueOf(mentor.getCurrentDuty()).resolve())
 				.currentPeriod(mentor.getCurrentPeriod())
+				.build();
+	}
+
+	public static MentorDto from2(Mentor mentor){
+		return MentorDto.builder()
+				.mentorId(mentor.getMentorId())
+				.nickname(mentor.getUser().getNickname())
+				.thumbnailImageUrl(mentor.getUser().getThumbnailImageUrl())
+				.introduction(mentor.getIntroduction())
+				.company(mentor.getCompany())
+				.mentorCareerList(mentor.getMentorCareerList().stream()
+						.map(MentorCareerDto::from).collect(Collectors.toList()))
 				.build();
 	}
 
@@ -118,5 +133,30 @@ public class MentorDto {
 		public static JoinResponse from(MentorDto mentorDto) {
 			return new JoinResponse(mentorDto.getMentorId());
 		}
+	}
+
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	public static class MentorDetailResponse {
+		private Long mentorId;
+		private String nickname;
+		private String introduction;
+		private String company;
+		private String thumbnailImageUrl;
+		private List<MentorCareerDto> mentorCareerList;
+
+		public static MentorDetailResponse from(MentorDto mentorDto) {
+			return MentorDetailResponse.builder()
+					.mentorId(mentorDto.getMentorId())
+					.nickname(mentorDto.getNickname())
+					.introduction(mentorDto.getIntroduction())
+					.company(mentorDto.getCompany())
+					.thumbnailImageUrl(mentorDto.getThumbnailImageUrl())
+					.mentorCareerList(mentorDto.getMentorCareerList())
+					.build();
+		}
+
 	}
 }
