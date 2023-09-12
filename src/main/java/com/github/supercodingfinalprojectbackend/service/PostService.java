@@ -34,9 +34,9 @@ public class PostService {
         Posts entity = Posts.fromDto(postDto,mentor);
         Posts post = postsRepository.save(entity);
 
-        List<String> workCareerList = postDto.getWork_career();
-        List<String> educateCareerList = postDto.getEducate_career();
-        List<String> reviewStyleList = postDto.getReview_style();
+        List<String> workCareerList = postDto.getWorkCareer();
+        List<String> educateCareerList = postDto.getEducateCareer();
+        List<String> reviewStyleList = postDto.getReviewStyle();
 
         for (String workCareer : workCareerList) {
             PostsContent postsContent = PostsContent.fromPost(workCareer, PostContentType.WORK_CAREER.name(), post);
@@ -52,7 +52,7 @@ public class PostService {
             postsContentRepository.save(postsContent);
         }
 
-        SkillStackType skillStackType = SkillStackType.findBySkillStackType(postDto.getPost_stack());
+        SkillStackType skillStackType = SkillStackType.findBySkillStackType(postDto.getPostStack());
         SkillStack skillStack = skillStackRepository.findBySkillStackName(skillStackType.getSkillStackName());
         PostsSkillStack postsSkillStack = PostsSkillStack.fromPost(post,skillStack);
         postsSkillStackRepository.save(postsSkillStack);

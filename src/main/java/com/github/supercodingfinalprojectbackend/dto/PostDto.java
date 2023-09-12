@@ -3,9 +3,7 @@ package com.github.supercodingfinalprojectbackend.dto;
 import com.github.supercodingfinalprojectbackend.entity.Posts;
 import com.github.supercodingfinalprojectbackend.entity.PostsContent;
 import com.github.supercodingfinalprojectbackend.entity.type.PostContentType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -15,8 +13,12 @@ import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
+@ToString
 public class PostDto {
+    private Long postId;
+    private MentorDto mentorDto;
     @NotBlank
     private String title;
     @NotBlank
@@ -24,16 +26,16 @@ public class PostDto {
     @NotNull
     private Integer price;
     @NotBlank
-    private String post_stack;
+    private String postStack;
     @NotNull
     @Size(min = 1)
-    private List<String> work_career;
+    private List<String> workCareer;
     @NotNull
     @Size(min = 1)
-    private List<String> educate_career;
+    private List<String> educateCareer;
     @NotNull
     @Size(min = 1)
-    private List<String> review_style;
+    private List<String> reviewStyle;
 
     public static PostDto PostInfoResponse(Posts posts, List<PostsContent> postsContent, String skillStack) {
 
@@ -45,10 +47,10 @@ public class PostDto {
                 .title(posts.getTitle())
                 .level(posts.getLevel())
                 .price(posts.getPrice())
-                .post_stack(skillStack)
-                .work_career(workCareerList)
-                .educate_career(educateCareerList)
-                .review_style(reviewStyleList)
+                .postStack(skillStack)
+                .workCareer(workCareerList)
+                .educateCareer(educateCareerList)
+                .reviewStyle(reviewStyleList)
                 .build();
     }
 
@@ -59,4 +61,13 @@ public class PostDto {
                 .collect(Collectors.toList());
     }
 
+    public static PostDto from(Posts post) {
+        return PostDto.builder()
+                .postId(post.getPostId())
+                .mentorDto(MentorDto.from(post.getMentor()))
+                .title(post.getTitle())
+                .level(post.getLevel())
+                .price(post.getPrice())
+                .build();
+    }
 }

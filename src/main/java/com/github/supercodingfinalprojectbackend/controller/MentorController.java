@@ -6,12 +6,15 @@ import com.github.supercodingfinalprojectbackend.service.MentorService;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -45,5 +48,14 @@ public class MentorController {
 					MentorDto.MentorDetailResponse.from(
 							mentorService.getMentorDetail(mentorId))
 			);
+	}
+
+	@PostMapping(value = "/info", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@Operation(summary = "멘토 정보 수정")
+	public void changeMentorInfo(
+			@RequestParam(value = "thumbnailImageFile", required = false) @Parameter(name = "썸네일 이미지 파일") MultipartFile thumbnailImageFile
+//			@Request
+			) {
+
 	}
 }
