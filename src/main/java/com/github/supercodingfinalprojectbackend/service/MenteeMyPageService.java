@@ -67,20 +67,20 @@ public class MenteeMyPageService {
         return ResponseUtils.ok("성공적으로 조회하였습니다", responseOrderList);
     }
 
-    public ResponseEntity<?> getMenteeTransactionList(Long userId) {
-        User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
-        Mentee mentee = menteeRepository.findByUserAndIsDeletedIsFalse(user).orElseThrow(ApiErrorCode.NOT_FOUND_MENTEE::exception);
-        List<OrderSheet> orderSheet = orderSheetRepository.findByMenteeAndIsDeletedIsFalseAndIsCompletedIsTrue(mentee).orElseThrow(ApiErrorCode.NOT_FOUND_ORDERSHEET::exception);
-
-        List<SelectedClassTime> selectedClassTime = selectedClassTimeRepository.findByOrderSheet(orderSheet);
-
-        List<String> convertTime = convertToFormattedStrings(selectedClassTime);
-
+//    public ResponseEntity<?> getMenteeTransactionList(Long userId) {
+//        User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
+//        Mentee mentee = menteeRepository.findByUserAndIsDeletedIsFalse(user).orElseThrow(ApiErrorCode.NOT_FOUND_MENTEE::exception);
+//        List<OrderSheet> orderSheet = orderSheetRepository.findByMenteeAndIsDeletedIsFalseAndIsCompletedIsTrue(mentee)
+//
+//        List<SelectedClassTime> selectedClassTime = selectedClassTimeRepository.findByOrderSheet(orderSheet);
+//
+//        List<String> convertTime = convertToFormattedStrings(selectedClassTime);
+//
 //        List<MenteeMyPageDto.ResponseTransactionDto> responseTransactionDtos = orderSheet.stream()
-
+//
 //     TODO : 할것들이 많음
-        return ResponseUtils.ok("성공적으로 조회하였습니다.", selectedClassTime);
-    }
+//        return ResponseUtils.ok("성공적으로 조회하였습니다.", selectedClassTime);
+//    }
 
     private List<String> convertToFormattedStrings(List<SelectedClassTime> classTimes) {
         List<String> formattedClassTimes = classTimes.stream()

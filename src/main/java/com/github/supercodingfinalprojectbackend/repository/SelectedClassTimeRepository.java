@@ -10,7 +10,8 @@ import java.util.List;
 
 @Repository
 public interface SelectedClassTimeRepository extends JpaRepository<SelectedClassTime, Long> {
-    List<SelectedClassTime> findByOrderSheet(List<OrderSheet> orderSheet);
 
     List<SelectedClassTime> findAllByMentorAndOrderSheetAndIsDeletedIsFalse(Mentor mentor, OrderSheet orderSheet);
+
+    List<SelectedClassTime> findByOrderSheet(List<OrderSheet> orderSheet);
 }

@@ -25,7 +25,8 @@ public class MenteeMyPageController {
         return myPageService.getOrderList(userId);
     }
 
-    public ResponseEntity<?> getMenteeTransactionList(@RequestParam Long userId){
-        return myPageService.getMenteeTransactionList(userId);
-    }
+//    @GetMapping("/transaction")
+//    public ResponseEntity<?> getMenteeTransactionList(@RequestParam Long userId){
+//        return myPageService.getMenteeTransactionList(userId);
+//    }
 }
