@@ -294,7 +294,7 @@ public class Oauth2Service {
             savedMentor.setMentorSkillStacks(mentorSkillStacks);
         }
 
-        Set<MentorCareerDto> careerDtoSet = mentorDto.getCareerDtoSet();
+        Set<MentorCareerDto> careerDtoSet = mentorDto.getMentorCareerSet();
         if (careerDtoSet != null) {
             careerDtoSet.forEach(careerDto->{
                 MentorCareer newMentorCareer = MentorCareer.builder()

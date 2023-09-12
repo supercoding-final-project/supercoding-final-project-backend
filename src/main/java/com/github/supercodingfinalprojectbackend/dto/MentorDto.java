@@ -28,15 +28,13 @@ public class MentorDto {
 	private Boolean searchable;
 	private DutyType currentDuty;
 	private String currentPeriod;
-	private Set<MentorCareerDto> careerDtoSet;
+	private Set<MentorCareerDto> mentorCareerSet;
 	private Set<SkillStackType> skillStackTypeSet;
 	private List<MentorCareerDto> mentorCareerList;
-
 
 	public static MentorDto from(Mentor mentor){
 		return MentorDto.builder()
 				.mentorId(mentor.getMentorId())
-//				.name(mentor.getUser().getName())
 				.nickname(mentor.getUser().getNickname())
 				.email(mentor.getUser().getEmail())
 				.thumbnailImageUrl(mentor.getUser().getThumbnailImageUrl())
@@ -44,18 +42,8 @@ public class MentorDto {
 				.company(mentor.getCompany())
 				.currentDuty(DutyType.valueOf(mentor.getCurrentDuty()).resolve())
 				.currentPeriod(mentor.getCurrentPeriod())
-				.build();
-	}
-
-	public static MentorDto from2(Mentor mentor){
-		return MentorDto.builder()
-				.mentorId(mentor.getMentorId())
-				.nickname(mentor.getUser().getNickname())
-				.thumbnailImageUrl(mentor.getUser().getThumbnailImageUrl())
-				.introduction(mentor.getIntroduction())
-				.company(mentor.getCompany())
-				.mentorCareerList(mentor.getMentorCareerList().stream()
-						.map(MentorCareerDto::from).collect(Collectors.toList()))
+				.mentorCareerSet(mentor.getMentorCareerList().stream().map(MentorCareerDto::from).collect(Collectors.toSet()))
+				.mentorCareerList(mentor.getMentorCareerList().stream().map(MentorCareerDto::from).collect(Collectors.toList()))
 				.build();
 	}
 
@@ -75,7 +63,7 @@ public class MentorDto {
 				.introduction(request.introduction)
 				.currentDuty(currentDuty)
 				.currentPeriod(request.currentPeriod)
-				.careerDtoSet(careers)
+				.mentorCareerSet(careers)
 				.skillStackTypeSet(skillStackTypes)
 				.build();
 	}

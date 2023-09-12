@@ -50,6 +50,6 @@ public class MentorService {
 		if (!mentor.isValid()) {
 			throw new ApiException(NOT_FOUND_MENTOR);
 		}
-		return MentorDto.from2(mentor);
+		return MentorDto.from(mentor);
 	}
 }
