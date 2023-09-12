@@ -1,14 +1,16 @@
 package com.github.supercodingfinalprojectbackend.dto;
 
 import com.github.supercodingfinalprojectbackend.entity.Mentor;
+import com.github.supercodingfinalprojectbackend.entity.MentorSkillStack;
 import com.github.supercodingfinalprojectbackend.entity.type.DutyType;
 import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
+import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Getter
@@ -19,7 +21,6 @@ public class MentorDto {
 
 	private Long mentorId;
 	private Long mentorAbstractAccountId;
-	private String name;    // TODO: name 제거
 	private String nickname;
 	private String email;
 	private String thumbnailImageUrl;
@@ -28,13 +29,13 @@ public class MentorDto {
 	private Boolean searchable;
 	private DutyType currentDuty;
 	private String currentPeriod;
-	private Set<MentorCareerDto> mentorCareerSet;
-	private Set<SkillStackType> skillStackTypeSet;
+	private List<MentorSkillStackDto> mentorSkillStackList;
 	private List<MentorCareerDto> mentorCareerList;
 
 	public static MentorDto from(Mentor mentor){
 		return MentorDto.builder()
 				.mentorId(mentor.getMentorId())
+				.mentorAbstractAccountId(mentor.getUser().getAbstractAccount().getAbstractAccountId())
 				.nickname(mentor.getUser().getNickname())
 				.email(mentor.getUser().getEmail())
 				.thumbnailImageUrl(mentor.getUser().getThumbnailImageUrl())
@@ -42,30 +43,42 @@ public class MentorDto {
 				.company(mentor.getCompany())
 				.currentDuty(DutyType.valueOf(mentor.getCurrentDuty()).resolve())
 				.currentPeriod(mentor.getCurrentPeriod())
-				.mentorCareerSet(mentor.getMentorCareerList().stream().map(MentorCareerDto::from).collect(Collectors.toSet()))
 				.mentorCareerList(mentor.getMentorCareerList().stream().map(MentorCareerDto::from).collect(Collectors.toList()))
+				.mentorSkillStackList(mentor.getMentorSkillStacks().stream().map(MentorSkillStackDto::from).collect(Collectors.toList()))
 				.build();
 	}
 
 	public static MentorDto from(JoinRequest request) {
-		DutyType currentDuty = ValidateUtils.requireApply(request.currentDuty, s->DutyType.valueOf(s).resolve(), 400, "존재하지 않는 직무입니다.");
+		Objects.requireNonNull(request);
 
-		Set<MentorCareerDto> careers = request.careers.stream()
+		String company = ValidateUtils.requireNotNullElse(request.company, "");
+		String introduction = ValidateUtils.requireNotNullElse(request.introduction, "");
+		List<MentorCareerDto.Request> careers = ValidateUtils.requireNotNullElse(request.careers, List.of());
+
+
+		DutyType currentDuty = ValidateUtils.requireApply(request.careers.get(0).getDutyName(), s->DutyType.valueOf(s).resolve(), ApiErrorCode.INVALID_DUTY);
+
+		List<MentorCareerDto> mentorCareerDtoList = request.careers.stream()
 				.map(MentorCareerDto::from)
-				.collect(Collectors.toSet());
+				.collect(Collectors.toList());
 
-		Set<SkillStackType> skillStackTypes = request.skillStackNames.stream()
-				.map(skillStackName->ValidateUtils.requireApply(skillStackName, SkillStackType::valueOf, 400, "존재하지 않는 기술스택입니다."))
-				.collect(Collectors.toSet());
+		List<MentorSkillStackDto> mentorSkillStackDtoList = request.skillStackNames.stream()
+				.map(skillStackName->ValidateUtils.requireApply(skillStackName, SkillStackType::valueOf, ApiErrorCode.INVALID_SKILL_STACK))
+				.map(MentorSkillStackDto::from)
+				.collect(Collectors.toList());
 
-		return MentorDto.builder()
-				.company(request.company)
-				.introduction(request.introduction)
+		MentorDto mentorDto = MentorDto.builder()
+				.company(company)
+				.introduction(introduction)
 				.currentDuty(currentDuty)
-				.currentPeriod(request.currentPeriod)
-				.mentorCareerSet(careers)
-				.skillStackTypeSet(skillStackTypes)
+				.currentPeriod(request.careers.get(0).getPeriod())
+				.mentorCareerList(mentorCareerDtoList)
+				.mentorSkillStackList(mentorSkillStackDtoList)
 				.build();
+
+		mentorSkillStackDtoList.forEach(s->s.setMentorDto(mentorDto));
+
+		return mentorDto;
 	}
 
 	@Getter
@@ -104,10 +117,12 @@ public class MentorDto {
 	public static class JoinRequest {
 		private String company;
 		private String introduction;
-		private String currentDuty;
-		private String currentPeriod;
-		private Set<MentorCareerDto.Request> careers;
-		private Set<String> skillStackNames;
+		private List<MentorCareerDto.Request> careers;
+		private List<String> skillStackNames;
+
+		public boolean validate() {
+			return company != null && introduction != null;
+		}
 	}
 
 	@Getter
@@ -120,6 +135,10 @@ public class MentorDto {
 
 		public static JoinResponse from(MentorDto mentorDto) {
 			return new JoinResponse(mentorDto.getMentorId());
+		}
+
+		public static JoinResponse from(Mentor mentor) {
+			return new JoinResponse(mentor.getMentorId());
 		}
 	}
 

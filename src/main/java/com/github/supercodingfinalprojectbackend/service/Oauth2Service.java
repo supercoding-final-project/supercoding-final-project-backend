@@ -268,46 +268,38 @@ public class Oauth2Service {
         return newLogin;
     }
 
-    public MentorDto joinMentor(Long userId, MentorDto mentorDto) {
-        ValidateUtils.requireNotNull(mentorDto, 500, "mentorDto는 null일 수 없습니다.");
+    public MentorDto.JoinResponse joinMentor(Long userId, MentorDto.JoinRequest request) {
         User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
 
-        Mentor newMentor = Mentor.from(user, mentorDto);
+        Mentor newMentor = Mentor.of(user, request.getCompany(), request.getIntroduction());
         Mentor savedMentor = mentorRepository.save(newMentor);
 
-        Set<SkillStackType> skillStackTypeSet = mentorDto.getSkillStackTypeSet();
-        if (skillStackTypeSet != null) {
-            List<MentorSkillStack> mentorSkillStacks = skillStackTypeSet.stream()
-                    .map(skillStackType -> {
-                        SkillStack skillStack = skillStackRepository.findBySkillStackId(Long.valueOf(skillStackType.getSkillStackCode()))
-                                .orElseThrow(ApiErrorCode.INTERNAL_SERVER_ERROR::exception);
+        List<MentorCareerDto.Request> careers = request.getCareers();
+        if (careers != null) {
+            ValidateUtils.requireTrue(careers.stream().allMatch(MentorCareerDto.Request::validate), ApiErrorCode.INVALID_DUTY);
+            List<MentorCareer> mentorCareers = careers.stream()
+                    .map(c->MentorCareer.of(savedMentor, c))
+                    .map(mentorCareerRepository::save)
+                    .collect(Collectors.toList());
+            savedMentor.setMentorCareers(mentorCareers);
+        }
 
-                        MentorSkillStack mentorSkillStack = MentorSkillStack.builder()
-                                .mentor(savedMentor)
-                                .skillStack(skillStack)
-                                .build();
-
-                        return mentorSkillStackRepository.save(mentorSkillStack);
-                    })
+        List<String> skillStackNames = request.getSkillStackNames();
+        if (skillStackNames != null) {
+            List<SkillStack> skillStacks = skillStackNames.stream()
+                    .map(skillStackName->ValidateUtils.requireApply(skillStackName, SkillStackType::valueOf, ApiErrorCode.INVALID_SKILL_STACK))
+                    .map(SkillStackType::getSkillStackCode)
+                    .map(c->skillStackRepository.findBySkillStackId(c).orElseThrow(ApiErrorCode.INTERNAL_SERVER_ERROR::exception))
                     .collect(Collectors.toList());
 
+            List<MentorSkillStack> mentorSkillStacks = skillStacks.stream()
+                    .map(s->MentorSkillStack.of(savedMentor, s))
+                    .map(mentorSkillStackRepository::save)
+                    .collect(Collectors.toList());
             savedMentor.setMentorSkillStacks(mentorSkillStacks);
         }
 
-        Set<MentorCareerDto> careerDtoSet = mentorDto.getMentorCareerSet();
-        if (careerDtoSet != null) {
-            careerDtoSet.forEach(careerDto->{
-                MentorCareer newMentorCareer = MentorCareer.builder()
-                        .mentor(savedMentor)
-                        .duty(careerDto.getDutyType().name())
-                        // TODO: period 타입변경 Integer -> String
-//                        .period(careerDto.getPeriod())
-                        .build();
-                mentorCareerRepository.save(newMentorCareer);
-            });
-        }
-
-        return MentorDto.from(savedMentor);
+        return MentorDto.JoinResponse.from(savedMentor);
     }
 
     public TokenDto renewTokens(String refreshToken) {

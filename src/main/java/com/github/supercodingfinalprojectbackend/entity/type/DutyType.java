@@ -10,6 +10,13 @@ public enum DutyType implements CustomEnum {
     DutyType() { this.redirect = null; }
     DutyType(DutyType redirect) { this.redirect = redirect; }
 
+    public static boolean contains(String dutyName) {
+        for (DutyType dutyType : values()) {
+            if (dutyType.name().equals(dutyName)) return true;
+        }
+        return false;
+    }
+
     // resole 호출 반드시 필요
     @Override
     public DutyType resolve() { return redirect != null ? redirect.resolve() : this; }

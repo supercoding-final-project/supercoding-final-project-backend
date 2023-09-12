@@ -2,9 +2,11 @@ package com.github.supercodingfinalprojectbackend.controller;
 
 import com.github.supercodingfinalprojectbackend.dto.MentorDto;
 import com.github.supercodingfinalprojectbackend.dto.PaymoneyDto;
+import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.service.Oauth2Service;
 import com.github.supercodingfinalprojectbackend.service.UserService;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
+import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
 import com.github.supercodingfinalprojectbackend.util.auth.AuthUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -26,12 +28,10 @@ public class UserController {
     public ResponseEntity<ResponseUtils.ApiResponse<MentorDto.JoinResponse>> joinMentor(
             @RequestBody @Parameter(name = "멘토 등록 요청 객체", required = true) MentorDto.JoinRequest request
     ){
+        ValidateUtils.requireTrue(request.validate(), ApiErrorCode.INVALID_REQUEST_BODY);
+
         Long userId = AuthUtils.getUserId();
-        MentorDto mentorDtoRequest = MentorDto.from(request);
-
-        MentorDto mentorDto = oauth2Service.joinMentor(userId, mentorDtoRequest);
-
-        MentorDto.JoinResponse response = MentorDto.JoinResponse.from(mentorDto);
+        MentorDto.JoinResponse response = oauth2Service.joinMentor(userId, request);
         return ResponseUtils.created("멘토 등록에 성공했습니다.", response);
     }
 

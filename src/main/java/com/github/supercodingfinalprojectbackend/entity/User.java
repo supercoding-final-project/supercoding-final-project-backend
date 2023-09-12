@@ -28,4 +28,9 @@ public class User extends CommonEntity {
     private String nickname;
     @Column(name = "thumbnail_image_url")
     private String thumbnailImageUrl;
+
+    public void changeInfo(String nickname, String email) {
+        if (nickname != null) this.nickname = nickname;
+        if (email != null) this.email = email;
+    }
 }
