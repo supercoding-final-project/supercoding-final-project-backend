@@ -22,17 +22,17 @@ public class PostsContent extends CommonEntity{
     @Column(name = "text")
     private String text;
 
-    @Column(name = "location")
-    private String location;
+    @Column(name = "content_type")
+    private String contentType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Posts posts;
 
-    public static PostsContent fromPost(String text, Integer location, Posts posts ){
+    public static PostsContent fromPost(String text, String contentType, Posts posts ){
         return PostsContent.builder()
                 .text(text)
-                .location(String.valueOf(location))
+                .contentType(contentType)
                 .posts(posts)
                 .build();
     }
