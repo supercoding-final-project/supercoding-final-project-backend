@@ -10,7 +10,7 @@ import lombok.*;
 @ToString
 public class OrderSheetDto {
     private Long orderSheetId;
-    private Post postDto;
+    private PostDto postDto;
     private MenteeDto menteeDto;
     private Long totalPrice;
     private Boolean isCompleted;
@@ -18,7 +18,7 @@ public class OrderSheetDto {
     public static OrderSheetDto from(OrderSheet orderSheet) {
         return OrderSheetDto.builder()
                 .orderSheetId(orderSheet.getOrderSheetId())
-                .postDto(Post.from(orderSheet.getPost()))
+                .postDto(PostDto.from(orderSheet.getPost()))
                 .menteeDto(MenteeDto.from(orderSheet.getMentee()))
                 .totalPrice(orderSheet.getTotlaPrice().longValue())
                 .isCompleted(orderSheet.getIsCompleted())
