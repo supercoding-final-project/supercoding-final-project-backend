@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.Valid;
 import java.util.List;
 
 
@@ -68,7 +67,7 @@ public class PostService {
         return ResponseUtils.ok("정상적으로 멘티 모집 조회 되었습니다.", PostDto.PostInfoResponse(posts,contentList,stack));
     }
 
-    public ResponseEntity<ApiResponse<Void>> updatePost(Long postId, @Valid PostDto postDto) {
+    public ResponseEntity<ApiResponse<Void>> updatePost(Long postId, PostDto postDto) {
         Posts posts = postsRepository.findById(postId).orElseThrow(PostErrorCode.POST_NOT_POST_ID::exception);
         posts.postsUpdate(postDto);
 
@@ -79,9 +78,9 @@ public class PostService {
             postsContentRepository.save(postsContent);
         }
 
-        List<String> workCareerList = postDto.getWork_career();
-        List<String> educateCareerList = postDto.getEducate_career();
-        List<String> reviewStyleList = postDto.getReview_style();
+        List<String> workCareerList = postDto.getWorkCareer();
+        List<String> educateCareerList = postDto.getEducateCareer();
+        List<String> reviewStyleList = postDto.getReviewStyle();
 
         for (String workCareer : workCareerList) {
             PostsContent postsContent = PostsContent.fromPost(workCareer, PostContentType.WORK_CAREER.name(), posts);
@@ -98,7 +97,7 @@ public class PostService {
         }
 
         PostsSkillStack postsSkillStack = postsSkillStackRepository.findByPosts(posts);
-        SkillStack skillStack = skillStackRepository.findBySkillStackName(postDto.getPost_stack());
+        SkillStack skillStack = skillStackRepository.findBySkillStackName(postDto.getPostStack());
         postsSkillStack.skillStackUpdate(skillStack);
         return ResponseUtils.ok("멘티 모집이 정상적으로 수정되었습니다.",null);
     }
