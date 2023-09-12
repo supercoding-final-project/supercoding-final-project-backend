@@ -5,6 +5,7 @@ import com.github.supercodingfinalprojectbackend.dto.MentorDto.MentorInfoRespons
 import com.github.supercodingfinalprojectbackend.service.MentorService;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
