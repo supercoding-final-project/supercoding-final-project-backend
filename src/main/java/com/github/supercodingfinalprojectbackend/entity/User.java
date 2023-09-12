@@ -6,7 +6,6 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -32,5 +31,9 @@ public class User extends CommonEntity {
     public void changeInfo(String nickname, String email) {
         if (nickname != null) this.nickname = nickname;
         if (email != null) this.email = email;
+    }
+
+    public void changeUserNameNickname(String nickname){
+        this.nickname = nickname;
     }
 }

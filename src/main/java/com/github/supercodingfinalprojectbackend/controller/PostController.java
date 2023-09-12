@@ -29,4 +29,14 @@ public class PostController {
     public ResponseEntity<ApiResponse<PostDto>> getPost(@PathVariable Long postId){
         return postService.getPost(postId);
     }
+
+    @PatchMapping("/{postId}")
+    public ResponseEntity<ApiResponse<Void>> updatePost(@PathVariable Long postId,@RequestBody @Valid PostDto postDto){
+        return postService.updatePost(postId,postDto);
+    }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<ApiResponse<Void>> deletePost(@PathVariable Long postId){
+        return postService.deletePost(postId);
+    }
 }

@@ -1,10 +1,9 @@
 package com.github.supercodingfinalprojectbackend.entity.type;
 
-import java.util.Arrays;
-import java.util.Set;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Arrays;
 
 @Getter
 @RequiredArgsConstructor
