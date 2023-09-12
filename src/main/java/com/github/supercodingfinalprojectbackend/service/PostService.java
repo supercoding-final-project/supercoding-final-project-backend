@@ -1,9 +1,10 @@
 package com.github.supercodingfinalprojectbackend.service;
 
-import com.github.supercodingfinalprojectbackend.dto.Post.PostCreateDto;
+import com.github.supercodingfinalprojectbackend.dto.PostDto;
 import com.github.supercodingfinalprojectbackend.entity.*;
+import com.github.supercodingfinalprojectbackend.entity.type.PostContentType;
 import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
-import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
+import com.github.supercodingfinalprojectbackend.exception.errorcode.PostErrorCode;
 import com.github.supercodingfinalprojectbackend.repository.*;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils.ApiResponse;
@@ -12,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -29,29 +29,42 @@ public class PostService {
     private final SkillStackRepository skillStackRepository;
 
     @Transactional
-    public ResponseEntity<ApiResponse<Void>> createPost(PostCreateDto postCreateDto, Long userId) {
-        User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
-        Mentor mentor = mentorRepository.findByUserAndIsDeletedIsFalse(user).orElseThrow(ApiErrorCode.NOT_FOUND_MENTOR::exception);
-        Posts entity = Posts.fromDto(postCreateDto,mentor);
+    public ResponseEntity<ApiResponse<Void>> createPost(PostDto postDto, Long userId) {
+        Mentor mentor = mentorRepository.findByUserUserIdAndIsDeletedIsFalse(userId).get();
+        Posts entity = Posts.fromDto(postDto,mentor);
         Posts post = postsRepository.save(entity);
 
-        List<String> textList = postCreateDto.getText();
-        List<MultipartFile> imgList = postCreateDto.getImg();
+        List<String> workCareerList = postDto.getWorkCareer();
+        List<String> educateCareerList = postDto.getEducateCareer();
+        List<String> reviewStyleList = postDto.getReviewStyle();
 
-        for (int i=0; i<=textList.size(); i++) {
-            PostsContent postsContent = PostsContent.fromPost(textList.get(i),i,post);
-            postsContentRepository.save(postsContent);
-        }
-        for (int i=0; i<=imgList.size(); i++) {
-            PostsContent postsContent = PostsContent.fromPost(String.valueOf(i),i,post);
+        for (String workCareer : workCareerList) {
+            PostsContent postsContent = PostsContent.fromPost(workCareer, PostContentType.WORK_CAREER.name(), post);
             postsContentRepository.save(postsContent);
         }
 
-        SkillStackType skillStackType = SkillStackType.findBySkillStackType(postCreateDto.getPost_stack());
+        for (String educateCareer : educateCareerList) {
+            PostsContent postsContent = PostsContent.fromPost(educateCareer, PostContentType.EDUCATE_CAREER.name(), post);
+            postsContentRepository.save(postsContent);
+        }
+        for (String reviewStyle : reviewStyleList) {
+            PostsContent postsContent = PostsContent.fromPost(reviewStyle, PostContentType.REVIEW_STYLE.name(), post);
+            postsContentRepository.save(postsContent);
+        }
+
+        SkillStackType skillStackType = SkillStackType.findBySkillStackType(postDto.getPostStack());
         SkillStack skillStack = skillStackRepository.findBySkillStackName(skillStackType.getSkillStackName());
         PostsSkillStack postsSkillStack = PostsSkillStack.fromPost(post,skillStack);
         postsSkillStackRepository.save(postsSkillStack);
 
         return ResponseUtils.created("포스트가 정상적으로 등록되었습니다.",null);
+    }
+
+    public ResponseEntity<ApiResponse<PostDto>> getPost(Long postId) {
+        Posts posts = postsRepository.findById(postId).orElseThrow(PostErrorCode.POST_NOT_POST_ID::exception);
+        List<PostsContent> contentList = postsContentRepository.findAllByPosts(posts);
+        String stack = postsSkillStackRepository.findByPosts(posts).getSkillStack().getSkillStackName();
+
+        return ResponseUtils.ok("정상적으로 포스트 조회 되었습니다.", PostDto.PostInfoResponse(posts,contentList,stack));
     }
 }

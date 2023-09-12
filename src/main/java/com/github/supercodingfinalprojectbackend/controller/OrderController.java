@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/order")
+@RequestMapping("/api/v1/orders")
 public class OrderController {
 
     private final OrderService orderService;
@@ -29,6 +29,18 @@ public class OrderController {
         PaymentDto paymentDtoResponse = orderService.approveOrder(userId, orderDtoRequest);
         PaymentDto.PaymentIdResponse response = PaymentDto.PaymentIdResponse.from(paymentDtoResponse);
 
-        return ResponseUtils.created("결제에 성공했습니다.", response);
+        return ResponseUtils.created("결제 요청을 성공적으로 승인했습니다.", response);
+    }
+
+    @PostMapping("/refuse")
+    @Operation(summary = "주문서 결제 반려")
+    public ResponseEntity<ResponseUtils.ApiResponse<OrderSheetDto.OrderSheetIdResponse>> refuseOrder(@RequestBody OrderSheetDto.OrderSheetIdRequest request) {
+        Long userId = AuthUtils.getUserId();
+        OrderSheetDto orderDtoRequest = OrderSheetDto.from(request);
+
+        OrderSheetDto orderSheetDto = orderService.refuseOrder(userId, orderDtoRequest);
+        OrderSheetDto.OrderSheetIdResponse response = OrderSheetDto.OrderSheetIdResponse.from(orderSheetDto);
+
+        return ResponseUtils.ok("결제 요청을 성공적으로 취소하였습니다.", response);
     }
 }
