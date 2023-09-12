@@ -27,7 +27,10 @@ public enum ApiErrorCode implements ErrorCode {
 
     IMAGE_EXTENSION_BAD_REQUEST(HttpStatus.BAD_REQUEST, "확장자명을 변경해주십시오."),
 
-    IMAGE_INVALID_FORMAT(HttpStatus.BAD_REQUEST,"유효하지 않은 형식입니다")
+    IMAGE_INVALID_FORMAT(HttpStatus.BAD_REQUEST,"유효하지 않은 형식입니다"),
+
+    NOT_FOUND_REVIEW(HttpStatus.NOT_FOUND, "존재하지 않는 리뷰입니다."),
+    UNABLE_TO_DELETE_REVIEW(HttpStatus.FORBIDDEN,"리뷰를 삭제할 수 없습니다.")
     ;
 
     ApiErrorCode(HttpStatus status, String message) {

@@ -1,19 +1,19 @@
 package com.github.supercodingfinalprojectbackend.controller;
 
+import com.github.supercodingfinalprojectbackend.dto.MentorDto;
 import com.github.supercodingfinalprojectbackend.dto.MentorDto.MentorInfoResponse;
 import com.github.supercodingfinalprojectbackend.service.MentorService;
-import java.util.List;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -33,6 +33,17 @@ public class MentorController {
 			return ResponseUtils.ok(
 					"Mentor 리스트를 성공적으로 가져왔습니다.",
 					mentorService.getMentors(keyword, skillStack, cursor, PageRequest.of(0, pageSize))
+			);
+	}
+
+	@GetMapping("/detail/{mentorId}")
+	public ResponseEntity<ApiResponse<MentorDto.MentorDetailResponse>> getMentorDetail(
+			@PathVariable("mentorId") Long mentorId
+	){
+			return ResponseUtils.ok(
+					"Mentor 상세정보를 성공적으로 가져왔습니다.",
+					MentorDto.MentorDetailResponse.from(
+							mentorService.getMentorDetail(mentorId))
 			);
 	}
 }

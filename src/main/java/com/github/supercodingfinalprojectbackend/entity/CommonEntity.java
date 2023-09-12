@@ -16,11 +16,11 @@ public abstract class CommonEntity {
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt;
+    protected Instant createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at", insertable = false)
-    private Instant updatedAt;
+    protected Instant updatedAt;
 
     public boolean isValid() { return !isDeleted; }
 }

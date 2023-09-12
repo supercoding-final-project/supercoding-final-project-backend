@@ -1,18 +1,12 @@
 package com.github.supercodingfinalprojectbackend.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "reviews")
@@ -20,24 +14,45 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Review {
+public class Review extends CommonEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "review_id", nullable = false)
-	private Long reviewId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "review_id", nullable = false)
+    private Long reviewId;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "mentee_id")
-	private Mentee mentee;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mentee_id")
+    private Mentee mentee;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "post_id")
-	private Posts post;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
+    private Posts post;
 
-	@Column(name = "content")
-	private String content;
+    @Column(name = "title")
+    private String title;
 
-	@Column(name = "start")
-	private Integer star;
+    @Column(name = "content")
+    private String content;
+
+    @Column(name = "star")
+    private Integer star;
+
+    public static Review toEntity(Mentee mentee, Posts posts, String title, String content, Integer star) {
+        return Review.builder()
+                .mentee(mentee)
+                .post(posts)
+                .title(title)
+                .content(content)
+                .star(star)
+                .build();
+    }
+
+    public boolean isValid(Long menteeId) {
+        return !this.isDeleted && Objects.equals(this.mentee.getMenteeId(), menteeId);
+    }
+
+    public void delete() {
+        this.isDeleted = true;
+    }
 }
