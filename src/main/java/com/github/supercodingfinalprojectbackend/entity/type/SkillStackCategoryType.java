@@ -8,8 +8,14 @@ public enum SkillStackCategoryType implements CustomEnum {
     BACKEND,
     FRONTEND,
     OBJECT_ORIENTED_PROGRAMMING,
-    FUNCTIONAL_PROGRAMMING
-    ;
+    FUNCTIONAL_PROGRAMMING,
+
+    DBA(SkillStackType.MYSQL,
+        SkillStackType.MONGODB,
+        SkillStackType.REDIS,
+        SkillStackType.MARIA,
+        SkillStackType.ORACLE
+    );
 
     private final Set<SkillStackType> skillStackTypeSet;
     private final SkillStackCategoryType redirect;

@@ -1,10 +1,9 @@
 package com.github.supercodingfinalprojectbackend.entity.type;
 
-import java.util.Arrays;
-import java.util.Set;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Arrays;
 
 @Getter
 @RequiredArgsConstructor
@@ -60,7 +59,9 @@ public enum SkillStackType {
 	DOT_NET(".NET", 49),
 	APOLLO("Apollo", 50),
 	POSTGRE_SQL("PostgreSQL", 51),
-	ORACLE("Oracle", 52);
+	ORACLE("Oracle", 52),
+	MARIA("Maria",53);
+
 
 	private final String skillStackName;
 	private final Integer skillStackCode;
