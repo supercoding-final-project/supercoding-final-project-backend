@@ -36,4 +36,8 @@ public class PostsContent extends CommonEntity{
                 .posts(posts)
                 .build();
     }
+
+    public void postContentIsDeleted(){
+        this.isDeleted = true;
+    }
 }

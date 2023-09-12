@@ -1,6 +1,9 @@
 package com.github.supercodingfinalprojectbackend.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
@@ -29,5 +32,13 @@ public class PostsSkillStack extends CommonEntity{
                 .posts(posts)
                 .skillStack(skillStack)
                 .build();
+    }
+
+    public void skillStackUpdate(SkillStack skillStack){
+        this.skillStack  = skillStack;
+    }
+
+    public void postsSkillStackIsDeleted(){
+        this.isDeleted = true;
     }
 }
