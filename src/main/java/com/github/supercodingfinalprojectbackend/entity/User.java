@@ -6,7 +6,6 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -28,4 +27,8 @@ public class User extends CommonEntity {
     private String nickname;
     @Column(name = "thumbnail_image_url")
     private String thumbnailImageUrl;
+
+    public void changeUserNameNickname(String nickname){
+        this.nickname = nickname;
+    }
 }
