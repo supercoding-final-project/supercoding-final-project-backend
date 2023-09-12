@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -38,5 +39,10 @@ public class PostController {
     @DeleteMapping("/{postId}")
     public ResponseEntity<ApiResponse<Void>> deletePost(@PathVariable Long postId){
         return postService.deletePost(postId);
+    }
+
+    @GetMapping("/day")
+    public ResponseEntity<ApiResponse<List<Integer>>> getTimes(@RequestParam Long postId, @RequestParam String days){
+        return postService.getTimes(postId,days);
     }
 }

@@ -4,6 +4,7 @@ import com.github.supercodingfinalprojectbackend.dto.PostDto;
 import com.github.supercodingfinalprojectbackend.entity.*;
 import com.github.supercodingfinalprojectbackend.entity.type.PostContentType;
 import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
+import com.github.supercodingfinalprojectbackend.entity.type.WeekType;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.PostErrorCode;
 import com.github.supercodingfinalprojectbackend.repository.*;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
@@ -14,7 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -27,6 +31,8 @@ public class PostService {
     private final PostsContentRepository postsContentRepository;
     private final PostsSkillStackRepository postsSkillStackRepository;
     private final SkillStackRepository skillStackRepository;
+
+    private final MentorScheduleTemplateRepository mentorScheduleTemplateRepository;
 
     public ResponseEntity<ApiResponse<Void>> createPost(PostDto postDto, Long userId) {
         Mentor mentor = mentorRepository.findByUserUserIdAndIsDeletedIsFalse(userId).get();
@@ -60,7 +66,7 @@ public class PostService {
     }
     @Transactional(readOnly = true)
     public ResponseEntity<ApiResponse<PostDto>> getPost(Long postId) {
-        Posts posts = postsRepository.findById(postId).orElseThrow(PostErrorCode.POST_NOT_POST_ID::exception);
+        Posts posts = postsRepository.findByPostIdAndIsDeletedFalse(postId).orElseThrow(PostErrorCode.POST_NOT_POST_ID::exception);
         List<PostsContent> contentList = postsContentRepository.findAllByPosts(posts);
         String stack = postsSkillStackRepository.findByPosts(posts).getSkillStack().getSkillStackName();
 
@@ -68,7 +74,7 @@ public class PostService {
     }
 
     public ResponseEntity<ApiResponse<Void>> updatePost(Long postId, PostDto postDto) {
-        Posts posts = postsRepository.findById(postId).orElseThrow(PostErrorCode.POST_NOT_POST_ID::exception);
+        Posts posts = postsRepository.findByPostIdAndIsDeletedFalse(postId).orElseThrow(PostErrorCode.POST_NOT_POST_ID::exception);
         posts.postsUpdate(postDto);
 
         List<PostsContent> postsContentList = postsContentRepository.findAllByPosts(posts);
@@ -103,7 +109,7 @@ public class PostService {
     }
 
     public ResponseEntity<ApiResponse<Void>> deletePost(Long postId) {
-        Posts posts = postsRepository.findById(postId).orElseThrow(PostErrorCode.POST_NOT_POST_ID::exception);
+        Posts posts = postsRepository.findByPostIdAndIsDeletedFalse(postId).orElseThrow(PostErrorCode.POST_NOT_POST_ID::exception);
         posts.postsIsDeleted();
 
         List<PostsContent> postsContentList = postsContentRepository.findAllByPosts(posts);
@@ -116,6 +122,24 @@ public class PostService {
         PostsSkillStack postsSkillStack = postsSkillStackRepository.findByPosts(posts);
         postsSkillStack.postsSkillStackIsDeleted();
         return ResponseUtils.noContent("멘티 모집이 정삭적으로 삭제되었습니다.",null);
+    }
+
+
+    public ResponseEntity<ApiResponse<List<Integer>>> getTimes(Long postId, String days) {
+        Posts posts = postsRepository.findByPostIdAndIsDeletedFalse(postId).orElseThrow(PostErrorCode.POST_NOT_POST_ID::exception);
+        
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
+        LocalDate date = LocalDate.parse(days,formatter);
+
+        String name = date.getDayOfWeek().name();
+        String weekType = WeekType.valueOf(name).getName();
+
+        List<MentorScheduleTemplate> scheduleList = mentorScheduleTemplateRepository.findByMentorAndScheduleWeek(posts.getMentor(),weekType);
+        List<Integer> timeList = scheduleList.stream()
+                .map(MentorScheduleTemplate::getValidTime)
+                .collect(Collectors.toList());
+
+        return ResponseUtils.ok("멘토의 신청가능한 시간이 조회되었습니다.",timeList);
     }
 }
 
