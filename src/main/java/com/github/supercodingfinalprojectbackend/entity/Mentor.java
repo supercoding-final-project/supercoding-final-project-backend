@@ -86,4 +86,17 @@ public class Mentor extends CommonEntity {
 	public void setMentorCareers(List<MentorCareer> mentorCareers) {
 		this.mentorCareerList = mentorCareers;
 	}
+
+	public void changeInfo(MentorDto.ChangeInfoRequest request) {
+//		List<MentorCareer> mentorCareerList;
+//		List<MentorSkillStack> mentorSkillStacks;
+		this.user.changeInfo(request.getNickname(), request.getEmail());
+		this.introduction = request.getIntroduction();
+		this.company = request.getCompany();
+		this.searchable = request.getSearchable();
+		this.currentDuty = request.getCurrentDuty();
+		this.currentPeriod = request.getCurrentPeriod();
+//		this.mentorCareerList = mentorCareerList;
+//		this.mentorSkillStacks = mentorSkillStacks;
+	}
 }

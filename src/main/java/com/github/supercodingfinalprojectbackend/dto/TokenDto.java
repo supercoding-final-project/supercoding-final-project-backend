@@ -24,6 +24,14 @@ public class TokenDto {
     @ToString
     public static class RefreshTokenRequest {
         private String refreshToken;
+
+        public boolean validate() {
+            return refreshToken != null;
+        }
+
+        public String getRefreshToken() {
+            return JwtUtils.cutPrefix(refreshToken);
+        }
     }
 
     @Getter

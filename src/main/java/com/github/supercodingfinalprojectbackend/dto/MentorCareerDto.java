@@ -65,4 +65,22 @@ public class MentorCareerDto {
             }
         }
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @ToString
+    @EqualsAndHashCode(of = {"dutyName"})
+    public static class Response {
+        private String dutyName;
+        private String period;
+
+        public static Response from(MentorCareer mentorCareer) {
+            return Response.builder()
+                    .dutyName(mentorCareer.getDuty())
+                    .period(mentorCareer.getPeriod())
+                    .build();
+        }
+    }
 }

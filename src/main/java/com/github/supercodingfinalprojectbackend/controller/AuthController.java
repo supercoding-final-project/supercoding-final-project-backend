@@ -3,6 +3,7 @@ package com.github.supercodingfinalprojectbackend.controller;
 import com.github.supercodingfinalprojectbackend.dto.Login;
 import com.github.supercodingfinalprojectbackend.dto.TokenDto;
 import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
+import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.service.Oauth2Service;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
@@ -10,6 +11,7 @@ import com.github.supercodingfinalprojectbackend.util.auth.AuthUtils;
 import com.github.supercodingfinalprojectbackend.util.jwt.JwtUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
+@Tag(name = "인증 API")
 public class AuthController {
 
     private final Oauth2Service oauth2Service;

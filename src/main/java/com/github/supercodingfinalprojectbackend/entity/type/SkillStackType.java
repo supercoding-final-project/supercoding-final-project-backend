@@ -54,4 +54,13 @@ public enum SkillStackType {
 				.findFirst()
 				.orElseThrow(() -> new RuntimeException("존재하지 않는 기술스택입니다."));
 	}
+
+    public static boolean contains(String s) {
+		try {
+			valueOf(s);
+			return true;
+		} catch (IllegalArgumentException e) {
+			return false;
+		}
+    }
 }
