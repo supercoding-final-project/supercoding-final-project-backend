@@ -20,4 +20,10 @@ public class Mentee extends CommonEntity {
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    public static Mentee from(User user) {
+        return Mentee.builder()
+                .user(user)
+                .build();
+    }
 }

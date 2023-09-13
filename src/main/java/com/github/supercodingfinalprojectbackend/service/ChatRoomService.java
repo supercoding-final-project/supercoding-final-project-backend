@@ -74,7 +74,7 @@ public class ChatRoomService {
         return  chatRoomResponse;
     }
     public String createChatName(User user1, User user2){
-        return user1.getName() + " " + user2.getName();
+        return user1.getNickname() + " " + user2.getNickname();
     }
 
  /*   public MessageDto.ResponseEnterChatRoom getEnterChatRoom(Long chatRoomId) {
