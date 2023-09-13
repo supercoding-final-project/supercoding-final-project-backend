@@ -23,9 +23,6 @@ import org.springframework.web.client.RestTemplate;
 import javax.crypto.SecretKey;
 import javax.transaction.Transactional;
 import java.net.URI;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -104,55 +101,6 @@ public class Oauth2Service {
         loginRecordRepository.save(LoginRecord.of(user, userRole));
 
         return login;
-    }
-
-    private UserAbstractAccount createAndSaveUserAbstractAccount() {
-        UserAbstractAccount newAbstractAccount = UserAbstractAccount.builder()
-                .accountNumber(createAccountNumber())
-                .paymoney(0L)
-                .build();
-        return userAbstractAccountRepository.save(newAbstractAccount);
-    }
-
-    private UserSocialInfo createAndSaveUserSocialInfo(User user, Long socialId, SocialPlatformType socialPlatformType) {
-        UserSocialInfo newUserSocialInfo = UserSocialInfo.builder()
-                .user(user)
-                .socialId(socialId)
-                .socialPlatformName(socialPlatformType.name())
-                .build();
-        return userSocialInfoRepository.save(newUserSocialInfo);
-    }
-
-    private Mentee createAndSaveMentee(User user) {
-        Mentee newMentee = Mentee.builder()
-                .user(user)
-                .build();
-        return menteeRepository.save(newMentee);
-    }
-
-    private User createAndSaveUser(UserAbstractAccount abstractAccount, String email, String nickname, String thumbnailImageUrl) {
-        User newUser = User.builder()
-                .abstractAccount(abstractAccount)
-                .email(email)
-                .nickname(nickname)
-                .thumbnailImageUrl(thumbnailImageUrl)
-                .build();
-        return userRepository.save(newUser);
-    }
-
-    private String createAccountNumber() {
-        long seed = Instant.now().toEpochMilli();
-        Random random = new Random(seed);
-        int min = 0x1000;
-        int max = 0xffff;
-
-        String num1 = Integer.toHexString(random.nextInt(max - min + 1) + min);
-        long seconds = seed / 1000;    // 초 단위
-        long time = seconds % LocalDateTime.of(2070, 1, 1, 0, 0, 0).toEpochSecond(ZoneOffset.UTC);    // 0 ~ 99년 12월 31일 23시 59분 59초
-        String num2 = String.format("%08x", time);
-        String num3 = Integer.toHexString(random.nextInt(max - min + 1) + min);
-        String num4 = Integer.toHexString(random.nextInt(max - min + 1) + min);
-        return num1 + "-" + num2 + "-" + num3 + "-" + num4;
     }
 
     private Kakao.OauthToken getKakaoToken(String code) {
