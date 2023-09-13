@@ -248,18 +248,16 @@ public class Oauth2Service {
 
     public MentorDto.JoinResponse joinMentor(Long userId, MentorDto.JoinRequest request) {
         User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
-
-        Mentor newMentor = Mentor.of(user, request.getCompany(), request.getIntroduction());
-        Mentor savedMentor = mentorRepository.save(newMentor);
+        Mentor mentor = mentorRepository.save(Mentor.of(user, request.getCompany(), request.getIntroduction()));
 
         List<MentorCareerDto.Request> careers = request.getCareers();
         if (careers != null) {
             ValidateUtils.requireTrue(careers.stream().allMatch(MentorCareerDto.Request::validate), ApiErrorCode.INVALID_DUTY);
             List<MentorCareer> mentorCareers = careers.stream()
-                    .map(c->MentorCareer.of(savedMentor, c))
+                    .map(c->MentorCareer.of(mentor, c))
                     .map(mentorCareerRepository::save)
                     .collect(Collectors.toList());
-            savedMentor.setMentorCareers(mentorCareers);
+            mentor.setMentorCareers(mentorCareers);
         }
 
         List<String> skillStackNames = request.getSkillStackNames();
@@ -271,13 +269,13 @@ public class Oauth2Service {
                     .collect(Collectors.toList());
 
             List<MentorSkillStack> mentorSkillStacks = skillStacks.stream()
-                    .map(s->MentorSkillStack.of(savedMentor, s))
+                    .map(s->MentorSkillStack.of(mentor, s))
                     .map(mentorSkillStackRepository::save)
                     .collect(Collectors.toList());
-            savedMentor.setMentorSkillStacks(mentorSkillStacks);
+            mentor.setMentorSkillStacks(mentorSkillStacks);
         }
 
-        return MentorDto.JoinResponse.from(savedMentor);
+        return MentorDto.JoinResponse.from(mentor);
     }
 
     public TokenDto.Response renewTokens(String refreshToken) {

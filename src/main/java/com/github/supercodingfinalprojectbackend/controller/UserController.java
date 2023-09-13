@@ -37,13 +37,12 @@ public class UserController {
 
     @PostMapping("/paymoney")
     @Operation(summary = "페이머니 충전")
-    public ResponseEntity<ResponseUtils.ApiResponse<PaymoneyDto>> chargePaymoney(@RequestBody PaymoneyDto.ChargeRequest request) {
-        Long userId = AuthUtils.getUserId();
-        Long chargeAmount = request.getChargeAmount();
+    public ResponseEntity<ResponseUtils.ApiResponse<PaymoneyDto.ChargeResponse>> chargePaymoney(@RequestBody PaymoneyDto.ChargeRequest request) {
+        ValidateUtils.requireTrue(request.validate(), ApiErrorCode.INVALID_REQUEST_BODY);
 
-        Long chargePaymoney = userService.chargePaymoney(userId, chargeAmount);
-        PaymoneyDto response = new PaymoneyDto(chargePaymoney);
+        Long userId = AuthUtils.getUserId();
+
+        PaymoneyDto.ChargeResponse response = userService.chargePaymoney(userId, request);
         return ResponseUtils.ok("페이머니를 성공적으로 충전했습니다!", response);
     }
-
 }
