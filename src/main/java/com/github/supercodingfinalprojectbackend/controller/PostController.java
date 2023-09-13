@@ -1,9 +1,9 @@
 package com.github.supercodingfinalprojectbackend.controller;
 
 import com.github.supercodingfinalprojectbackend.dto.PostDto;
+import com.github.supercodingfinalprojectbackend.dto.PostDto.OrderCodeReviewDto;
 import com.github.supercodingfinalprojectbackend.service.PostService;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils.ApiResponse;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -44,5 +44,11 @@ public class PostController {
     @GetMapping("/day")
     public ResponseEntity<ApiResponse<List<Integer>>> getTimes(@RequestParam Long postId, @RequestParam String days){
         return postService.getTimes(postId,days);
+    }
+
+    @PostMapping("/order")
+    public ResponseEntity<ApiResponse<List<Integer>>> orderCodeReview(@RequestBody OrderCodeReviewDto orderCodeReviewDto) {
+        Long userId = 1L;
+        return postService.orderCodeReview(orderCodeReviewDto,userId);
     }
 }

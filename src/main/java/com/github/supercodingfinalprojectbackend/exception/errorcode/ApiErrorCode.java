@@ -30,7 +30,10 @@ public enum ApiErrorCode implements ErrorCode {
     IMAGE_INVALID_FORMAT(HttpStatus.BAD_REQUEST,"유효하지 않은 형식입니다"),
 
     NOT_FOUND_REVIEW(HttpStatus.NOT_FOUND, "존재하지 않는 리뷰입니다."),
-    UNABLE_TO_DELETE_REVIEW(HttpStatus.FORBIDDEN,"리뷰를 삭제할 수 없습니다.")
+    UNABLE_TO_DELETE_REVIEW(HttpStatus.FORBIDDEN,"리뷰를 삭제할 수 없습니다."),
+    POST_NOT_POST_ID(HttpStatus.NOT_FOUND,"등록되지 않은 포스트입니다."),
+
+    MENTEE_ACCOUNT_NOT_ENOUGH(HttpStatus.CONFLICT,"멘티의 잔액이 부족합니다.")
     ;
 
     ApiErrorCode(HttpStatus status, String message) {
