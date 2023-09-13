@@ -42,7 +42,6 @@ public class MentorTemplateService {
             MentorScheduleTemplate mentorScheduleTemplate = MentorScheduleTemplate.from(scheduleDto,mentor,validTimes);
             mentorScheduleTemplates.add(mentorScheduleTemplate);
         }
-
         mentorScheduleTemplateRepository.saveAll(mentorScheduleTemplates);
         return ResponseUtils.ok("성공적으로 저장되었습니다.",scheduleDto);
     }
