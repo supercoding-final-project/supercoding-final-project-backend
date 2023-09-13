@@ -1,9 +1,15 @@
 package com.github.supercodingfinalprojectbackend.dto;
 
 
-import com.github.supercodingfinalprojectbackend.entity.*;
-import lombok.*;
+import com.github.supercodingfinalprojectbackend.entity.OrderSheet;
+import com.github.supercodingfinalprojectbackend.entity.Payment;
+import com.github.supercodingfinalprojectbackend.entity.Posts;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.util.List;
 
 @Getter
@@ -34,18 +40,18 @@ public class MenteeMyPageDto {
     @Builder
     public static class ResponseOrderDto{
         private Long orderId;
-        private Long postId;
-        private Long menteeId;
-        private Long totalPrice;
-        private Boolean isCompleted = false;
+        private String postTitle;
+        private String mentorNickname;
+        private Integer totalPrice;
+        private Boolean isCompleted;
     }
 
     public static ResponseOrderDto from(OrderSheet orderSheet){
         return ResponseOrderDto.builder()
                 .orderId(orderSheet.getOrderSheetId())
-                .postId(orderSheet.getPost().getPostId())
-                .menteeId(orderSheet.getMentee().getMenteeId())
-                .totalPrice(Long.valueOf(orderSheet.getTotlaPrice()))
+                .postTitle(orderSheet.getPost().getTitle())
+                .mentorNickname(orderSheet.getPost().getMentor().getUser().getNickname())
+                .totalPrice(orderSheet.getTotlaPrice())
                 .isCompleted(orderSheet.getIsCompleted())
                 .build();
     }
@@ -64,8 +70,10 @@ public class MenteeMyPageDto {
     public static class ResponseTransactionDto{
         private String postName;
         private String mentorNickname;
-        private List<TransactionCalendar> transactionCalendars;
+        private List<String> transactionCalendars;
         private String email;
+        private Integer totalPrice;
+        private Instant createdAt;
     }
     @Getter
     @Builder
@@ -75,11 +83,14 @@ public class MenteeMyPageDto {
         private String Calendar;
     }
 
-    public static ResponseTransactionDto from(OrderSheet orderSheet, Posts posts, SelectedClassTime selectedClassTime){
+    public static ResponseTransactionDto from(List<String> selectedClassTime, Posts posts, OrderSheet orderSheet, Payment payment){
         return ResponseTransactionDto.builder()
                 .email(posts.getMentor().getUser().getEmail())
                 .postName(posts.getTitle())
+                .transactionCalendars(selectedClassTime)
                 .mentorNickname(posts.getMentor().getUser().getNickname())
+                .totalPrice(orderSheet.getTotlaPrice())
+                .createdAt(payment.getCreatedAt())
                 .build();
     }
 }
