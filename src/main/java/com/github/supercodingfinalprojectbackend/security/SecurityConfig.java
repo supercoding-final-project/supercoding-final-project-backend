@@ -19,9 +19,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final FilterExceptionHandler filterExceptionHandler;
-    private final AuthorizationFilter authorizationFilter;
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -46,9 +43,6 @@ public class SecurityConfig {
                         .antMatchers(HttpMethod.POST, "/api/v1/order/approve").hasRole(UserRole.MENTOR.resolve().name())
                         .anyRequest().permitAll() // 다른 모든 요청을 허용하도록 설정
                 )
-                // 필터 추가
-                .addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(filterExceptionHandler, authorizationFilter.getClass())
                 .build();
     }
 }

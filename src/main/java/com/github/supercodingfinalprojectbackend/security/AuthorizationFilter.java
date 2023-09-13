@@ -3,9 +3,12 @@ package com.github.supercodingfinalprojectbackend.security;
 import com.github.supercodingfinalprojectbackend.util.jwt.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -19,6 +22,7 @@ import java.io.IOException;
 @Component
 @Slf4j
 @RequiredArgsConstructor
+@Order(1)
 public class AuthorizationFilter extends OncePerRequestFilter {
 
     private final ProviderManager providerManager;
