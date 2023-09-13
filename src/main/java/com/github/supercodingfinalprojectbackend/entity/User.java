@@ -21,12 +21,19 @@ public class User extends CommonEntity {
     private UserAbstractAccount abstractAccount;
     @Column(name = "email")
     private String email;
-    @Column(name = "name")
-    private String name;
     @Column(name = "nickname")
     private String nickname;
     @Column(name = "thumbnail_image_url")
     private String thumbnailImageUrl;
+
+    public static User of(UserAbstractAccount userAbstractAccount, String email, String nickname, String thumbnailImageUrl) {
+        return User.builder()
+                .abstractAccount(userAbstractAccount)
+                .email(email)
+                .nickname(nickname)
+                .thumbnailImageUrl(thumbnailImageUrl)
+                .build();
+    }
 
     public void changeInfo(String nickname, String email) {
         if (nickname != null) this.nickname = nickname;

@@ -59,7 +59,7 @@ public class Oauth2Service {
     @Qualifier("AuthHolder")
     private final AuthHolder authHolder;
 
-    public Login kakaoLogin(String code) {
+    public Login.Response kakaoLogin(String code) {
         ValidateUtils.requireNotNull(code, 401, "카카오 로그인에 실패했습니다.");
 
         Kakao.OauthToken kakaoOauthToken = getKakaoToken(code);
@@ -67,29 +67,28 @@ public class Oauth2Service {
 
         // 회원이 존재하지 않으면 회원 가입
         Long kakaoId = kakaoUserInfo.getId();
-        UserSocialInfo userSocialInfo = userSocialInfoRepository.findBySocialIdAndSocialPlatformNameAndIsDeletedIsFalse(kakaoId, SocialPlatformType.KAKAO.name())
+        UserSocialInfo userSocialInfo = userSocialInfoRepository.findBySocialIdAndSocialPlatformNameAndIsDeletedIsFalse(kakaoId, SocialPlatformType.KAKAO.resolve().name())
                 .orElseGet(()->{
                     Kakao.Account kakaoAccount = kakaoUserInfo.getKakaoAccount();
                     Kakao.Profile kakaoProfile = kakaoAccount.getProfile();
 
-                    UserAbstractAccount userAbstractAccount = createAndSaveUserAbstractAccount();
-                    User user = createAndSaveUser(userAbstractAccount, kakaoAccount.getEmail(), kakaoProfile.getNickname(), kakaoProfile.getThumbnailImageUrl());
-                    createAndSaveMentee(user);
-                    return createAndSaveUserSocialInfo(user, kakaoUserInfo.getId(), SocialPlatformType.KAKAO);
+                    UserAbstractAccount userAbstractAccount = userAbstractAccountRepository.save(UserAbstractAccount.of());
+                    User user = userRepository.save(User.of(userAbstractAccount, kakaoAccount.getEmail(), kakaoProfile.getNickname(), kakaoProfile.getThumbnailImageUrl()));
+                    menteeRepository.save(Mentee.from(user));
+
+                    return userSocialInfoRepository.save(UserSocialInfo.of(user, kakaoUserInfo.getId(), SocialPlatformType.KAKAO.resolve()));
                 });
 
         Login login = serviceLogin(userSocialInfo.getUser());
         kakaoLogout(kakaoOauthToken.getAccessToken());
 
-        return login;
+        return Login.Response.from(login);
     }
 
     public Login serviceLogin(User user) {
-        ValidateUtils.requireNotNull(user, 500, "user는 null일 수 없습니다.");
-
         // 이전 로그인 기록을 뒤져서 어떤 역할로 로그인할 것인지 선택
         LoginRecord loginRecord = loginRecordRepository.findFirstByUserAndIsDeletedIsFalseOrderByCreatedAtDesc(user).orElse(null);
-        UserRole userRole = loginRecord == null ? UserRole.MENTEE : UserRole.valueOf(loginRecord.getRoleName());
+        UserRole userRole = loginRecord == null ? UserRole.MENTEE.resolve() : UserRole.valueOf(loginRecord.getRoleName()).resolve();
 
         // 토큰 생성
         Long userId = user.getUserId();
@@ -98,19 +97,11 @@ public class Oauth2Service {
         TokenHolder tokenHolder = JwtUtils.createTokens(userIdString, authorities, secretKey);
 
         // 메모리에 로그인 정보 저장
-        Login login = Login.builder()
-                .userRole(userRole)
-                .accessToken(tokenHolder.getAccessToken())
-                .refreshToken(tokenHolder.getRefreshToken())
-                .build();
+        Login login = Login.of(userRole, tokenHolder);
         authHolder.put(userId, login);
 
         // DB에 로그인 기록 저장
-        LoginRecord newloginRecord = LoginRecord.builder()
-                .user(user)
-                .roleName(userRole.name())
-                .build();
-        loginRecordRepository.save(newloginRecord);
+        loginRecordRepository.save(LoginRecord.of(user, userRole));
 
         return login;
     }
@@ -230,39 +221,26 @@ public class Oauth2Service {
     }
 
     public void logout(Long userId) {
-        ValidateUtils.requireNotNull(userId, 500, "userId는 null일 수 없습니다.");
         authHolder.remove(userId);
     }
 
-    public Login switchRole(Long userId, UserRole userRole) {
+    public Login.Response switchRole(Long userId, UserRole userRole) {
         User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
 
         Login login = authHolder.get(userId);
         if (!login.getUserRole().equals(userRole)) {
-            login = switchLogin(user, login, userRole);
+            login = switchLogin(user, userRole);
         }
 
-        return login;
+        return Login.Response.from(login);
     }
 
-    private Login switchLogin(User user, Login existsLogin, UserRole userRole) {
-        ValidateUtils.requireNotNull(user, 500, "user는 null일 수 없습니다.");
-        ValidateUtils.requireNotNull(existsLogin, 500, "existsLogin은 null일 수 없습니다.");
-        ValidateUtils.requireNotNull(userRole, 500, "userRole은 null일 수 없습니다.");
-
-        LoginRecord newloginRecord = LoginRecord.builder()
-                .user(user)
-                .roleName(userRole.name())
-                .build();
-        loginRecordRepository.save(newloginRecord);
+    private Login switchLogin(User user, UserRole userRole) {
+        loginRecordRepository.save(LoginRecord.of(user, userRole));
 
         Set<String> authorities = Set.of(userRole.name());
         TokenHolder tokenHolder = JwtUtils.createTokens(user.getUserId().toString(), authorities, secretKey);
-        Login newLogin = Login.builder()
-                .accessToken(tokenHolder.getAccessToken())
-                .refreshToken(tokenHolder.getRefreshToken())
-                .userRole(userRole)
-                .build();
+        Login newLogin = Login.of(userRole, tokenHolder);
         authHolder.put(user.getUserId(), newLogin);
 
         return newLogin;
@@ -302,17 +280,14 @@ public class Oauth2Service {
         return MentorDto.JoinResponse.from(savedMentor);
     }
 
-    public TokenDto renewTokens(String refreshToken) {
+    public TokenDto.Response renewTokens(String refreshToken) {
         String userIdStr = ValidateUtils.requireApply(refreshToken, t->JwtUtils.getSubject(t, secretKey), ApiErrorCode.UNRELIABLE_JWT);
         Long userId = ValidateUtils.requireApply(userIdStr, Long::parseLong, ApiErrorCode.UNRELIABLE_JWT);
         Login login = ValidateUtils.requireNotNull(authHolder.get(userId), 404, "로그인 기록이 없습니다.");
-        TokenHolder tokenHolder = JwtUtils.createTokens(userIdStr, Set.of(login.getUserRole().name()), secretKey);
-        Login newLogin = Login.builder()
-                .userRole(login.getUserRole())
-                .accessToken(tokenHolder.getAccessToken())
-                .refreshToken(tokenHolder.getRefreshToken())
-                .build();
+        TokenHolder tokenHolder = JwtUtils.createTokens(userIdStr, Set.of(login.getUserRole().resolve().name()), secretKey);
+        Login newLogin = Login.of(login.getUserRole(), tokenHolder);
         authHolder.put(userId, newLogin);
-        return TokenDto.from(tokenHolder);
+
+        return TokenDto.Response.from(tokenHolder);
     }
 }
