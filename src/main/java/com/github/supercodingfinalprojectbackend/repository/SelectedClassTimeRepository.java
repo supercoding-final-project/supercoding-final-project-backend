@@ -14,5 +14,4 @@ public interface SelectedClassTimeRepository extends JpaRepository<SelectedClass
     List<SelectedClassTime> findAllByMentorAndOrderSheetAndIsDeletedIsFalse(Mentor mentor, OrderSheet orderSheet);
 
     List<SelectedClassTime> findAllByOrderSheet(OrderSheet orderSheet);
-
 }

@@ -5,7 +5,6 @@ import com.github.supercodingfinalprojectbackend.exception.FilterExceptionHandle
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -42,11 +41,12 @@ public class SecurityConfig {
                 // 접근 권한 설정
                 .authorizeHttpRequests(matcherRegistry -> matcherRegistry
                         .antMatchers("/api/v1/test/**").authenticated()
-                        .antMatchers("/api/v1/auth/logout/kakao/", "/api/v1/user/switch/**", "/api/v1/user/role/join/mentor").authenticated()
-                        .antMatchers(HttpMethod.POST, "/api/v1/order/approve").hasRole(UserRole.MENTOR.resolve().name())
+                        .antMatchers("/api/v1/auth/logout", "/api/v1/auth/switch/**").authenticated()
+                        .antMatchers("/api/v1/users/role/join/mentor", "/api/v1/users/paymoney").authenticated()
+                        .antMatchers("/api/v1/mentors/info").authenticated()
+                        .antMatchers("/api/v1/orders/approve", "/api/v1/orders/refuse").hasRole(UserRole.MENTOR.resolve().name())
                         .anyRequest().permitAll() // 다른 모든 요청을 허용하도록 설정
                 )
-                // 필터 추가
                 .addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(filterExceptionHandler, authorizationFilter.getClass())
                 .build();

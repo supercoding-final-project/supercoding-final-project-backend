@@ -24,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -31,7 +32,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/v1/api/mentors")
+@RequestMapping("/api/v1/mentors")
 @RestController
 public class MentorController {
 
@@ -62,30 +63,12 @@ public class MentorController {
 			);
 	}
 
-	@PostMapping(value = "/info", consumes = "multipart/form-data;charset=utf-8")
+	@PostMapping(value = "/info")
 	@Operation(summary = "멘토 정보 수정")
-	public void changeMentorInfo(
-			@RequestParam(value = "thumbnailImageFile", required = false) @Parameter(name = "썸네일 이미지 파일") MultipartFile thumbnailImageFile,
-			@RequestParam("nickname") @Parameter(name = "닉네임", required = true) String nickname,
-			@RequestParam(value = "email", required = false) @Parameter(name = "이메일") String email,
-			@RequestParam(value = "introduction", required = false) @Parameter(name = "소개글") String introduction,
-			@RequestParam(value = "company", required = false) @Parameter(name = "현재 다니는 회사(현직)") String company,
-			@RequestParam(value = "skillStack", required = false) @Parameter(name = "기술스택") List<String> skillStacks,
-			@RequestParam(value = "career", required = false) @Parameter(name = "기술스택") List<MentorCareerDto.Request> careers,
-			@RequestParam(value = "searchable", required = false) @Parameter(name = "검색 노출 유무") Boolean searchable
-	) {
-		CompletableFuture<Map<Integer, String>> future = CompletableFuture.supplyAsync(()-> {
-			try {
-				return s3Service.uploadImageFiles(thumbnailImageFile);
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			}
-		});
-
-//		future.thenApplyAsync();
-
+	public ResponseEntity<ApiResponse<MentorDto.ChangeInfoResponse>> changeMentorInfo(@RequestBody MentorDto.ChangeInfoRequest request) {
+		ValidateUtils.requireTrue(request.validate(), ApiErrorCode.INVALID_REQUEST_BODY);
 		Long userId = AuthUtils.getUserId();
-
-
+		MentorDto.ChangeInfoResponse response = mentorService.changeMentorInfo(userId, request);
+		return ResponseUtils.ok("멘토의 정보가 성공적으로 수정되었습니다.", response);
 	}
 }

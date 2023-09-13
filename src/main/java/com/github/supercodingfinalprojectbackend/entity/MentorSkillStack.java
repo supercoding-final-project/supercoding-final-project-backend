@@ -40,4 +40,8 @@ public class MentorSkillStack extends CommonEntity {
 	public void softDelete() {
 		this.isDeleted = true;
 	}
+
+	public String getSkillStackName() {
+		return skillStack.getSkillStackName();
+	}
 }

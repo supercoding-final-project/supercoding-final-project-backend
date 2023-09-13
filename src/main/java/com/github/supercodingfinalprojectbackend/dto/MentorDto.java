@@ -1,13 +1,18 @@
 package com.github.supercodingfinalprojectbackend.dto;
 
 import com.github.supercodingfinalprojectbackend.entity.Mentor;
+import com.github.supercodingfinalprojectbackend.entity.MentorCareer;
 import com.github.supercodingfinalprojectbackend.entity.MentorSkillStack;
+import com.github.supercodingfinalprojectbackend.entity.User;
 import com.github.supercodingfinalprojectbackend.entity.type.DutyType;
 import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
 import com.querydsl.core.annotations.QueryProjection;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Objects;
@@ -165,5 +170,98 @@ public class MentorDto {
 					.build();
 		}
 
+	}
+
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	@ToString
+	public static class ChangeInfoRequest {
+		@Schema(name = "썸네일 이미지 URL")
+		private String thumbnailImageUrl;
+		@Schema(name = "닉네임")
+		private String nickname;
+		@Schema(name = "이메일")
+		private String email;
+		@Schema(name = "멘토 소개글")
+		private String introduction;
+		@Schema(name = "현재 다니는 회사")
+		private String company;
+		@Schema(name = "기술 스택들")
+		private List<String> skillStacks;
+		@Schema(name = "커리어들")
+		private List<MentorCareerDto.Request> careers;
+		@Schema(name = "검색 노출 유무")
+		private Boolean searchable;
+
+		public boolean validate() {
+			if (careers != null && !careers.isEmpty() && !careers.stream().allMatch(MentorCareerDto.Request::validate)) return false;
+			if (skillStacks != null && !skillStacks.isEmpty() && !skillStacks.stream().allMatch(SkillStackType::contains)) return false;
+
+			return nickname != null &&
+					searchable != null;
+		}
+
+		public String getCurrentDuty() {
+			return careers != null && !careers.isEmpty() ? careers.get(0).getDutyName() : null;
+		}
+
+		public String getCurrentPeriod() {
+			return careers != null && !careers.isEmpty() ? careers.get(0).getPeriod() : null;
+		}
+	}
+
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	@ToString
+	public static class ChangeInfoResponse {
+		@Schema(name = "썸네일 이미지 URL")
+		private String thumbnailImageUrl;
+		@Schema(name = "닉네임")
+		private String nickname;
+		@Schema(name = "이메일")
+		private String email;
+		@Schema(name = "멘토 소개글")
+		private String introduction;
+		@Schema(name = "현재 다니는 회사")
+		private String company;
+		@Schema(name = "기술 스택들")
+		private List<String> skillStacks;
+		@Schema(name = "커리어들")
+		private List<MentorCareerDto.Response> careers;
+		@Schema(name = "검색 노출 유무")
+		private Boolean searchable;
+
+		public static ChangeInfoResponse from(Mentor mentor) {
+			User user = mentor.getUser();
+
+			List<MentorCareer> mentorCareers = mentor.getMentorCareerList();
+			List<MentorCareerDto.Response> careers = mentorCareers != null && !mentorCareers.isEmpty() ?
+					mentorCareers.stream()
+							.map(MentorCareerDto.Response::from)
+							.collect(Collectors.toList())
+					: null;
+
+			List<MentorSkillStack> mentorSkillStacks = mentor.getMentorSkillStacks();
+			List<String> skillStacks = mentorSkillStacks != null && !mentorSkillStacks.isEmpty() ?
+					mentorSkillStacks.stream()
+							.map(MentorSkillStack::getSkillStackName)
+							.collect(Collectors.toList())
+					: null;
+
+			return ChangeInfoResponse.builder()
+					.thumbnailImageUrl(user.getThumbnailImageUrl())
+					.nickname(user.getNickname())
+					.email(user.getEmail())
+					.introduction(mentor.getIntroduction())
+					.company(mentor.getCompany())
+					.careers(careers)
+					.skillStacks(skillStacks)
+					.searchable(mentor.getSearchable())
+					.build();
+		}
 	}
 }
