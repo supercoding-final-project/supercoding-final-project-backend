@@ -49,5 +49,12 @@ public class TokenDto {
                     .refreshToken(JwtUtils.prefix(tokenDto.refreshToken))
                     .build();
         }
+
+        public static Response from(TokenHolder tokenHolder) {
+            return Response.builder()
+                    .accessToken(JwtUtils.prefix(tokenHolder.getAccessToken()))
+                    .refreshToken(JwtUtils.prefix(tokenHolder.getRefreshToken()))
+                    .build();
+        }
     }
 }

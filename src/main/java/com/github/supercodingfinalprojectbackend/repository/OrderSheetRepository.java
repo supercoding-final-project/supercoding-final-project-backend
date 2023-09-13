@@ -1,6 +1,5 @@
 package com.github.supercodingfinalprojectbackend.repository;
 
-import com.github.supercodingfinalprojectbackend.entity.Mentee;
 import com.github.supercodingfinalprojectbackend.entity.Mentor;
 import com.github.supercodingfinalprojectbackend.entity.OrderSheet;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,8 +11,15 @@ import java.util.Optional;
 @Repository
 public interface OrderSheetRepository extends JpaRepository<OrderSheet, Long> {
 
-    Optional<List<OrderSheet>> findByMenteeAndIsDeletedIsFalse(Mentee MenteeId);
+    List<OrderSheet> findAllByMenteeUserUserIdAndIsCompletedIsFalse(Long userId);
 
-    Optional<List<OrderSheet>> findByMenteeAndIsDeletedIsFalseAndIsCompletedIsTrue(Mentee MenteeId);
+    List<OrderSheet> findAllByMenteeUserUserIdAndIsCompletedIsTrue(Long userId);
+
+
+    List<OrderSheet> findAllByPostMentorUserUserIdAndIsCompletedTrue(Long userId);
+
+
+    List<OrderSheet> findAllByPostMentorUserUserIdAndIsCompletedIsFalse(Long userId);
+
     Optional<OrderSheet> findByPostMentorAndOrderSheetIdAndIsDeletedIsFalse(Mentor mentor, Long orderSheetId);
 }

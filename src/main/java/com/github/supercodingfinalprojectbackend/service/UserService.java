@@ -1,5 +1,6 @@
 package com.github.supercodingfinalprojectbackend.service;
 
+import com.github.supercodingfinalprojectbackend.dto.PaymoneyDto;
 import com.github.supercodingfinalprojectbackend.entity.User;
 import com.github.supercodingfinalprojectbackend.entity.UserAbstractAccount;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
@@ -16,9 +17,10 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public Long chargePaymoney(Long userId, Long chargeAmount) {
+    public PaymoneyDto.ChargeResponse chargePaymoney(Long userId, PaymoneyDto.ChargeRequest request) {
         User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
         UserAbstractAccount userAbstractAccount = user.getAbstractAccount();
-        return userAbstractAccount.chargePaymoney(chargeAmount);
+        Long paymoney = userAbstractAccount.chargePaymoney(request.getChargeAmount());
+        return PaymoneyDto.ChargeResponse.from(paymoney);
     }
 }

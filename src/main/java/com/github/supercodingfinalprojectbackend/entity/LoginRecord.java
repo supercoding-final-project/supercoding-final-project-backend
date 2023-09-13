@@ -1,5 +1,6 @@
 package com.github.supercodingfinalprojectbackend.entity;
 
+import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
 import lombok.*;
 
 import javax.persistence.*;
@@ -22,4 +23,11 @@ public class LoginRecord extends CommonEntity {
     private User user;
     @Column(name = "role_name")
     private String roleName;
+
+    public static LoginRecord of(User user, UserRole userRole) {
+        return LoginRecord.builder()
+                .user(user)
+                .roleName(userRole.resolve().name())
+                .build();
+    }
 }
