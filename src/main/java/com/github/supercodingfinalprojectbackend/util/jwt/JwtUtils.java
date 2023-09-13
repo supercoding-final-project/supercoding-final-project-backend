@@ -63,17 +63,12 @@ public class JwtUtils {
     }
 
     public static String getJwtFromRequest(HttpServletRequest request) {
-        ValidateUtils.requireNotNull(request, 500, "request는 null일 수 없습니다.");
-
         String jwt = request.getHeader(ACCESS_TOKEN_HEADER_NAME);
         if (jwt == null) return null;
         return cutPrefix(jwt);
     }
 
     public static Claims parseClaims(String jwt, SecretKey secretKey) {
-        ValidateUtils.requireNotNull(jwt, 500, "jwt는 null일 수 없습니다.");
-        ValidateUtils.requireNotNull(secretKey, 500, "secretKey는 null일 수 없습니다.");
-
         try {
             return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(jwt).getBody();
         } catch (ExpiredJwtException e) {
@@ -86,9 +81,6 @@ public class JwtUtils {
     }
 
     public static UsernamePasswordAuthenticationToken parseAuthentication(String jwt, SecretKey secretKey) {
-        ValidateUtils.requireNotNull(jwt, 500, "jwt는 null일 수 없습니다.");
-        ValidateUtils.requireNotNull(secretKey, 500, "secretKey는 null일 수 없습니다.");
-
         Claims claims = parseClaims(jwt, secretKey);
         String userId = claims.getSubject();
         List<?> authorities = claims.get("authorities", List.class);
