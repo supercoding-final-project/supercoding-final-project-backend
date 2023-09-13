@@ -5,6 +5,7 @@ import com.github.supercodingfinalprojectbackend.entity.ChatRoom;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.repository.ChatRoomRepository;
 import com.github.supercodingfinalprojectbackend.service.MessageService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +26,7 @@ public class MessageController {
     private final MessageService messageService;
     private final ChatRoomRepository chatRoomRepository;
 
+    @Operation(summary = "메세지 리시트 반환 기능")
     @GetMapping("/message")
     public ResponseEntity<?> getMessageByChatRoom(
             @RequestParam Long ChatRoomId, @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "20") Integer size){
