@@ -2,6 +2,7 @@ package com.github.supercodingfinalprojectbackend.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.github.supercodingfinalprojectbackend.dto.ImageDto;
 import com.github.supercodingfinalprojectbackend.exception.ApiException;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -53,20 +54,25 @@ public class S3Service {
     }
 
     public String uploadImageFile(MultipartFile file) throws IOException {
-        if (!validateImageFiles(file)) throw ApiErrorCode.IMAGE_INVALID_FORMAT.exception();
+        if (!validateImageFile(file)) throw ApiErrorCode.IMAGE_INVALID_FORMAT.exception();
         return upload(file);
     }
-    public Map<Integer, String> uploadImageFiles(MultipartFile... files) throws InterruptedException {
+
+    private boolean validateImageFile(MultipartFile file) {
+        return validateImageExtension(parseExtension(file));
+    }
+
+    public ImageDto.UrlMapResponse uploadImageFiles(Collection<MultipartFile> files) throws InterruptedException {
         if (!validateImageFiles(files)) throw ApiErrorCode.IMAGE_INVALID_FORMAT.exception();
 
-        final int numberOfThreads = files.length;
+        final int numberOfThreads = files.size();
         final CountDownLatch latch = new CountDownLatch(numberOfThreads);
         ConcurrentHashMap<Integer, String> result = new ConcurrentHashMap<>(numberOfThreads);
 
-        for (int i = 0; i < numberOfThreads; i++) {
-            final int index = i;
-            MultipartFile file = files[index];
-
+        int count = 0;
+        for (MultipartFile file : files) {
+            count++;
+            final int index = count;
             new Thread(()->{
                 try {
                     String url = upload(file);
@@ -80,13 +86,13 @@ public class S3Service {
         }
         latch.await();
 
-        return result;
+        return ImageDto.UrlMapResponse.from(result);
     }
 
-    private boolean validateImageFiles(MultipartFile... files) {
+    private boolean validateImageFiles(Collection<MultipartFile> files) {
         Objects.requireNonNull(files);
 
-        return Arrays.stream(files)
+        return files.stream()
                 .map(this::parseExtension)
                 .allMatch(this::validateImageExtension);
     }
