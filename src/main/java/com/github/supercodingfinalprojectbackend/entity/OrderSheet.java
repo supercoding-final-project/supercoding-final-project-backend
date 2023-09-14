@@ -42,4 +42,10 @@ public class OrderSheet extends CommonEntity {
     public void softDelete() {
         this.isDeleted = true;
     }
+
+    public void canceled() {
+        mentee.getUser().getAbstractAccount().chargePaymoney(totlaPrice.longValue());
+        this.isCompleted = false;
+        softDelete();
+    }
 }
