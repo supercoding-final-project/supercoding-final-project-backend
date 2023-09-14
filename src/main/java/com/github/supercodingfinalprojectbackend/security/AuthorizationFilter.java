@@ -22,7 +22,6 @@ import java.io.IOException;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-@Order(1)
 public class AuthorizationFilter extends OncePerRequestFilter {
 
     private final ProviderManager providerManager;

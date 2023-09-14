@@ -30,6 +30,7 @@ public class OrderController {
     @PostMapping("/approve")
     @Operation(summary = "주문서 결제 승인")
     public ResponseEntity<ResponseUtils.ApiResponse<PaymentDto.PaymentIdResponse>> approveOrder(@RequestBody OrderSheetDto.OrderSheetIdRequest request) {
+        ValidateUtils.requireTrue(AuthUtils.hasRole(UserRole.MENTOR), ApiErrorCode.UNAUTHORIZED);
         ValidateUtils.requireTrue(request.validate(), ApiErrorCode.INVALID_REQUEST_BODY);
 
         Long userId = AuthUtils.getUserId();
@@ -41,6 +42,7 @@ public class OrderController {
     @PostMapping("/refuse")
     @Operation(summary = "주문서 결제 반려")
     public ResponseEntity<ResponseUtils.ApiResponse<OrderSheetDto.OrderSheetIdResponse>> refuseOrder(@RequestBody OrderSheetDto.OrderSheetIdRequest request) {
+        ValidateUtils.requireTrue(AuthUtils.hasRole(UserRole.MENTOR), ApiErrorCode.UNAUTHORIZED);
         ValidateUtils.requireTrue(request.validate(), ApiErrorCode.INVALID_REQUEST_BODY);
 
         Long userId = AuthUtils.getUserId();
@@ -51,9 +53,10 @@ public class OrderController {
 
     @DeleteMapping("/identifier")
     @Operation(summary = "주문서 결제 취소")
-    public ResponseEntity<ResponseUtils.ApiResponse<OrderSheetDto.OrderSheetIdSetResponse>> cancelOrder(@RequestParam("id") @Parameter(name = "주문서 아이디", required = true) Set<String> orderSheetIdStringSet) {
+    public ResponseEntity<ResponseUtils.ApiResponse<OrderSheetDto.OrderSheetIdSetResponse>> cancelOrder(
+            @RequestParam("id") @Parameter(name = "주문서 아이디", required = true) Set<String> orderSheetIdStringSet
+    ) {
         ValidateUtils.requireTrue(AuthUtils.hasRole(UserRole.MENTEE), ApiErrorCode.UNAUTHORIZED);
-
         Long userId = AuthUtils.getUserId();
 
         Set<Long> orderSheetIdSet = orderSheetIdStringSet.stream()

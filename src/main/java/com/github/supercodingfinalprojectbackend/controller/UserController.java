@@ -27,13 +27,12 @@ public class UserController {
 
     @PostMapping(value = "/role/join/mentor")
     @Operation(summary = "멘토 등록")
-    public ResponseEntity<ResponseUtils.ApiResponse<MentorDto.JoinResponse>> joinMentor(
-            @RequestBody @Parameter(name = "멘토 등록 요청 객체", required = true) MentorDto.JoinRequest request
-    ){
+    public ResponseEntity<ResponseUtils.ApiResponse<MentorDto.JoinResponse>> joinMentor(@RequestBody MentorDto.JoinRequest request){
         ValidateUtils.requireTrue(request.validate(), ApiErrorCode.INVALID_REQUEST_BODY);
 
         Long userId = AuthUtils.getUserId();
         MentorDto.JoinResponse response = oauth2Service.joinMentor(userId, request);
+
         return ResponseUtils.created("멘토 등록에 성공했습니다.", response);
     }
 

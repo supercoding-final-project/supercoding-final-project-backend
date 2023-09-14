@@ -119,10 +119,15 @@ public class MentorDto {
 	@AllArgsConstructor
 	@Builder
 	@ToString
+	@Schema(name = "멘토 등록 요청 객체")
 	public static class JoinRequest {
+		@Schema(name = "현재 다니는 회사")
 		private String company;
+		@Schema(name = "멘토 소개글")
 		private String introduction;
+		@Schema(name = "커리어")
 		private List<MentorCareerDto.Request> careers;
+		@Schema(name = "기술스택")
 		private List<String> skillStackNames;
 
 		public boolean validate() {
@@ -177,6 +182,7 @@ public class MentorDto {
 	@AllArgsConstructor
 	@Builder
 	@ToString
+	@Schema(name = "멘토 정보 수정 요청 객체")
 	public static class ChangeInfoRequest {
 		@Schema(name = "썸네일 이미지 URL")
 		private String thumbnailImageUrl;
