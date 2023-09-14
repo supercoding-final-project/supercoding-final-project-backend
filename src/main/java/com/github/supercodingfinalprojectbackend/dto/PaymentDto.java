@@ -31,8 +31,8 @@ public class PaymentDto {
     public static class PaymentIdResponse {
         private Long paymentId;
 
-        public static PaymentIdResponse from(PaymentDto paymentDto) {
-            return new PaymentIdResponse(paymentDto.getPaymentId());
+        public static PaymentIdResponse from(Payment payment) {
+            return new PaymentIdResponse(payment.getPaymentId());
         }
     }
 }

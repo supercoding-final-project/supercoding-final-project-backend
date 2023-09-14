@@ -3,6 +3,10 @@ package com.github.supercodingfinalprojectbackend.dto;
 import com.github.supercodingfinalprojectbackend.entity.OrderSheet;
 import lombok.*;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -39,6 +43,10 @@ public class OrderSheetDto {
     @ToString
     public static class OrderSheetIdRequest {
         private Long orderSheetId;
+
+        public boolean validate() {
+            return orderSheetId != null;
+        }
     }
 
     @Getter
@@ -49,8 +57,25 @@ public class OrderSheetDto {
     public static class OrderSheetIdResponse {
         private Long orderSheetId;
 
-        public static OrderSheetIdResponse from(OrderSheetDto orderSheetDto) {
-            return new OrderSheetIdResponse(orderSheetDto.getOrderSheetId());
+        public static OrderSheetIdResponse from(OrderSheet orderSheet) {
+            return new OrderSheetIdResponse(orderSheet.getOrderSheetId());
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @ToString
+    public static class OrderSheetIdSetResponse {
+        private Set<Long> orderSheetIds;
+
+        public static OrderSheetIdSetResponse from(List<OrderSheet> orderSheets) {
+            Set<Long> orderSheetIdSet = orderSheets.stream()
+                    .map(OrderSheet::getOrderSheetId)
+                    .collect(Collectors.toSet());
+
+            return new OrderSheetIdSetResponse(orderSheetIdSet);
         }
     }
 }
