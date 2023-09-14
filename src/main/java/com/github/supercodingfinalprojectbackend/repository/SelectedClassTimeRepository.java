@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface SelectedClassTimeRepository extends JpaRepository<SelectedClassTime, Long> {
 
-    List<SelectedClassTime> findAllByMentorAndOrderSheetAndIsDeletedIsFalse(Mentor mentor, OrderSheet orderSheet);
-
     List<SelectedClassTime> findAllByOrderSheet(OrderSheet orderSheet);
+
+    List<SelectedClassTime> findAllByMentorUserUserIdAndOrderSheetAndIsDeletedIsFalse(Long userId, OrderSheet orderSheet);
 }
