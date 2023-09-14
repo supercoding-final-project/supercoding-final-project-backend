@@ -13,5 +13,5 @@ public interface SelectedClassTimeRepository extends JpaRepository<SelectedClass
 
     List<SelectedClassTime> findAllByOrderSheet(OrderSheet orderSheet);
 
-    void deleteAllByMentorUserUserIdAndOrderSheetAndIsDeletedIsFalse(Long userId, OrderSheet orderSheet);
+    void deleteAllByMentorUserUserIdAndOrderSheet(Long userId, OrderSheet orderSheet);
 }
