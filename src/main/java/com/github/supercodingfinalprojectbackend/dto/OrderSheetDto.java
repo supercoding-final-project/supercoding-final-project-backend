@@ -3,7 +3,9 @@ package com.github.supercodingfinalprojectbackend.dto;
 import com.github.supercodingfinalprojectbackend.entity.OrderSheet;
 import lombok.*;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor
@@ -68,7 +70,11 @@ public class OrderSheetDto {
     public static class OrderSheetIdSetResponse {
         private Set<Long> orderSheetIds;
 
-        public static OrderSheetIdSetResponse from(Set<Long> orderSheetIdSet) {
+        public static OrderSheetIdSetResponse from(List<OrderSheet> orderSheets) {
+            Set<Long> orderSheetIdSet = orderSheets.stream()
+                    .map(OrderSheet::getOrderSheetId)
+                    .collect(Collectors.toSet());
+
             return new OrderSheetIdSetResponse(orderSheetIdSet);
         }
     }
