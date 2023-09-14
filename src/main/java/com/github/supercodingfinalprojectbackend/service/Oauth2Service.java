@@ -5,6 +5,7 @@ import com.github.supercodingfinalprojectbackend.entity.*;
 import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
 import com.github.supercodingfinalprojectbackend.entity.type.SocialPlatformType;
 import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
+import com.github.supercodingfinalprojectbackend.exception.ApiException;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.repository.*;
 import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
@@ -23,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.crypto.SecretKey;
 import javax.transaction.Transactional;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -108,15 +110,14 @@ public class Oauth2Service {
 
         RestTemplate restTemplate = new RestTemplate();
         RequestEntity<MultiValueMap<String, String>> request = createKakaoTokenRequest(code);
-        ResponseEntity<Kakao.OauthToken> response = ValidateUtils.requireApply(request, o->restTemplate.exchange(o, Kakao.OauthToken.class), 500, "카카오 토큰 요청에 실패했습니다.");
+        ResponseEntity<Kakao.OauthToken> response = restTemplate.exchange(request, Kakao.OauthToken.class);
         Kakao.OauthToken kakaoOauthToken = response.getBody();
-        return ValidateUtils.requireNotNull(kakaoOauthToken, 500, "카카오 토큰 요청에 실패했습니다.");
+        return ValidateUtils.requireNotNull(kakaoOauthToken, 500, "카카오 토큰이 존재하지 않습니다.");
     }
 
     private RequestEntity<MultiValueMap<String, String>> createKakaoTokenRequest(String code) {
         ValidateUtils.requireNotNull(code, 500, "code는 null일 수 없습니다.");
 
-        URI uri = ValidateUtils.requireApply(kakaoTokenUri, URI::create, 500,"카카오 토큰 요청에 실패했습니다.");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
@@ -127,7 +128,13 @@ public class Oauth2Service {
         body.add("redirect_uri", kakaoRedirectUri);
         body.add("code", code);
 
-        return RequestEntity.post(uri).headers(headers).body(body);
+        try {
+            return RequestEntity.post(new URI(kakaoTokenUri))
+                    .headers(headers)
+                    .body(body);
+        } catch (URISyntaxException e) {
+            throw new ApiException(500, String.format("카카오 토큰 요청 url을 생성하지 못했습니다. (%s)", kakaoTokenUri));
+        }
     }
 
     private Kakao.UserInfo getKakaoUserInfo(Kakao.OauthToken kakaoOauthToken) {
