@@ -3,6 +3,8 @@ package com.github.supercodingfinalprojectbackend.dto;
 import com.github.supercodingfinalprojectbackend.entity.OrderSheet;
 import lombok.*;
 
+import java.util.Set;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -55,6 +57,19 @@ public class OrderSheetDto {
 
         public static OrderSheetIdResponse from(OrderSheet orderSheet) {
             return new OrderSheetIdResponse(orderSheet.getOrderSheetId());
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @ToString
+    public static class OrderSheetIdSetResponse {
+        private Set<Long> orderSheetIds;
+
+        public static OrderSheetIdSetResponse from(Set<Long> orderSheetIdSet) {
+            return new OrderSheetIdSetResponse(orderSheetIdSet);
         }
     }
 }
