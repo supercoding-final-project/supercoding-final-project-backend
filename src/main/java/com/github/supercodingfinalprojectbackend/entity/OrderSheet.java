@@ -38,4 +38,8 @@ public class OrderSheet extends CommonEntity {
         mentee.getUser().getAbstractAccount().chargePaymoney(totlaPrice.longValue());
         this.isCompleted = false;
     }
+
+    public void softDelete() {
+        this.isDeleted = true;
+    }
 }
