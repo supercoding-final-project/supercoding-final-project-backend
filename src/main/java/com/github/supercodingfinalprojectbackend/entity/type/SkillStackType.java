@@ -1,10 +1,9 @@
 package com.github.supercodingfinalprojectbackend.entity.type;
 
-import java.util.Arrays;
-import java.util.Set;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Arrays;
 
 @Getter
 @RequiredArgsConstructor
@@ -55,4 +54,13 @@ public enum SkillStackType {
 				.findFirst()
 				.orElseThrow(() -> new RuntimeException("존재하지 않는 기술스택입니다."));
 	}
+
+    public static boolean contains(String s) {
+		try {
+			valueOf(s);
+			return true;
+		} catch (IllegalArgumentException e) {
+			return false;
+		}
+    }
 }

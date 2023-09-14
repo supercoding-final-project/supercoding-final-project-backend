@@ -3,6 +3,7 @@ package com.github.supercodingfinalprojectbackend.exception;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 
 @Component
 @Slf4j
+@Order(0)
 public class FilterExceptionHandler extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException {

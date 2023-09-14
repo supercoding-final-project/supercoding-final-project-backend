@@ -24,6 +24,14 @@ public class TokenDto {
     @ToString
     public static class RefreshTokenRequest {
         private String refreshToken;
+
+        public boolean validate() {
+            return refreshToken != null;
+        }
+
+        public String getRefreshToken() {
+            return JwtUtils.cutPrefix(refreshToken);
+        }
     }
 
     @Getter
@@ -39,6 +47,13 @@ public class TokenDto {
             return Response.builder()
                     .accessToken(JwtUtils.prefix(tokenDto.accessToken))
                     .refreshToken(JwtUtils.prefix(tokenDto.refreshToken))
+                    .build();
+        }
+
+        public static Response from(TokenHolder tokenHolder) {
+            return Response.builder()
+                    .accessToken(JwtUtils.prefix(tokenHolder.getAccessToken()))
+                    .refreshToken(JwtUtils.prefix(tokenHolder.getRefreshToken()))
                     .build();
         }
     }

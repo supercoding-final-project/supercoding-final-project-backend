@@ -1,5 +1,6 @@
 package com.github.supercodingfinalprojectbackend.entity;
 
+import com.github.supercodingfinalprojectbackend.entity.type.SocialPlatformType;
 import lombok.*;
 
 import javax.persistence.*;
@@ -24,4 +25,12 @@ public class UserSocialInfo extends CommonEntity {
     private Long socialId;
     @Column(name = "social_platform_name")
     private String socialPlatformName;
+
+    public static UserSocialInfo of(User user, Long socialId, SocialPlatformType socialPlatformType) {
+        return UserSocialInfo.builder()
+                .user(user)
+                .socialId(socialId)
+                .socialPlatformName(socialPlatformType.name())
+                .build();
+    }
 }

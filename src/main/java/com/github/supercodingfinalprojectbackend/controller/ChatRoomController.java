@@ -8,6 +8,7 @@ import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCod
 import com.github.supercodingfinalprojectbackend.repository.UserRepository;
 import com.github.supercodingfinalprojectbackend.service.ChatRoomService;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,7 @@ public class ChatRoomController {
 
 
     @PostMapping("/createchat")
+    @Operation(summary = "채팅방 생성")
     public ResponseEntity<?> createChatRoom(@RequestBody MessageDto.CreateChatRoomRequest chatRoomRequest) {
         // 현재 로그인한 사용자 확인
         User user1 = userRepository.findByUserIdAndIsDeletedIsFalse(chatRoomRequest.getUser1Idx()).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
@@ -38,6 +40,7 @@ public class ChatRoomController {
     }
 
     @GetMapping("/chatrooms")
+    @Operation(summary = "채팅방 리스트 조회")
     public ResponseEntity<?> getChatRoomList(@RequestParam Long userId) {
         MessageDto.ResponseChatRoom chatRoomResponse = chatRoomService.getChatList(userId);
         return ResponseUtils.ok("채팅 리스트 반환에 성공하였습니다",chatRoomResponse);

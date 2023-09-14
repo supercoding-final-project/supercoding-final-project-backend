@@ -31,6 +31,12 @@ public enum ApiErrorCode implements ErrorCode {
 
     NOT_FOUND_REVIEW(HttpStatus.NOT_FOUND, "존재하지 않는 리뷰입니다."),
     UNABLE_TO_DELETE_REVIEW(HttpStatus.FORBIDDEN,"리뷰를 삭제할 수 없습니다."),
+    INVALID_SKILL_STACK(HttpStatus.BAD_REQUEST, "유효하지 않은 기술스택입니다."),
+    INVALID_DUTY(HttpStatus.BAD_REQUEST, "유효하지 않은 직무입니다."),
+    INVALID_REQUEST_BODY(HttpStatus.BAD_REQUEST, "요청 바디가 잘못되었습니다."),
+    NOT_FOUND_POST(HttpStatus.NOT_FOUND, "해당 포스터가 존재하지 않습니다."),
+    NOT_FOUND_ORDERSHEET(HttpStatus.NOT_FOUND, "해당 주문은 존재하지 않습니다"),
+
     POST_NOT_POST_ID(HttpStatus.NOT_FOUND,"등록되지 않은 포스트입니다."),
 
     MENTEE_ACCOUNT_NOT_ENOUGH(HttpStatus.CONFLICT,"멘티의 잔액이 부족합니다.")

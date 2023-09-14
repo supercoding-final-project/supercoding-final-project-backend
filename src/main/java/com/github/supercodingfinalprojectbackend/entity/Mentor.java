@@ -1,11 +1,13 @@
 package com.github.supercodingfinalprojectbackend.entity;
 
+import com.github.supercodingfinalprojectbackend.dto.MentorCareerDto;
 import com.github.supercodingfinalprojectbackend.dto.MentorDto;
 import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "mentors")
@@ -46,9 +48,8 @@ public class Mentor extends CommonEntity {
 	@OneToMany(mappedBy = "mentor")
 	private List<MentorCareer> mentorCareerList = new ArrayList<>();
 
-	public static Mentor from(User user, MentorDto mentorDto) {
+	public static Mentor of(User user, MentorDto mentorDto) {
 		return Mentor.builder()
-				.mentorSkillStacks(null)
 				.user(user)
 				.introduction(mentorDto.getIntroduction())
 				.searchable(false)
@@ -58,10 +59,48 @@ public class Mentor extends CommonEntity {
 				.build();
 	}
 
+	public static Mentor of(User user, String company, String introduction) {
+		return Mentor.builder()
+				.user(Objects.requireNonNull(user))
+				.company(company)
+				.introduction(introduction)
+				.searchable(false)
+				.build();
+	}
+
 	public void setMentorSkillStacks(List<MentorSkillStack> mentorSkillStacks) { this.mentorSkillStacks = mentorSkillStacks; }
 
 	@Override
 	public boolean isValid() {
 		return !this.getIsDeleted() && this.getSearchable();
+	}
+
+	public void changeInfo(String introduction, String company, List<MentorSkillStack> mentorSkillStacks, List<MentorCareer> mentorCareers, Boolean searchable) {
+		if (introduction != null) this.introduction = introduction;
+		if (company != null) this.company = company;
+		if (mentorSkillStacks != null) this.mentorSkillStacks = mentorSkillStacks;
+		if (mentorCareers != null) this.mentorCareerList = mentorCareers;
+		if (searchable != null) this.searchable = searchable;
+	}
+
+	public void setMentorCareers(List<MentorCareer> mentorCareers) {
+		if (mentorCareers != null && !mentorCareers.isEmpty()) {
+			this.currentDuty = mentorCareers.get(0).getDuty();
+			this.currentPeriod = mentorCareers.get(0).getDuty();
+		}
+		this.mentorCareerList = mentorCareers;
+	}
+
+	public void changeInfo(MentorDto.ChangeInfoRequest request) {
+//		List<MentorCareer> mentorCareerList;
+//		List<MentorSkillStack> mentorSkillStacks;
+		this.user.changeInfo(request.getNickname(), request.getEmail());
+		this.introduction = request.getIntroduction();
+		this.company = request.getCompany();
+		this.searchable = request.getSearchable();
+		this.currentDuty = request.getCurrentDuty();
+		this.currentPeriod = request.getCurrentPeriod();
+//		this.mentorCareerList = mentorCareerList;
+//		this.mentorSkillStacks = mentorSkillStacks;
 	}
 }

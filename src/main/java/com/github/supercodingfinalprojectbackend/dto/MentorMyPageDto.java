@@ -1,6 +1,5 @@
 package com.github.supercodingfinalprojectbackend.dto;
 
-
 import com.github.supercodingfinalprojectbackend.entity.OrderSheet;
 import com.github.supercodingfinalprojectbackend.entity.Payment;
 import com.github.supercodingfinalprojectbackend.entity.Posts;
@@ -13,26 +12,15 @@ import java.time.Instant;
 import java.util.List;
 
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-public class MenteeMyPageDto {
-    private Long userId;
-    private String nickname;
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class  ResponseChangeInfo{
-        private String nickname;
-    }
+@Builder
+public class MentorMyPageDto {
 
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
     public static class ResponseOrderList{
-        private List<ResponseOrderDto> orderDtoList;
+        private List<MentorMyPageDto.ResponseOrderDto> orderDtoList;
     }
     @Getter
     @NoArgsConstructor
@@ -41,16 +29,16 @@ public class MenteeMyPageDto {
     public static class ResponseOrderDto{
         private Long orderId;
         private String postTitle;
-        private String mentorNickname;
+        private String menteeNickname;
         private Integer totalPrice;
         private Boolean isCompleted;
     }
 
-    public static ResponseOrderDto from(OrderSheet orderSheet){
+    public static MentorMyPageDto.ResponseOrderDto from(OrderSheet orderSheet){
         return ResponseOrderDto.builder()
                 .orderId(orderSheet.getOrderSheetId())
                 .postTitle(orderSheet.getPost().getTitle())
-                .mentorNickname(orderSheet.getPost().getMentor().getUser().getNickname())
+                .menteeNickname(orderSheet.getMentee().getUser().getNickname())
                 .totalPrice(orderSheet.getTotlaPrice())
                 .isCompleted(orderSheet.getIsCompleted())
                 .build();
@@ -60,37 +48,23 @@ public class MenteeMyPageDto {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public static class ResponseTransactionList{
-        private List<ResponseTransactionDto> transactionDtoList;
-    }
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
     public static class ResponseTransactionDto{
         private String postName;
-        private String mentorNickname;
+        private String menteeNickname;
         private List<String> transactionCalendars;
         private String email;
         private Integer totalPrice;
         private Instant createdAt;
     }
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class TransactionCalendar{
-        private String Calendar;
-    }
 
-    public static ResponseTransactionDto from(List<String> selectedClassTime, Posts posts, OrderSheet orderSheet, Payment payment){
+    public static MentorMyPageDto.ResponseTransactionDto from(List<String> selectedClassTime, Posts posts, OrderSheet orderSheet, Payment payment){
         return ResponseTransactionDto.builder()
-                .email(posts.getMentor().getUser().getEmail())
+                .email(orderSheet.getMentee().getUser().getEmail())
                 .postName(posts.getTitle())
                 .transactionCalendars(selectedClassTime)
-                .mentorNickname(posts.getMentor().getUser().getNickname())
-                .totalPrice(orderSheet.getTotlaPrice())
                 .createdAt(payment.getCreatedAt())
+                .menteeNickname(orderSheet.getMentee().getUser().getNickname())
+                .totalPrice(orderSheet.getTotlaPrice())
                 .build();
     }
 }
