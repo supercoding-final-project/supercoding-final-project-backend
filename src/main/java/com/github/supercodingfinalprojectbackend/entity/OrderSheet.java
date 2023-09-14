@@ -1,5 +1,6 @@
 package com.github.supercodingfinalprojectbackend.entity;
 
+import com.github.supercodingfinalprojectbackend.dto.PostDto.OrderCodeReviewDto;
 import lombok.*;
 
 import javax.persistence.*;
@@ -47,5 +48,14 @@ public class OrderSheet extends CommonEntity {
         mentee.getUser().getAbstractAccount().chargePaymoney(totlaPrice.longValue());
         this.isCompleted = false;
         softDelete();
+    }
+
+    public static OrderSheet of(OrderCodeReviewDto orderCodeReviewDto, Mentee mentee, Posts posts){
+        return OrderSheet.builder()
+                .mentee(mentee)
+                .post(posts)
+                .totlaPrice(orderCodeReviewDto.getTotalPrice())
+                .isCompleted(false)
+                .build();
     }
 }
