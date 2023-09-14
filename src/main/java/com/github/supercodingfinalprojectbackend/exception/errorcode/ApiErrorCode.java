@@ -36,7 +36,8 @@ public enum ApiErrorCode implements ErrorCode {
     INVALID_REQUEST_BODY(HttpStatus.BAD_REQUEST, "요청 바디가 잘못되었습니다."),
     NOT_FOUND_POST(HttpStatus.NOT_FOUND, "해당 포스터가 존재하지 않습니다."),
     NOT_FOUND_ORDERSHEET(HttpStatus.NOT_FOUND, "해당 주문은 존재하지 않습니다"),
-    INVALID_REQUEST_PARAMETER(HttpStatus.BAD_REQUEST, "리퀘스트 파라미터가 잘못되었습니다.");
+    INVALID_REQUEST_PARAMETER(HttpStatus.BAD_REQUEST, "리퀘스트 파라미터가 잘못되었습니다."),
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "권한이 없습니다.");
 
 
     ApiErrorCode(HttpStatus status, String message) {
