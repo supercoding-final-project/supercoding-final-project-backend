@@ -37,8 +37,7 @@ public enum ApiErrorCode implements ErrorCode {
     INVALID_REQUEST_PARAMETER(HttpStatus.BAD_REQUEST, "리퀘스트 파라미터가 잘못되었습니다."),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "권한이 없습니다."),
     POST_NOT_POST_ID(HttpStatus.NOT_FOUND,"등록되지 않은 포스트입니다."),
-    MENTEE_ACCOUNT_NOT_ENOUGH(HttpStatus.CONFLICT,"멘티의 잔액이 부족합니다."),
-    MENTEE_MYPAGE_CHANGEINFO_BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다.");
+    MENTEE_ACCOUNT_NOT_ENOUGH(HttpStatus.CONFLICT,"멘티의 잔액이 부족합니다.");
 
     ApiErrorCode(HttpStatus status, String message) {
         this.message = message;
