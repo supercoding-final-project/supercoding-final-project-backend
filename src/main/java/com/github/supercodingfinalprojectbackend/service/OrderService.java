@@ -36,17 +36,16 @@ public class OrderService {
         return PaymentDto.PaymentIdResponse.from(payment);
     }
 
-    public OrderSheetDto refuseOrder(Long userId, OrderSheetDto orderDtoRequest) {
+    public OrderSheetDto.OrderSheetIdResponse refuseOrder(Long userId, OrderSheetDto.OrderSheetIdRequest orderDtoRequest) {
         Long orderSheetId = orderDtoRequest.getOrderSheetId();
-        Mentor mentor = mentorRepository.findByUserUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_MENTOR::exception);
 
-        OrderSheet orderSheet = orderSheetRepository.findByPostMentorAndOrderSheetIdAndIsDeletedIsFalse(mentor, orderSheetId)
+        OrderSheet orderSheet = orderSheetRepository.findByPostMentorUserUserIdAndOrderSheetIdAndIsDeletedIsFalse(userId, orderSheetId)
                 .orElseThrow(()->new ApiException(401, "다른 멘토의 결제 요청을 취소할 수 없습니다."));
 
         orderSheet.beRejected();
-        List<SelectedClassTime> selectedClassTimes = selectedClassTimeRepository.findAllByMentorAndOrderSheetAndIsDeletedIsFalse(mentor, orderSheet);
-        selectedClassTimes.forEach(SelectedClassTime::beRejected);
 
-        return OrderSheetDto.from(orderSheet);
+        selectedClassTimeRepository.deleteAllByMentorUserUserIdAndOrderSheetAndIsDeletedIsFalse(userId, orderSheet);
+
+        return OrderSheetDto.OrderSheetIdResponse.from(orderSheet);
     }
 }
