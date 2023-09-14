@@ -1,6 +1,7 @@
 package com.github.supercodingfinalprojectbackend.dto;
 
 import com.github.supercodingfinalprojectbackend.entity.OrderSheet;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.util.List;
@@ -41,7 +42,9 @@ public class OrderSheetDto {
     @AllArgsConstructor
     @Builder
     @ToString
+    @Schema(name = "주문서 결제 승인 요청 객체")
     public static class OrderSheetIdRequest {
+        @Schema(name = "주문서 아이디")
         private Long orderSheetId;
 
         public boolean validate() {

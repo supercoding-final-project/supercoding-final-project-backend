@@ -9,6 +9,7 @@ import com.github.supercodingfinalprojectbackend.util.ResponseUtils.ApiResponse;
 import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
 import com.github.supercodingfinalprojectbackend.util.auth.AuthUtils;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -22,6 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/mentors")
 @RestController
+@Tag(name = "멘토 API")
 public class MentorController {
 
 	private final MentorService mentorService;

@@ -1,5 +1,6 @@
 package com.github.supercodingfinalprojectbackend.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 @Getter
@@ -12,7 +13,9 @@ public class PaymoneyDto {
     @AllArgsConstructor
     @Builder
     @ToString
+    @Schema(name = "페이머니 충전 요청 객체")
     public static class ChargeRequest {
+        @Schema(name = "페이머니 충전 금액")
         private Long chargeAmount;
 
         public boolean validate() {

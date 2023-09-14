@@ -51,7 +51,9 @@ public class OrderController {
 
     @DeleteMapping("/identifier")
     @Operation(summary = "주문서 결제 취소")
-    public ResponseEntity<ResponseUtils.ApiResponse<OrderSheetDto.OrderSheetIdSetResponse>> cancelOrder(@RequestParam("id") @Parameter(name = "주문서 아이디", required = true) Set<String> orderSheetIdStringSet) {
+    public ResponseEntity<ResponseUtils.ApiResponse<OrderSheetDto.OrderSheetIdSetResponse>> cancelOrder(
+            @RequestParam("id") @Parameter(name = "주문서 아이디", required = true) Set<String> orderSheetIdStringSet
+    ) {
         ValidateUtils.requireTrue(AuthUtils.hasRole(UserRole.MENTEE), ApiErrorCode.UNAUTHORIZED);
 
         Long userId = AuthUtils.getUserId();
