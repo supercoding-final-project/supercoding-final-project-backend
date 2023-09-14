@@ -25,16 +25,15 @@ public class OrderService {
     private final PaymentRepository paymentRepository;
     private final SelectedClassTimeRepository selectedClassTimeRepository;
 
-    public PaymentDto approveOrder(Long userId, OrderSheetDto orderDtoRequest) {
+    public PaymentDto.PaymentIdResponse approveOrder(Long userId, OrderSheetDto.OrderSheetIdRequest orderDtoRequest) {
         Mentor mentor = mentorRepository.findByUserUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_MENTOR::exception);
         Long orderSheetId = orderDtoRequest.getOrderSheetId();
 
         OrderSheet orderSheet = orderSheetRepository.findByPostMentorAndOrderSheetIdAndIsDeletedIsFalse(mentor, orderSheetId)
                 .orElseThrow(()->new ApiException(401, "다른 멘토의 결제 요청을 승인할 수 없습니다."));
 
-        Payment payment = orderSheet.approvedBy(mentor);
-        Payment savedPayment = paymentRepository.save(payment);
-        return PaymentDto.from(savedPayment);
+        Payment payment = paymentRepository.save(orderSheet.approvedBy(mentor));
+        return PaymentDto.PaymentIdResponse.from(payment);
     }
 
     public OrderSheetDto refuseOrder(Long userId, OrderSheetDto orderDtoRequest) {
