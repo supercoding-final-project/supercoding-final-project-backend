@@ -1,34 +1,24 @@
 package com.github.supercodingfinalprojectbackend.controller;
 
-import com.github.supercodingfinalprojectbackend.dto.MentorCareerDto;
+
 import com.github.supercodingfinalprojectbackend.dto.MentorDto;
 import com.github.supercodingfinalprojectbackend.dto.MentorDto.MentorInfoResponse;
-import com.github.supercodingfinalprojectbackend.dto.UserDto;
-import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.service.MentorService;
 import com.github.supercodingfinalprojectbackend.service.S3Service;
-import com.github.supercodingfinalprojectbackend.service.UserService;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils.ApiResponse;
 import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
 import com.github.supercodingfinalprojectbackend.util.auth.AuthUtils;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor

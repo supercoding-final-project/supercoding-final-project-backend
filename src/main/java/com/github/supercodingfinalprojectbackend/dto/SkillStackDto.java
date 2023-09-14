@@ -12,11 +12,13 @@ import lombok.*;
 public class SkillStackDto {
     private Long skillStackId;
     private String skillStackName;
+    private String skillStackImg;
 
     public static SkillStackDto from(SkillStack skillStack) {
         return SkillStackDto.builder()
                 .skillStackId(skillStack.getSkillStackId())
                 .skillStackName(skillStack.getSkillStackName())
+                .skillStackImg(skillStack.getSkillStackImg())
                 .build();
     }
 
