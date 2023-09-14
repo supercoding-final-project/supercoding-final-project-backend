@@ -39,6 +39,10 @@ public class OrderSheetDto {
     @ToString
     public static class OrderSheetIdRequest {
         private Long orderSheetId;
+
+        public boolean validate() {
+            return orderSheetId != null;
+        }
     }
 
     @Getter
