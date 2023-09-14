@@ -26,4 +26,8 @@ public class AuthUtils {
         String roleName =  Objects.requireNonNull(authorities.stream().findFirst().orElse(null)).getAuthority();
         return UserRole.valueOf(roleName).resolve();
     }
+
+    public static boolean hasRole(UserRole userRole) {
+        return getUserRole().equals(userRole.resolve());
+    }
 }
