@@ -6,12 +6,18 @@ spring:
           kakao:
             client-id:  ENC(uNAxhIKqrBffW2Xci1t7Nt3e0W0OcifYfkwFsm3we7+6v5ucclxxO/EVpUo2obly)
             client-secret: ENC(4ASqJYZAwcKLj2LqzvKmPSGEe65kzIpU1KQpENpZ6dpg6zuqRXekyvSRVPaUJXuZ)
-            redirect-uri: ENC(4olohEhY1Laeb1Jky5FfGiii5bb9h779tzzqDqW2e1qPPyjMpK1djj/Rb+zK60XOf/E9RFMD1ME=)
+            redirect-uri: ENC(OnHuTuWL+tluCb+SsW8wKuaf2JBxx/VB8FlqPbTaJN1RIKOkInlfHQsvJ9T2qXbliyazv9zpCylPM2WNxoUPmA==)
             authorization-grant-type: authorization_code
             scope:
               - profile_nickname
               - account_email
-              - talk_message
+          google:
+            client-id: ENC(nIHKNaLE64roFSa0vhX2owgajZTQbimU4YrQrc8YjFUq9uIx7nmW/4UUon3j1NrJ2h8Vunlg99lKPGchQfX5aDBbfPukyHhEe/Svp1fgFmLMoSH5DKM9fg==)
+            client-secret: ENC(xg86ODTUIGrPNnSVqQ1uJyRP5brUw7zUo+4VqM26dgPrtHswa0/p0x+EPZ6U7jz6)
+            scope:
+              - email
+              - profile
+
         provider:
           kakao:
             authorization-uri: https://kauth.kakao.com/oauth/authorize

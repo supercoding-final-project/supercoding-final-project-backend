@@ -38,4 +38,12 @@ public class Payment extends CommonEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "consumer_abstract_account_id")
 	private UserAbstractAccount consumerAbstarctAccount;
+
+	public static Payment of(OrderSheet orderSheet, Mentee mentee, Mentor mentor) {
+		return Payment.builder()
+				.orderSheet(orderSheet)
+				.consumerAbstarctAccount(mentee.getUser().getAbstractAccount())
+				.sellerAbstractAccount(mentor.getUser().getAbstractAccount())
+				.build();
+	}
 }

@@ -31,18 +31,23 @@ public class OrderSheet extends CommonEntity {
     public Payment approvedBy(Mentor mentor) {
         mentor.getUser().getAbstractAccount().chargePaymoney(totlaPrice.longValue());
         isCompleted = true;
-        isDeleted = true;
 
-        return Payment.builder()
-                .orderSheet(this)
-                .consumerAbstarctAccount(mentee.getUser().getAbstractAccount())
-                .sellerAbstractAccount(mentor.getUser().getAbstractAccount())
-                .build();
+        return Payment.of(this, mentee, mentor);
     }
 
     public void beRejected() {
-        this.isDeleted = true;
         mentee.getUser().getAbstractAccount().chargePaymoney(totlaPrice.longValue());
+        this.isCompleted = false;
+    }
+
+    public void softDelete() {
+        this.isDeleted = true;
+    }
+
+    public void canceled() {
+        mentee.getUser().getAbstractAccount().chargePaymoney(totlaPrice.longValue());
+        this.isCompleted = false;
+        softDelete();
     }
 
     public static OrderSheet of(OrderCodeReviewDto orderCodeReviewDto, Mentee mentee, Posts posts){
