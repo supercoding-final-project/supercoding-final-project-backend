@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface OrderSheetRepository extends JpaRepository<OrderSheet, Long> {
@@ -24,4 +25,6 @@ public interface OrderSheetRepository extends JpaRepository<OrderSheet, Long> {
     Optional<OrderSheet> findByPostMentorAndOrderSheetIdAndIsDeletedIsFalseAndIsCompletedIsFalse(Mentor mentor, Long orderSheetId);
 
     Optional<OrderSheet> findByPostMentorUserUserIdAndOrderSheetIdAndIsDeletedIsFalseAndIsCompletedIsFalse(Long userId, Long orderSheetId);
+
+    List<OrderSheet> findAllByMenteeUserUserIdAndOrderSheetIdIsInAndIsCompletedIsFalseAndIsDeletedIsFalse(Long userId, Set<Long> orderSheetIdSet);
 }
