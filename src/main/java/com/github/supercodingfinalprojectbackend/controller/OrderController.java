@@ -2,8 +2,10 @@ package com.github.supercodingfinalprojectbackend.controller;
 
 import com.github.supercodingfinalprojectbackend.dto.OrderSheetDto;
 import com.github.supercodingfinalprojectbackend.dto.PaymentDto;
+import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.service.OrderService;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
+import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
 import com.github.supercodingfinalprojectbackend.util.auth.AuthUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,13 +27,12 @@ public class OrderController {
     @PostMapping("/approve")
     @Operation(summary = "주문서 결제 승인")
     public ResponseEntity<ResponseUtils.ApiResponse<PaymentDto.PaymentIdResponse>> approveOrder(@RequestBody OrderSheetDto.OrderSheetIdRequest request) {
+        ValidateUtils.requireTrue(request.validate(), ApiErrorCode.INVALID_REQUEST_BODY);
+
         Long userId = AuthUtils.getUserId();
-        OrderSheetDto orderDtoRequest = OrderSheetDto.from(request);
+        PaymentDto.PaymentIdResponse response = orderService.approveOrder(userId, request);
 
-        PaymentDto paymentDtoResponse = orderService.approveOrder(userId, orderDtoRequest);
-        PaymentDto.PaymentIdResponse response = PaymentDto.PaymentIdResponse.from(paymentDtoResponse);
-
-        return ResponseUtils.created("결제 요청을 성공적으로 승인했습니다.", response);
+        return ResponseUtils.ok("결제 요청을 성공적으로 승인했습니다.", response);
     }
 
     @PostMapping("/refuse")
