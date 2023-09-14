@@ -22,4 +22,6 @@ public interface OrderSheetRepository extends JpaRepository<OrderSheet, Long> {
     List<OrderSheet> findAllByPostMentorUserUserIdAndIsCompletedIsFalse(Long userId);
 
     Optional<OrderSheet> findByPostMentorAndOrderSheetIdAndIsDeletedIsFalse(Mentor mentor, Long orderSheetId);
+
+    Optional<OrderSheet> findByPostMentorUserUserIdAndOrderSheetIdAndIsDeletedIsFalse(Long userId, Long orderSheetId);
 }
