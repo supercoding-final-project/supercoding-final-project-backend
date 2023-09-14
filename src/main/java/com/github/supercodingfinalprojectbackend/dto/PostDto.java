@@ -70,4 +70,21 @@ public class PostDto {
                 .price(post.getPrice())
                 .build();
     }
+
+    @Getter
+    @AllArgsConstructor
+    @Builder
+    public static class OrderCodeReviewDto{
+        private Long postId;
+        private List<PostTimeDto> selectTime;
+        private Integer totalPrice;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @Builder
+    public static class PostTimeDto {
+        private String day;
+        private List<Integer> timeList;
+    }
 }

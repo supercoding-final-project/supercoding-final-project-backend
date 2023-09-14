@@ -1,5 +1,6 @@
 package com.github.supercodingfinalprojectbackend.repository;
 
+import com.github.supercodingfinalprojectbackend.entity.Mentee;
 import com.github.supercodingfinalprojectbackend.entity.Mentor;
 import com.github.supercodingfinalprojectbackend.entity.OrderSheet;
 import com.github.supercodingfinalprojectbackend.entity.SelectedClassTime;
@@ -12,6 +13,8 @@ import java.util.List;
 public interface SelectedClassTimeRepository extends JpaRepository<SelectedClassTime, Long> {
 
     List<SelectedClassTime> findAllByMentorAndOrderSheetAndIsDeletedIsFalse(Mentor mentor, OrderSheet orderSheet);
+    List<SelectedClassTime> findAllByMentorAndDayAndHourAndIsDeletedIsFalse(Mentor mentor, Integer day, Integer hour);
+    List<SelectedClassTime> findAllByMenteeAndDayAndHourAndIsDeletedIsFalse(Mentee mentee, Integer day, Integer hour);
 
     List<SelectedClassTime> findAllByOrderSheet(OrderSheet orderSheet);
 }

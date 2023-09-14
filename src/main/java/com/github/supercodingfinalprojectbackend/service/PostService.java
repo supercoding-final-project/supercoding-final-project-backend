@@ -1,10 +1,13 @@
 package com.github.supercodingfinalprojectbackend.service;
 
 import com.github.supercodingfinalprojectbackend.dto.PostDto;
+import com.github.supercodingfinalprojectbackend.dto.PostDto.OrderCodeReviewDto;
+import com.github.supercodingfinalprojectbackend.dto.PostDto.PostTimeDto;
 import com.github.supercodingfinalprojectbackend.entity.*;
 import com.github.supercodingfinalprojectbackend.entity.type.PostContentType;
 import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
-import com.github.supercodingfinalprojectbackend.exception.errorcode.PostErrorCode;
+import com.github.supercodingfinalprojectbackend.entity.type.WeekType;
+import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.repository.*;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils.ApiResponse;
@@ -14,7 +17,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -27,6 +33,11 @@ public class PostService {
     private final PostsContentRepository postsContentRepository;
     private final PostsSkillStackRepository postsSkillStackRepository;
     private final SkillStackRepository skillStackRepository;
+    private final MentorScheduleTemplateRepository mentorScheduleTemplateRepository;
+    private final MenteeRepository menteeRepository;
+    private final OrderSheetRepository orderSheetRepository;
+
+    private final SelectedClassTimeRepository selectedClassTimeRepository;
 
     public ResponseEntity<ApiResponse<Void>> createPost(PostDto postDto, Long userId) {
         Mentor mentor = mentorRepository.findByUserUserIdAndIsDeletedIsFalse(userId).get();
@@ -60,7 +71,7 @@ public class PostService {
     }
     @Transactional(readOnly = true)
     public ResponseEntity<ApiResponse<PostDto>> getPost(Long postId) {
-        Posts posts = postsRepository.findById(postId).orElseThrow(PostErrorCode.POST_NOT_POST_ID::exception);
+        Posts posts = postsRepository.findByPostIdAndIsDeletedFalse(postId).orElseThrow(ApiErrorCode.POST_NOT_POST_ID::exception);
         List<PostsContent> contentList = postsContentRepository.findAllByPosts(posts);
         String stack = postsSkillStackRepository.findByPosts(posts).getSkillStack().getSkillStackName();
 
@@ -68,7 +79,7 @@ public class PostService {
     }
 
     public ResponseEntity<ApiResponse<Void>> updatePost(Long postId, PostDto postDto) {
-        Posts posts = postsRepository.findById(postId).orElseThrow(PostErrorCode.POST_NOT_POST_ID::exception);
+        Posts posts = postsRepository.findByPostIdAndIsDeletedFalse(postId).orElseThrow(ApiErrorCode.POST_NOT_POST_ID::exception);
         posts.postsUpdate(postDto);
 
         List<PostsContent> postsContentList = postsContentRepository.findAllByPosts(posts);
@@ -103,7 +114,7 @@ public class PostService {
     }
 
     public ResponseEntity<ApiResponse<Void>> deletePost(Long postId) {
-        Posts posts = postsRepository.findById(postId).orElseThrow(PostErrorCode.POST_NOT_POST_ID::exception);
+        Posts posts = postsRepository.findByPostIdAndIsDeletedFalse(postId).orElseThrow(ApiErrorCode.POST_NOT_POST_ID::exception);
         posts.postsIsDeleted();
 
         List<PostsContent> postsContentList = postsContentRepository.findAllByPosts(posts);
@@ -117,5 +128,63 @@ public class PostService {
         postsSkillStack.postsSkillStackIsDeleted();
         return ResponseUtils.noContent("멘티 모집이 정삭적으로 삭제되었습니다.",null);
     }
-}
 
+
+    public ResponseEntity<ApiResponse<List<Integer>>> getTimes(Long postId, String days) {
+        Posts posts = postsRepository.findByPostIdAndIsDeletedFalse(postId).orElseThrow(ApiErrorCode.POST_NOT_POST_ID::exception);
+        
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
+        LocalDate date = LocalDate.parse(days,formatter);
+
+        String name = date.getDayOfWeek().name();
+        String weekType = WeekType.valueOf(name).getName();
+
+        List<MentorScheduleTemplate> scheduleList = mentorScheduleTemplateRepository.findByMentorAndScheduleWeek(posts.getMentor(),weekType);
+        List<Integer> timeList = scheduleList.stream()
+                .map(MentorScheduleTemplate::getValidTime)
+                .collect(Collectors.toList());
+
+        return ResponseUtils.ok("멘토의 신청가능한 시간이 조회되었습니다.",timeList);
+    }
+
+    public ResponseEntity<ApiResponse<List<Integer>>> orderCodeReview(OrderCodeReviewDto orderCodeReviewDto, Long userId) {
+        Mentee mentee = menteeRepository.findByUserUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_MENTEE::exception);
+        Posts posts = postsRepository.findByPostIdAndIsDeletedFalse(orderCodeReviewDto.getPostId()).orElseThrow(ApiErrorCode.POST_NOT_POST_ID::exception);
+
+        OrderSheet orderSheet = orderSheetRepository.save(OrderSheet.of(orderCodeReviewDto, mentee, posts));
+        List<PostTimeDto> timeDtoList = orderCodeReviewDto.getSelectTime();
+
+        for (PostTimeDto postTimeDto : timeDtoList) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
+            LocalDate date = LocalDate.parse(postTimeDto.getDay(),formatter);
+            List<Integer> list = postTimeDto.getTimeList();
+
+            for (Integer hour : list) {
+                List<SelectedClassTime> checklist = selectedClassTimeRepository.findAllByMentorAndDayAndHourAndIsDeletedIsFalse(posts.getMentor(), date.getDayOfMonth(), hour);
+                if (checklist.size() > 0) {
+                    return ResponseUtils.conflict("이미 예약이 완료된 시간입니다", checklist.stream().map(SelectedClassTime::getHour).collect(Collectors.toList()));
+                }
+
+                checklist = selectedClassTimeRepository.findAllByMenteeAndDayAndHourAndIsDeletedIsFalse(mentee, date.getDayOfMonth(), hour);
+                if (checklist.size() > 0) {
+                    return ResponseUtils.conflict("동일한 시간에 이미 코드리뷰가 예약되어 있습니다.", checklist.stream().map(SelectedClassTime::getHour).collect(Collectors.toList()));
+                }
+            }
+
+            List<SelectedClassTime> timeList = list.stream()
+                    .map(time->SelectedClassTime.of(date,time,posts.getMentor(),mentee,orderSheet))
+                    .collect(Collectors.toList());
+
+            selectedClassTimeRepository.saveAll(timeList);
+        }
+
+        UserAbstractAccount account = mentee.getUser().getAbstractAccount();
+        if(account.getPaymoney()>=orderCodeReviewDto.getTotalPrice()){
+            account.spendPayMoney(orderCodeReviewDto.getTotalPrice());
+        }else{
+            throw ApiErrorCode.MENTEE_ACCOUNT_NOT_ENOUGH.exception();
+        }
+
+        return ResponseUtils.noContent("코드리뷰 신청이 완료되었습니다.", null);
+    }
+}

@@ -3,6 +3,7 @@ package com.github.supercodingfinalprojectbackend.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -41,5 +42,18 @@ public class SelectedClassTime extends CommonEntity {
 
     public void beRejected() {
         this.isDeleted = true;
+    }
+
+    public static SelectedClassTime of(LocalDate date, Integer time, Mentor mentor, Mentee mentee, OrderSheet orderSheet){
+
+        return SelectedClassTime.builder()
+                .year(date.getYear())
+                .month(date.getMonthValue())
+                .day(date.getDayOfMonth())
+                .hour(time)
+                .mentor(mentor)
+                .mentee(mentee)
+                .orderSheet(orderSheet)
+                .build();
     }
 }

@@ -23,7 +23,7 @@ public enum ApiErrorCode implements ErrorCode {
     NOT_FOUND_MENTEE(HttpStatus.NOT_FOUND, "존재하지 않는 멘티입니다."),
     IS_ALREADY_MENTEE(HttpStatus.OK, "이미 멘티로 로그인 중입니다."),
     CHATROOMID_NOT_FOUND(HttpStatus.NOT_FOUND,"해당 채팅방을 찾을 수 없습니다."),
-    MENTEE_MYPAGE_CHANGEINFO_BAD_REQUEST(HttpStatus.BAD_REQUEST,"이전 닉네임과 중복됩니다."),
+    MYPAGE_CHANGEINFO_BAD_REQUEST(HttpStatus.BAD_REQUEST,"이전 닉네임과 중복됩니다."),
 
     IMAGE_EXTENSION_BAD_REQUEST(HttpStatus.BAD_REQUEST, "확장자명을 변경해주십시오."),
 
@@ -35,8 +35,12 @@ public enum ApiErrorCode implements ErrorCode {
     INVALID_DUTY(HttpStatus.BAD_REQUEST, "유효하지 않은 직무입니다."),
     INVALID_REQUEST_BODY(HttpStatus.BAD_REQUEST, "요청 바디가 잘못되었습니다."),
     NOT_FOUND_POST(HttpStatus.NOT_FOUND, "해당 포스터가 존재하지 않습니다."),
-    NOT_FOUND_ORDERSHEET(HttpStatus.NOT_FOUND, "해당 주문은 존재하지 않습니다");
+    NOT_FOUND_ORDERSHEET(HttpStatus.NOT_FOUND, "해당 주문은 존재하지 않습니다"),
 
+    POST_NOT_POST_ID(HttpStatus.NOT_FOUND,"등록되지 않은 포스트입니다."),
+
+    MENTEE_ACCOUNT_NOT_ENOUGH(HttpStatus.CONFLICT,"멘티의 잔액이 부족합니다.")
+    ;
 
     ApiErrorCode(HttpStatus status, String message) {
         this.message = message;
