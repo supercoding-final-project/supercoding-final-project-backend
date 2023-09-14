@@ -38,11 +38,10 @@ public class OrderController {
     @PostMapping("/refuse")
     @Operation(summary = "주문서 결제 반려")
     public ResponseEntity<ResponseUtils.ApiResponse<OrderSheetDto.OrderSheetIdResponse>> refuseOrder(@RequestBody OrderSheetDto.OrderSheetIdRequest request) {
-        Long userId = AuthUtils.getUserId();
-        OrderSheetDto orderDtoRequest = OrderSheetDto.from(request);
+        ValidateUtils.requireTrue(request.validate(), ApiErrorCode.INVALID_REQUEST_BODY);
 
-        OrderSheetDto orderSheetDto = orderService.refuseOrder(userId, orderDtoRequest);
-        OrderSheetDto.OrderSheetIdResponse response = OrderSheetDto.OrderSheetIdResponse.from(orderSheetDto);
+        Long userId = AuthUtils.getUserId();
+        OrderSheetDto.OrderSheetIdResponse response = orderService.refuseOrder(userId, request);
 
         return ResponseUtils.ok("결제 요청을 성공적으로 취소하였습니다.", response);
     }
