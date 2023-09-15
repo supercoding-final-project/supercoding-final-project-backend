@@ -17,6 +17,10 @@ public enum DutyType implements CustomEnum {
         return false;
     }
 
+    public static String resolvedName(String dutyName) {
+        return DutyType.valueOf(dutyName).resolve().name();
+    }
+
     // resole 호출 반드시 필요
     @Override
     public DutyType resolve() { return redirect != null ? redirect.resolve() : this; }
