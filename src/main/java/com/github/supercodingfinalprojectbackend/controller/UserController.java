@@ -46,4 +46,13 @@ public class UserController {
         PaymoneyDto.ChargeResponse response = userService.chargePaymoney(userId, request);
         return ResponseUtils.ok("페이머니를 성공적으로 충전했습니다!", response);
     }
+
+    @GetMapping("/paymoney")
+    @Operation(summary = "페이머니 조회")
+    public ResponseEntity<ResponseUtils.ApiResponse<PaymoneyDto.Response>> getPaymoney(){
+        Long userId = AuthUtils.getUserId();
+
+        PaymoneyDto.Response response = userService.getPaymoney(userId);
+        return ResponseUtils.ok("페이머니를 성공적으로 조회했습니다.", response);
+    }
 }
