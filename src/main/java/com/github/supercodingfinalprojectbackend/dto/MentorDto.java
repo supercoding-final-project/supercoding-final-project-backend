@@ -268,4 +268,21 @@ public class MentorDto {
 					.build();
 		}
 	}
+
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	public static class InfoResonse {
+		private String nickname;
+		private String email;
+		private String thumbnailImageUrl;
+		private String introduction;
+		private String company;
+		private Boolean searchable;
+		private String currentDuty;
+		private String currentPeriod;
+		private List<MentorCareerDto.Response> careers;
+		private List<String> skillStacks;
+	}
 }
