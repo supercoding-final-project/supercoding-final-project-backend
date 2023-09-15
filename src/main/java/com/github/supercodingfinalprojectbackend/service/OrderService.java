@@ -10,6 +10,7 @@ import com.github.supercodingfinalprojectbackend.repository.OrderSheetRepository
 import com.github.supercodingfinalprojectbackend.repository.PaymentRepository;
 import com.github.supercodingfinalprojectbackend.repository.SelectedClassTimeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -33,6 +34,12 @@ public class OrderService {
                 .orElseThrow(()->new ApiException(401, "다른 멘토의 결제 요청을 승인할 수 없습니다."));
 
         Payment payment = paymentRepository.save(orderSheet.approvedBy(mentor));
+        try {
+            orderSheetRepository.save(orderSheet);
+        } catch (OptimisticLockingFailureException e) {
+            throw new ApiException(409, "이미 취소되었거나 반려되었습니다.");
+        }
+
         return PaymentDto.PaymentIdResponse.from(payment);
     }
 
