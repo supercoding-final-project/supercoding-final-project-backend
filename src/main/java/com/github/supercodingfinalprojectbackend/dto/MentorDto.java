@@ -9,10 +9,8 @@ import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
 import com.querydsl.core.annotations.QueryProjection;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Objects;
@@ -61,14 +59,14 @@ public class MentorDto {
 		List<MentorCareerDto.Request> careers = ValidateUtils.requireNotNullElse(request.careers, List.of());
 
 
-		DutyType currentDuty = ValidateUtils.requireApply(request.careers.get(0).getDutyName(), s->DutyType.valueOf(s).resolve(), ApiErrorCode.INVALID_DUTY);
+		DutyType currentDuty = ValidateUtils.requireNotThrow(request.careers.get(0).getDutyName(), s->DutyType.valueOf(s).resolve(), ApiErrorCode.INVALID_DUTY);
 
 		List<MentorCareerDto> mentorCareerDtoList = request.careers.stream()
 				.map(MentorCareerDto::from)
 				.collect(Collectors.toList());
 
 		List<MentorSkillStackDto> mentorSkillStackDtoList = request.skillStackNames.stream()
-				.map(skillStackName->ValidateUtils.requireApply(skillStackName, SkillStackType::valueOf, ApiErrorCode.INVALID_SKILL_STACK))
+				.map(skillStackName->ValidateUtils.requireNotThrow(skillStackName, SkillStackType::valueOf, ApiErrorCode.INVALID_SKILL_STACK))
 				.map(MentorSkillStackDto::from)
 				.collect(Collectors.toList());
 
@@ -267,6 +265,40 @@ public class MentorDto {
 					.careers(careers)
 					.skillStacks(skillStacks)
 					.searchable(mentor.getSearchable())
+					.build();
+		}
+	}
+
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	public static class InfoResponse {
+		private String nickname;
+		private String email;
+		private String thumbnailImageUrl;
+		private String introduction;
+		private String company;
+		private Boolean searchable;
+		private String currentDuty;
+		private String currentPeriod;
+		private List<MentorCareerDto.Response> careers;
+		private List<String> skillStacks;
+
+		public static InfoResponse of(Mentor mentor, List<MentorCareer> mentorCareers, List<MentorSkillStack> mentorSkillStacks) {
+			User user = mentor.getUser();
+
+			return InfoResponse.builder()
+					.nickname(user.getNickname())
+					.email(user.getEmail())
+					.thumbnailImageUrl(user.getThumbnailImageUrl())
+					.introduction(mentor.getIntroduction())
+					.company(mentor.getCompany())
+					.searchable(mentor.getSearchable())
+					.currentDuty(DutyType.resolvedName(mentor.getCurrentDuty()))
+					.currentPeriod(mentor.getCurrentPeriod())
+					.careers(mentorCareers.stream().map(MentorCareerDto.Response::from).collect(Collectors.toList()))
+					.skillStacks(mentorSkillStacks.stream().map(MentorSkillStack::getSkillStackName).collect(Collectors.toList()))
 					.build();
 		}
 	}

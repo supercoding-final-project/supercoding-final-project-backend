@@ -35,4 +35,15 @@ public class PaymoneyDto {
             return new ChargeResponse(paymoney);
         }
     }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Response {
+        private Long paymoney;
+
+        public static Response from(Long paymoney) {
+            return new Response(paymoney);
+        }
+    }
 }

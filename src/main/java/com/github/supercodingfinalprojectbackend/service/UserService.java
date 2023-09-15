@@ -23,4 +23,9 @@ public class UserService {
         Long paymoney = userAbstractAccount.chargePaymoney(request.getChargeAmount());
         return PaymoneyDto.ChargeResponse.from(paymoney);
     }
+
+    public PaymoneyDto.Response getPaymoney(Long userId) {
+        User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
+        return PaymoneyDto.Response.from(user.getAbstractAccount().getPaymoney());
+    }
 }

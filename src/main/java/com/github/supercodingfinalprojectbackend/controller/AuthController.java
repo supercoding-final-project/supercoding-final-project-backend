@@ -3,18 +3,15 @@ package com.github.supercodingfinalprojectbackend.controller;
 import com.github.supercodingfinalprojectbackend.dto.Login;
 import com.github.supercodingfinalprojectbackend.dto.TokenDto;
 import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
-import com.github.supercodingfinalprojectbackend.exception.ApiException;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.service.Oauth2Service;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
 import com.github.supercodingfinalprojectbackend.util.auth.AuthUtils;
-import com.github.supercodingfinalprojectbackend.util.jwt.JwtUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -61,7 +58,7 @@ public class AuthController {
             @PathVariable(name = "roleName") @Parameter(name = "역할 이름", required = true) String roleName
     ) {
         Long userId = AuthUtils.getUserId();
-        UserRole userRole = ValidateUtils.requireApply(roleName, r->UserRole.valueOf(r.toUpperCase()).resolve(), ApiErrorCode.INVALID_PATH_VARIABLE);
+        UserRole userRole = ValidateUtils.requireNotThrow(()->UserRole.valueOf(roleName.toUpperCase()).resolve(), ApiErrorCode.INVALID_PATH_VARIABLE);
         Login.Response response = oauth2Service.switchRole(userId, userRole);
         return ResponseUtils.ok("역할을 성공적으로 전환했습니다.", response);
     }

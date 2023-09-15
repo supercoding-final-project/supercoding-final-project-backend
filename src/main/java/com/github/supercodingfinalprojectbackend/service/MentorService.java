@@ -19,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.util.Validate;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -92,7 +91,7 @@ public class MentorService {
 		List<String> skillStacks = request.getSkillStacks();
 		if (skillStacks != null && !skillStacks.isEmpty()) {
 			List<MentorSkillStack> mentorSkillStackList = skillStacks.stream()
-					.map(s->ValidateUtils.requireApply(s, SkillStackType::valueOf, ApiErrorCode.INVALID_SKILL_STACK))
+					.map(s->ValidateUtils.requireNotThrow(s, SkillStackType::valueOf, ApiErrorCode.INVALID_SKILL_STACK))
 					.map(SkillStackType::getSkillStackCode)
 					.map(c->skillStackRepository.findBySkillStackId(c).orElseThrow(ApiErrorCode.INTERNAL_SERVER_ERROR::exception))
 					.map(s->MentorSkillStack.of(mentor, s))
@@ -104,5 +103,13 @@ public class MentorService {
 		}
 
 		return MentorDto.ChangeInfoResponse.from(mentor);
+    }
+
+    public MentorDto.InfoResponse getMentorInfo(Long userId) {
+		Mentor mentor = mentorRepository.findByUserUserIdAndIsDeletedIsFalse(userId).orElseThrow(NOT_FOUND_MENTOR::exception);
+		List<MentorCareer> mentorCareers = mentorCareerRepository.findAllByMentorAndIsDeletedIsFalse(mentor);
+		List<MentorSkillStack> mentorSkillStacks = mentorSkillStackRepository.findAllByMentorAndIsDeletedIsFalse(mentor);
+
+		return MentorDto.InfoResponse.of(mentor, mentorCareers, mentorSkillStacks);
     }
 }
