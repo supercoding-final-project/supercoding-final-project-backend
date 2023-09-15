@@ -27,6 +27,8 @@ public class OrderSheet extends CommonEntity {
     private Integer totlaPrice;
     @Column(name = "is_completed")
     private Boolean isCompleted;
+    @Version
+    private Integer version;    // 낙관적 락
 
     public Payment approvedBy(Mentor mentor) {
         mentor.getUser().getAbstractAccount().chargePaymoney(totlaPrice.longValue());
