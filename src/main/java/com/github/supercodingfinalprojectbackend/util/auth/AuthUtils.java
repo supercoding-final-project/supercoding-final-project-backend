@@ -24,6 +24,10 @@ public class AuthUtils {
         if (authentication == null) throw ApiErrorCode.NOT_AUTHENTICATED.exception();
         Set<GrantedAuthority> authorities = new HashSet<>(authentication.getAuthorities());
         String roleName =  Objects.requireNonNull(authorities.stream().findFirst().orElse(null)).getAuthority();
-        return UserRole.valueOf(roleName);
+        return UserRole.valueOf(roleName).resolve();
+    }
+
+    public static boolean hasRole(UserRole userRole) {
+        return getUserRole().equals(userRole.resolve());
     }
 }

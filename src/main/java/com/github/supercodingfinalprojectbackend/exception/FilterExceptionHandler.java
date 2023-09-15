@@ -17,7 +17,6 @@ import java.nio.charset.StandardCharsets;
 
 @Component
 @Slf4j
-@Order(0)
 public class FilterExceptionHandler extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException {

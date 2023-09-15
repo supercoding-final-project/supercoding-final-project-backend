@@ -3,18 +3,21 @@ package com.github.supercodingfinalprojectbackend.service;
 import com.github.supercodingfinalprojectbackend.dto.OrderSheetDto;
 import com.github.supercodingfinalprojectbackend.dto.PaymentDto;
 import com.github.supercodingfinalprojectbackend.entity.*;
+import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
 import com.github.supercodingfinalprojectbackend.exception.ApiException;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.repository.MentorRepository;
 import com.github.supercodingfinalprojectbackend.repository.OrderSheetRepository;
 import com.github.supercodingfinalprojectbackend.repository.PaymentRepository;
 import com.github.supercodingfinalprojectbackend.repository.SelectedClassTimeRepository;
+import com.github.supercodingfinalprojectbackend.util.auth.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -30,8 +33,8 @@ public class OrderService {
         Mentor mentor = mentorRepository.findByUserUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_MENTOR::exception);
         Long orderSheetId = orderDtoRequest.getOrderSheetId();
 
-        OrderSheet orderSheet = orderSheetRepository.findByPostMentorAndOrderSheetIdAndIsDeletedIsFalse(mentor, orderSheetId)
-                .orElseThrow(()->new ApiException(401, "다른 멘토의 결제 요청을 승인할 수 없습니다."));
+        OrderSheet orderSheet = orderSheetRepository.findByPostMentorAndOrderSheetIdAndIsDeletedIsFalseAndIsCompletedIsFalse(mentor, orderSheetId)
+                .orElseThrow(ApiErrorCode.NOT_FOUND_ORDERSHEET::exception);
 
         Payment payment = paymentRepository.save(orderSheet.approvedBy(mentor));
         try {
@@ -46,13 +49,21 @@ public class OrderService {
     public OrderSheetDto.OrderSheetIdResponse refuseOrder(Long userId, OrderSheetDto.OrderSheetIdRequest orderDtoRequest) {
         Long orderSheetId = orderDtoRequest.getOrderSheetId();
 
-        OrderSheet orderSheet = orderSheetRepository.findByPostMentorUserUserIdAndOrderSheetIdAndIsDeletedIsFalse(userId, orderSheetId)
-                .orElseThrow(()->new ApiException(401, "다른 멘토의 결제 요청을 취소할 수 없습니다."));
+        OrderSheet orderSheet = orderSheetRepository.findByPostMentorUserUserIdAndOrderSheetIdAndIsDeletedIsFalseAndIsCompletedIsFalse(userId, orderSheetId)
+                .orElseThrow(ApiErrorCode.NOT_FOUND_ORDERSHEET::exception);
 
         orderSheet.beRejected();
 
-        selectedClassTimeRepository.deleteAllByMentorUserUserIdAndOrderSheetAndIsDeletedIsFalse(userId, orderSheet);
+        selectedClassTimeRepository.deleteAllByMentorUserUserIdAndOrderSheet(userId, orderSheet);
 
         return OrderSheetDto.OrderSheetIdResponse.from(orderSheet);
+    }
+
+    public OrderSheetDto.OrderSheetIdSetResponse cancelOrders(Long userId, Set<Long> orderSheetIdSet) {
+        List<OrderSheet> orderSheets = orderSheetRepository.findAllByMenteeUserUserIdAndOrderSheetIdIsInAndIsCompletedIsFalseAndIsDeletedIsFalse(userId, orderSheetIdSet);
+        orderSheets.forEach(OrderSheet::canceled);
+
+        selectedClassTimeRepository.deleteAllByMenteeUserUserIdAndOrderSheetIsIn(userId, orderSheets);
+        return OrderSheetDto.OrderSheetIdSetResponse.from(orderSheets);
     }
 }

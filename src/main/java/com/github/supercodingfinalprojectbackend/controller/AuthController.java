@@ -8,12 +8,13 @@ import com.github.supercodingfinalprojectbackend.service.Oauth2Service;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
 import com.github.supercodingfinalprojectbackend.util.auth.AuthUtils;
-import com.github.supercodingfinalprojectbackend.util.jwt.JwtUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -26,11 +27,21 @@ public class AuthController {
 
     @GetMapping("/login/kakao")
     @Operation(summary = "카카오 로그인")
-    public ResponseEntity<ResponseUtils.ApiResponse<Login.Response>> kakaoLogin(
-            @RequestParam(name = "code") @Parameter(name = "카카오 인가 코드", required = true) String code
+    public ResponseEntity<?> kakaoLogin(
+            @RequestParam(name = "code", required = false) @Parameter(name = "카카오 인가 코드") String code,
+            @RequestParam(name = "error", required = false) @Parameter(name = "인증 실패 시 에러 코드") String error,
+            @RequestParam(name = "error_description", required = false) @Parameter(name = "인증 실패 시 에러 메세지") String errorDescription,
+            @RequestParam(name = "state", required = false) @Parameter(name = "요청시 전달한 state값과 동일한 값") String state
     ){
-        Login.Response response = oauth2Service.kakaoLogin(code);
-        return ResponseUtils.ok("로그인에 성공했습니다.", response);
+        if (code != null) {
+            Login.Response response = oauth2Service.kakaoLogin(code);
+            return ResponseUtils.ok("로그인에 성공했습니다.", response);
+        } else {
+            MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+            body.add("error", error);
+            body.add("errorDescription", errorDescription);
+            return ResponseUtils.badRequest("카카오 인가 코드를 받는 데 실패했습니다.", body);
+        }
     }
 
     @GetMapping("/logout")
@@ -47,7 +58,7 @@ public class AuthController {
             @PathVariable(name = "roleName") @Parameter(name = "역할 이름", required = true) String roleName
     ) {
         Long userId = AuthUtils.getUserId();
-        UserRole userRole = ValidateUtils.requireApply(roleName, r->UserRole.valueOf(r.toUpperCase()).resolve(), 400, "존재하지 않는 roleName입니다.");
+        UserRole userRole = ValidateUtils.requireNotThrow(()->UserRole.valueOf(roleName.toUpperCase()).resolve(), ApiErrorCode.INVALID_PATH_VARIABLE);
         Login.Response response = oauth2Service.switchRole(userId, userRole);
         return ResponseUtils.ok("역할을 성공적으로 전환했습니다.", response);
     }

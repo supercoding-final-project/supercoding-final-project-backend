@@ -1,5 +1,6 @@
 package com.github.supercodingfinalprojectbackend.entity;
 
+import com.github.supercodingfinalprojectbackend.dto.PostDto.OrderCodeReviewDto;
 import lombok.*;
 
 import javax.persistence.*;
@@ -26,6 +27,8 @@ public class OrderSheet extends CommonEntity {
     private Integer totlaPrice;
     @Column(name = "is_completed")
     private Boolean isCompleted;
+    @Version
+    private Integer version;    // 낙관적 락
 
     public Payment approvedBy(Mentor mentor) {
         mentor.getUser().getAbstractAccount().chargePaymoney(totlaPrice.longValue());
@@ -37,5 +40,24 @@ public class OrderSheet extends CommonEntity {
     public void beRejected() {
         mentee.getUser().getAbstractAccount().chargePaymoney(totlaPrice.longValue());
         this.isCompleted = false;
+    }
+
+    public void softDelete() {
+        this.isDeleted = true;
+    }
+
+    public void canceled() {
+        mentee.getUser().getAbstractAccount().chargePaymoney(totlaPrice.longValue());
+        this.isCompleted = false;
+        softDelete();
+    }
+
+    public static OrderSheet of(OrderCodeReviewDto orderCodeReviewDto, Mentee mentee, Posts posts){
+        return OrderSheet.builder()
+                .mentee(mentee)
+                .post(posts)
+                .totlaPrice(orderCodeReviewDto.getTotalPrice())
+                .isCompleted(false)
+                .build();
     }
 }

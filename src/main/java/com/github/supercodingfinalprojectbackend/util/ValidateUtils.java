@@ -4,6 +4,7 @@ import com.github.supercodingfinalprojectbackend.exception.ApiException;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ErrorCode;
 
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -62,24 +63,39 @@ public class ValidateUtils {
 
         return o1.equals(o2) ? 0 : comparator.compare(o1, o2);
     }
-    public static <T, R> R requireApply(T obj, Function<T, R> function, int status, String message) {
+    public static <T, R> R requireNotThrow(T obj, Function<T, R> function, int status, String message) {
         requireNotNull(obj, 500, "obj는 null일 수 없습니다.");
         requireNotNull(function, 500, "function은 null일 수 없습니다.");
 
         try {
             return function.apply(obj);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             throw new ApiException(validateStatus(status), validateMessage(message));
         }
     }
-    public static <T, R> R requireApply(T obj, Function<T, R> function, ErrorCode errorCode) {
+    public static <T, R> R requireNotThrow(T obj, Function<T, R> function, ErrorCode errorCode) {
         requireNotNull(obj, 500, "obj는 null일 수 없습니다.");
         requireNotNull(function, 500, "function은 null일 수 없습니다.");
 
         try {
             return function.apply(obj);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             throw errorCode.exception();
+        }
+    }
+
+    public static <R> R requireNotThrow(Supplier<R> supplier, ErrorCode errorCode) {
+        try {
+            return supplier.get();
+        } catch (Throwable e) {
+            throw errorCode.exception();
+        }
+    }
+    public static <R> R requireNotThrow(Supplier<R> supplier, int status, String message) {
+        try {
+            return supplier.get();
+        } catch (Throwable e) {
+            throw new ApiException(validateStatus(status), validateMessage(message));
         }
     }
 }

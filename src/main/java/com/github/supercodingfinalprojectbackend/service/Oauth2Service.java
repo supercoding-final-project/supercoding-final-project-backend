@@ -5,6 +5,7 @@ import com.github.supercodingfinalprojectbackend.entity.*;
 import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
 import com.github.supercodingfinalprojectbackend.entity.type.SocialPlatformType;
 import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
+import com.github.supercodingfinalprojectbackend.exception.ApiException;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.repository.*;
 import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
@@ -23,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.crypto.SecretKey;
 import javax.transaction.Transactional;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -108,15 +110,14 @@ public class Oauth2Service {
 
         RestTemplate restTemplate = new RestTemplate();
         RequestEntity<MultiValueMap<String, String>> request = createKakaoTokenRequest(code);
-        ResponseEntity<Kakao.OauthToken> response = ValidateUtils.requireApply(request, o->restTemplate.exchange(o, Kakao.OauthToken.class), 500, "카카오 토큰 요청에 실패했습니다.");
+        ResponseEntity<Kakao.OauthToken> response = restTemplate.exchange(request, Kakao.OauthToken.class);
         Kakao.OauthToken kakaoOauthToken = response.getBody();
-        return ValidateUtils.requireNotNull(kakaoOauthToken, 500, "카카오 토큰 요청에 실패했습니다.");
+        return ValidateUtils.requireNotNull(kakaoOauthToken, 500, "카카오 토큰이 존재하지 않습니다.");
     }
 
     private RequestEntity<MultiValueMap<String, String>> createKakaoTokenRequest(String code) {
         ValidateUtils.requireNotNull(code, 500, "code는 null일 수 없습니다.");
 
-        URI uri = ValidateUtils.requireApply(kakaoTokenUri, URI::create, 500,"카카오 토큰 요청에 실패했습니다.");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
@@ -127,14 +128,20 @@ public class Oauth2Service {
         body.add("redirect_uri", kakaoRedirectUri);
         body.add("code", code);
 
-        return RequestEntity.post(uri).headers(headers).body(body);
+        try {
+            return RequestEntity.post(new URI(kakaoTokenUri))
+                    .headers(headers)
+                    .body(body);
+        } catch (URISyntaxException e) {
+            throw new ApiException(500, String.format("카카오 토큰 요청 url을 생성하지 못했습니다. (%s)", kakaoTokenUri));
+        }
     }
 
     private Kakao.UserInfo getKakaoUserInfo(Kakao.OauthToken kakaoOauthToken) {
         RequestEntity<?> request = createKakaoUserInfoRequest(kakaoOauthToken);
 
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Kakao.UserInfo> response = ValidateUtils.requireApply(request, r->restTemplate.exchange(r, Kakao.UserInfo.class), 500, "카카오 유저 정보 요청에 실패했습니다.");
+        ResponseEntity<Kakao.UserInfo> response = ValidateUtils.requireNotThrow(request, r->restTemplate.exchange(r, Kakao.UserInfo.class), 500, "카카오 유저 정보 요청에 실패했습니다.");
 
         Kakao.UserInfo kakaoUserInfo = response.getBody();
         if (kakaoUserInfo == null) throw ApiErrorCode.NOT_FOUND_USER_INFO.exception();
@@ -143,7 +150,7 @@ public class Oauth2Service {
 
     private RequestEntity<Void> createKakaoUserInfoRequest(Kakao.OauthToken kakaoOauthToken) {
 
-        URI uri = ValidateUtils.requireApply(kakaoUserInfoUri, URI::create, 500, "카카오 유저 정보 요청 uri를 생성하지 못했습니다.");
+        URI uri = ValidateUtils.requireNotThrow(kakaoUserInfoUri, URI::create, 500, "카카오 유저 정보 요청 uri를 생성하지 못했습니다.");
         ValidateUtils.requireNotNull(kakaoOauthToken, 500, "kakaoOauthToken은 null일 수 없습니다.");
         String accessToken = kakaoOauthToken.getAccessToken();
         HttpHeaders headers = new HttpHeaders();
@@ -154,7 +161,7 @@ public class Oauth2Service {
     }
 
     public void kakaoLogout(String kakaoAccessToken) {
-        URI uri = ValidateUtils.requireApply(kakaoLogoutUri, URI::create, 500, "카카오 로그아웃 요청 uri를 생성하지 못했습니다.");
+        URI uri = ValidateUtils.requireNotThrow(kakaoLogoutUri, URI::create, 500, "카카오 로그아웃 요청 uri를 생성하지 못했습니다.");
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/x-www-form-urlencoded");
@@ -211,7 +218,7 @@ public class Oauth2Service {
         List<String> skillStackNames = request.getSkillStackNames();
         if (skillStackNames != null) {
             List<SkillStack> skillStacks = skillStackNames.stream()
-                    .map(skillStackName->ValidateUtils.requireApply(skillStackName, SkillStackType::valueOf, ApiErrorCode.INVALID_SKILL_STACK))
+                    .map(skillStackName->ValidateUtils.requireNotThrow(skillStackName, SkillStackType::valueOf, ApiErrorCode.INVALID_SKILL_STACK))
                     .map(SkillStackType::getSkillStackCode)
                     .map(c->skillStackRepository.findBySkillStackId(c).orElseThrow(ApiErrorCode.INTERNAL_SERVER_ERROR::exception))
                     .collect(Collectors.toList());
@@ -227,8 +234,8 @@ public class Oauth2Service {
     }
 
     public TokenDto.Response renewTokens(String refreshToken) {
-        String userIdStr = ValidateUtils.requireApply(refreshToken, t->JwtUtils.getSubject(t, secretKey), ApiErrorCode.UNRELIABLE_JWT);
-        Long userId = ValidateUtils.requireApply(userIdStr, Long::parseLong, ApiErrorCode.UNRELIABLE_JWT);
+        String userIdStr = ValidateUtils.requireNotThrow(refreshToken, t->JwtUtils.getSubject(t, secretKey), ApiErrorCode.UNRELIABLE_JWT);
+        Long userId = ValidateUtils.requireNotThrow(userIdStr, Long::parseLong, ApiErrorCode.UNRELIABLE_JWT);
         Login login = ValidateUtils.requireNotNull(authHolder.get(userId), 404, "로그인 기록이 없습니다.");
         TokenHolder tokenHolder = JwtUtils.createTokens(userIdStr, Set.of(login.getUserRole().resolve().name()), secretKey);
         Login newLogin = Login.of(login.getUserRole(), tokenHolder);

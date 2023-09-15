@@ -1,6 +1,5 @@
 package com.github.supercodingfinalprojectbackend.security;
 
-import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
 import com.github.supercodingfinalprojectbackend.exception.FilterExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +11,9 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -30,11 +32,14 @@ public class SecurityConfig {
                 )
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf().disable()
-                .cors()
+                // CORS 허용
+                .cors().configurationSource(request -> {
+                    CorsConfiguration config = new CorsConfiguration();
+                    config.setAllowedOrigins(List.of("https://super-final-front.vercel.app", "http://localhost:5500", "http://127.0.0.1:5500", "http://localhost:5173", "http://127.0.0.1:5173"));
+                    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
+                    return config;
+                })
                 .and()
-//                .csrf(csrf -> csrf
-//                        .ignoringRequestMatchers("/api/v1/**")
-//                )
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
                 )
@@ -44,7 +49,7 @@ public class SecurityConfig {
                         .antMatchers("/api/v1/auth/logout", "/api/v1/auth/switch/**").authenticated()
                         .antMatchers("/api/v1/users/role/join/mentor", "/api/v1/users/paymoney").authenticated()
                         .antMatchers("/api/v1/mentors/info").authenticated()
-                        .antMatchers("/api/v1/orders/approve", "/api/v1/orders/refuse").hasRole(UserRole.MENTOR.resolve().name())
+                        .antMatchers("/api/v1/orders/**").authenticated()
                         .anyRequest().permitAll() // 다른 모든 요청을 허용하도록 설정
                 )
                 .addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class)

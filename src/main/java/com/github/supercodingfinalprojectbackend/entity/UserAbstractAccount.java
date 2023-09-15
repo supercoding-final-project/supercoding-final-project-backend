@@ -50,4 +50,8 @@ public class UserAbstractAccount extends CommonEntity {
     public Long chargePaymoney(Long chargeAmount) {
         return this.paymoney += chargeAmount;
     }
+
+    public void spendPayMoney(Integer price) {
+        this.paymoney -= price;
+    }
 }

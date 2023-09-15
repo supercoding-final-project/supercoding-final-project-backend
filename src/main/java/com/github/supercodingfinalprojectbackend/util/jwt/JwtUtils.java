@@ -97,7 +97,7 @@ public class JwtUtils {
         ValidateUtils.requireNotNull(jwt, 500, "jwt는 null이 될 수 없습니다.");
         ValidateUtils.requireNotNull(secretKey, 500, "secreKey는 null이 될 수 없습니다.");
 
-        Claims claims = ValidateUtils.requireApply(jwt, t->JwtUtils.parseClaims(t, secretKey), 500, "jwt가 유효하지 않습니다.");
+        Claims claims = ValidateUtils.requireNotThrow(jwt, t->JwtUtils.parseClaims(t, secretKey), 500, "jwt가 유효하지 않습니다.");
         return claims.getSubject();
     }
 }
