@@ -60,4 +60,12 @@ public class MentorController {
 		MentorDto.ChangeInfoResponse response = mentorService.changeMentorInfo(userId, request);
 		return ResponseUtils.ok("멘토의 정보가 성공적으로 수정되었습니다.", response);
 	}
+
+	@GetMapping("/info")
+	@Operation(summary = "멘토 정보 조회")
+	public ResponseEntity<ApiResponse<MentorDto.InfoResponse>> getMentorInfo() {
+		Long userId = AuthUtils.getUserId();
+		MentorDto.InfoResponse response = mentorService.getMentorInfo(userId);
+		return ResponseUtils.ok("멘토의 정보를 성공적으로 조회했습니다.", response);
+	}
 }

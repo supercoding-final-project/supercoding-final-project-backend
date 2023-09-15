@@ -104,4 +104,12 @@ public class MentorService {
 
 		return MentorDto.ChangeInfoResponse.from(mentor);
     }
+
+    public MentorDto.InfoResponse getMentorInfo(Long userId) {
+		Mentor mentor = mentorRepository.findByUserUserIdAndIsDeletedIsFalse(userId).orElseThrow(NOT_FOUND_MENTOR::exception);
+		List<MentorCareer> mentorCareers = mentorCareerRepository.findAllByMentorAndIsDeletedIsFalse(mentor);
+		List<MentorSkillStack> mentorSkillStacks = mentorSkillStackRepository.findAllByMentorAndIsDeletedIsFalse(mentor);
+
+		return MentorDto.InfoResponse.of(mentor, mentorCareers, mentorSkillStacks);
+    }
 }
