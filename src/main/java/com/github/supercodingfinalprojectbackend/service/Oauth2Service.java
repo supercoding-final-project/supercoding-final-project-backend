@@ -91,9 +91,8 @@ public class Oauth2Service {
 
         // 토큰 생성
         Long userId = user.getUserId();
-        String userIdString = userId.toString();
         Set<String> authorities = Set.of(userRole.name());
-        TokenHolder tokenHolder = JwtUtils.createTokens(userIdString, authorities, secretKey);
+        TokenHolder tokenHolder = JwtUtils.createTokens(userId, authorities, secretKey);
 
         // 메모리에 로그인 정보 저장
         Login login = Login.of(userRole, tokenHolder);
@@ -194,7 +193,7 @@ public class Oauth2Service {
         loginRecordRepository.save(LoginRecord.of(user, userRole));
 
         Set<String> authorities = Set.of(userRole.name());
-        TokenHolder tokenHolder = JwtUtils.createTokens(user.getUserId().toString(), authorities, secretKey);
+        TokenHolder tokenHolder = JwtUtils.createTokens(user.getUserId(), authorities, secretKey);
         Login newLogin = Login.of(userRole, tokenHolder);
         authHolder.put(user.getUserId(), newLogin);
 
@@ -234,10 +233,9 @@ public class Oauth2Service {
     }
 
     public TokenDto.Response renewTokens(String refreshToken) {
-        String userIdStr = ValidateUtils.requireNotThrow(refreshToken, t->JwtUtils.getSubject(t, secretKey), ApiErrorCode.UNRELIABLE_JWT);
-        Long userId = ValidateUtils.requireNotThrow(userIdStr, Long::parseLong, ApiErrorCode.UNRELIABLE_JWT);
+        Long userId = ValidateUtils.requireNotThrow(refreshToken, t->JwtUtils.getUserId(t, secretKey), ApiErrorCode.UNRELIABLE_JWT);
         Login login = ValidateUtils.requireNotNull(authHolder.get(userId), 404, "로그인 기록이 없습니다.");
-        TokenHolder tokenHolder = JwtUtils.createTokens(userIdStr, Set.of(login.getUserRole().resolve().name()), secretKey);
+        TokenHolder tokenHolder = JwtUtils.createTokens(userId, Set.of(login.getUserRole().resolve().name()), secretKey);
         Login newLogin = Login.of(login.getUserRole(), tokenHolder);
         authHolder.put(userId, newLogin);
 

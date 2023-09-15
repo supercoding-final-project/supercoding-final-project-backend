@@ -20,14 +20,14 @@ public class JwtProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        String userId = (String) authentication.getPrincipal();
+        String userIdString = (String) authentication.getPrincipal();
         String accessToken = (String) authentication.getCredentials();
         Set<SimpleGrantedAuthority> authorities = new HashSet<>();
         for (GrantedAuthority authority : authentication.getAuthorities()) {
             authorities.add(new SimpleGrantedAuthority(authority.getAuthority()));
         }
 
-        AuthorizationDetails details = authorizationDetailsService.loadUserByUsername(userId);
+        AuthorizationDetails details = authorizationDetailsService.loadUserByUsername(userIdString);
 
         if (
                 !details.getPassword().equals(accessToken) ||

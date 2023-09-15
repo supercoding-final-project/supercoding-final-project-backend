@@ -1,5 +1,6 @@
 package com.github.supercodingfinalprojectbackend.security;
 
+import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
 import com.github.supercodingfinalprojectbackend.util.auth.AuthHolder;
 import com.github.supercodingfinalprojectbackend.dto.Login;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
@@ -20,20 +21,15 @@ public class AuthorizationDetailsService implements UserDetailsService {
     private final AuthHolder authHolder;
 
     @Override
-    public AuthorizationDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-        long userIdLong;
-        try {
-            userIdLong = Long.parseLong(userId);
-        } catch (NumberFormatException e) {
-            throw ApiErrorCode.UNRELIABLE_JWT.exception();
-        }
-        Login login = authHolder.get(userIdLong);
+    public AuthorizationDetails loadUserByUsername(String userIdString) throws UsernameNotFoundException {
+        Long userId = ValidateUtils.requireNotThrow(()->Long.parseLong(userIdString), ApiErrorCode.UNRELIABLE_JWT);
+        Login login = authHolder.get(userId);
         if (login == null) throw ApiErrorCode.UNRELIABLE_JWT.exception();
         String accessToken = login.getAccessToken();
         Set<SimpleGrantedAuthority> authorities = Set.of(new SimpleGrantedAuthority(login.getUserRole().name()));
 
         return AuthorizationDetails.builder()
-                .userId(userId)
+                .userId(userIdString)
                 .accessToken(accessToken)
                 .authorities(authorities)
                 .build();
