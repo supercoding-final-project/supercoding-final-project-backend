@@ -58,7 +58,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("https://super-final-front.vercel.app", "http://127.0.0.1:5500", "http://localhost:5173"));
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowCredentials(true);
         configuration.addExposedHeader("Authorization");
         configuration.setMaxAge(3600L);

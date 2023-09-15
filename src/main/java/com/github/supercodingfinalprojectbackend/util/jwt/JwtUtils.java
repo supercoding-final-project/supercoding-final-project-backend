@@ -20,15 +20,15 @@ public class JwtUtils {
     public static final String PREFIX = "Bearer ";
     private JwtUtils() {}
 
-    public static String createToken(String subject, Set<String> authorities, long lifeMillis, SecretKey secretKey) {
-        ValidateUtils.requireNotNull(subject, 500, "subject는 null일 수 없습니다.");
+    public static String createToken(Long userId, Set<String> authorities, long lifeMillis, SecretKey secretKey) {
+        ValidateUtils.requireNotNull(userId, 500, "subject는 null일 수 없습니다.");
         ValidateUtils.requireNotNull(authorities, 500, "authorities는 null일 수 없습니다.");
         ValidateUtils.requireNotNull(secretKey, 500, "secretKey는 null일 수 없습니다.");
         ValidateUtils.requireTrue(lifeMillis > 0L, 500, "lifeMillis는 0이하일 수 없습니다.");
 
         Date now = new Date();
         return Jwts.builder()
-                .setSubject(subject)
+                .claim("userId", userId)
                 .claim("authorities", authorities)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + lifeMillis))
@@ -36,15 +36,15 @@ public class JwtUtils {
                 .compact();
     }
 
-    public static TokenHolder createTokens(String subject, Set<String> authorities, SecretKey secretKey) {
-        ValidateUtils.requireNotNull(subject, 500, "subject는 null일 수 없습니다.");
+    public static TokenHolder createTokens(Long userId, Set<String> authorities, SecretKey secretKey) {
+        ValidateUtils.requireNotNull(userId, 500, "subject는 null일 수 없습니다.");
         Set<String> validAuthorities = ValidateUtils.requireNotNullElse(authorities, Set.of(UserRole.NONE.name()));
         ValidateUtils.requireNotNull(secretKey, 500, "secretKey는 null일 수 없습니다.");
 
         final long oneHour = 3_600_000L;
         final long twoMonth = oneHour * 24 * 60;
-        String accessToken = createToken(subject, validAuthorities, oneHour, secretKey);
-        String refreshToken = createToken(subject, validAuthorities, twoMonth, secretKey);
+        String accessToken = createToken(userId, validAuthorities, oneHour, secretKey);
+        String refreshToken = createToken(userId, validAuthorities, twoMonth, secretKey);
 
         return new TokenHolder().putAccessToken(accessToken).putRefreshToken(refreshToken);
     }
@@ -82,7 +82,7 @@ public class JwtUtils {
 
     public static UsernamePasswordAuthenticationToken parseAuthentication(String jwt, SecretKey secretKey) {
         Claims claims = parseClaims(jwt, secretKey);
-        String userId = claims.getSubject();
+        Long userId = claims.get("userId", Long.class);
         List<?> authorities = claims.get("authorities", List.class);
         if (authorities == null ) throw ApiErrorCode.INVALID_SIGNATURE_JWT.exception();
         Set<SimpleGrantedAuthority> grantedAuthorities = authorities.stream()
@@ -90,14 +90,11 @@ public class JwtUtils {
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());
 
-        return new UsernamePasswordAuthenticationToken(userId, jwt, grantedAuthorities);
+        return new UsernamePasswordAuthenticationToken(userId.toString(), jwt, grantedAuthorities);
     }
 
-    public static String getSubject(String jwt, SecretKey secretKey) {
-        ValidateUtils.requireNotNull(jwt, 500, "jwt는 null이 될 수 없습니다.");
-        ValidateUtils.requireNotNull(secretKey, 500, "secreKey는 null이 될 수 없습니다.");
-
+    public static Long getUserId(String jwt, SecretKey secretKey) {
         Claims claims = ValidateUtils.requireNotThrow(jwt, t->JwtUtils.parseClaims(t, secretKey), 500, "jwt가 유효하지 않습니다.");
-        return claims.getSubject();
+        return claims.get("userId", Long.class);
     }
 }
