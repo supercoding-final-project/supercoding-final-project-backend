@@ -36,7 +36,7 @@ public class ChatRoomService {
                 return chatRoom;
             }
         }
-        ChatRoom chatRoom = ChatRoom.builder().user1(user1).user2(user2).chatName(createChatName(user1, user2)).build();
+        ChatRoom chatRoom = ChatRoom.builder().user1(user1).user2(user2).chatName(createChatName(user1, user2)).isChat(false).build();
         return chatRoomRepository.save(chatRoom);
     }
     // User 에 관련된 채팅방 목록 조회

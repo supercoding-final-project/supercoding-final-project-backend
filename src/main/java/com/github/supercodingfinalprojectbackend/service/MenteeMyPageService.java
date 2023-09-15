@@ -21,6 +21,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -96,5 +97,40 @@ public class MenteeMyPageService {
                 .collect(Collectors.toList());
 
         return formattedClassTimes;
+    }
+
+    public ResponseEntity<?> getMenteeCalendersList(MenteeMyPageDto.RequestCalendersList requestCalendersList) {
+        List<SelectedClassTime> selectedClassTimes =  selectedClassTimeRepository.findAllByMenteeUserUserIdAndMonth(requestCalendersList.getUserId(), requestCalendersList.getMonth());
+
+        List<MenteeMyPageDto.ResponseCalenderList> calendarList = new ArrayList<>();
+
+        Map<Integer, List<SelectedClassTime>> groupedByMonth = selectedClassTimes.stream()
+                .collect(Collectors.groupingBy(SelectedClassTime::getMonth));
+
+        for (Map.Entry<Integer, List<SelectedClassTime>> entry : groupedByMonth.entrySet()) {
+            Integer month = entry.getKey();
+            List<SelectedClassTime> monthSelectedClassTimes = entry.getValue();
+
+            Map<Integer, List<SelectedClassTime>> groupedByDay = monthSelectedClassTimes.stream()
+                    .collect(Collectors.groupingBy(SelectedClassTime::getDay));
+
+            List<MenteeMyPageDto.ReservationDate> reservationDates = new ArrayList<>();
+            for (Map.Entry<Integer, List<SelectedClassTime>> dayEntry : groupedByDay.entrySet()) {
+                Integer day = dayEntry.getKey();
+                List<SelectedClassTime> daySelectedClassTimes = dayEntry.getValue();
+
+                List<MenteeMyPageDto.MentorReservation> mentorReservations = daySelectedClassTimes.stream()
+                        .map(selectedClassTime -> new MenteeMyPageDto.MentorReservation(
+                                selectedClassTime.getMentor().getUser().getNickname()
+                        ))
+                        .collect(Collectors.toList());
+
+                reservationDates.add(new MenteeMyPageDto.ReservationDate(day, mentorReservations));
+            }
+            calendarList.add(new MenteeMyPageDto.ResponseCalenderList(month, reservationDates));
+        }
+
+        return ResponseEntity.ok(calendarList);
+
     }
 }

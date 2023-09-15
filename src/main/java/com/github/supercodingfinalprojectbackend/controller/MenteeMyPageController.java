@@ -33,4 +33,10 @@ public class MenteeMyPageController {
     public ResponseEntity<?> getMenteeTransactionList(@RequestParam Long userId){
         return myPageService.getMenteeTransactionList(userId);
     }
+    @Operation(summary = "멘티 일정표 조회")
+    @GetMapping("/templates")
+    public ResponseEntity<?> getMenteeCalendersList(@RequestBody MenteeMyPageDto.RequestCalendersList requestCalendersList){
+        return myPageService.getMenteeCalendersList(requestCalendersList);
+    }
+
 }
