@@ -273,7 +273,7 @@ public class MentorDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	@Builder
-	public static class InfoResonse {
+	public static class InfoResponse {
 		private String nickname;
 		private String email;
 		private String thumbnailImageUrl;
