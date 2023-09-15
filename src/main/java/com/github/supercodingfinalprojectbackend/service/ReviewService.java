@@ -36,8 +36,12 @@ public class ReviewService {
         String inputContent = request.getContent();
         Integer inputStar = request.getStar();
 
-        Mentee mentee = menteeRepository.findByUserUserIdAndIsDeletedIsFalse(userId)
+        Mentee mentee = menteeRepository.findByUserUserId(userId)
                 .orElseThrow(() -> new ApiException(NOT_FOUND_MENTEE));
+
+        if (!mentee.isValid()) {
+            throw new ApiException(DELETED_MENTEE);
+        }
 
         Posts posts = postsRepository.findById(inputPostId)
                 .orElseThrow(() -> new ApiException(NOT_FOUND_POST));
@@ -65,7 +69,13 @@ public class ReviewService {
 
     public Page<ReviewDto> getMyReviews(Long userId, Long cursor, Pageable pageable) {
 
-        Mentee mentee = menteeRepository.findByUserUserId(userId);
+        Mentee mentee = menteeRepository.findByUserUserId(userId)
+                .orElseThrow(() -> new ApiException(NOT_FOUND_MENTEE));
+
+        if (!mentee.isValid()) {
+            throw new ApiException(DELETED_MENTEE);
+        }
+
         Page<Review> reviews = reviewRepository
                 .findAllByMenteeIdAndIsDeletedWithCursor(mentee.getMenteeId(), cursor, pageable);
 
@@ -75,7 +85,12 @@ public class ReviewService {
     @Transactional
     public ReviewDto deleteReview(Long userId, Long reviewId) {
 
-        Mentee mentee = menteeRepository.findByUserUserId(userId);
+        Mentee mentee = menteeRepository.findByUserUserId(userId)
+                .orElseThrow(() -> new ApiException(NOT_FOUND_MENTEE));
+
+        if (!mentee.isValid()) {
+            throw new ApiException(DELETED_MENTEE);
+        }
 
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ApiException(NOT_FOUND_REVIEW));
