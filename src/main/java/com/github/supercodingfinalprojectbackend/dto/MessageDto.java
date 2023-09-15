@@ -9,6 +9,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MessageDto {
+    private Long chatRoomId;
     private Long senderId;
     private String sendAt;
     private String chatContent;
