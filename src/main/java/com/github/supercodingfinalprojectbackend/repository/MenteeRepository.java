@@ -13,5 +13,5 @@ public interface MenteeRepository extends JpaRepository<Mentee, Long> {
     Optional<Mentee> findByUserAndIsDeletedIsFalse(User user);
     Optional<Mentee> findByUserUserIdAndIsDeletedIsFalse(Long userId);
 
-    Mentee findByUserUserId(Long userId);
+    Optional<Mentee> findByUserUserId(Long userId);
 }

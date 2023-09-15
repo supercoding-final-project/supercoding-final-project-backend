@@ -12,6 +12,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 import static com.github.supercodingfinalprojectbackend.dto.ReviewDto.*;
 
 @Slf4j
@@ -24,15 +26,15 @@ public class ReviewController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<CreateReviewResponse>> createReview(
-            @RequestBody CreateReviewRequest request
+            @RequestBody @Valid CreateReviewRequest request
     ) {
-        Long userId = AuthUtils.getUserId();
-        return ResponseUtils.created(
-                "리뷰 작성을 성공하였습니다.",
-                ReviewDto.CreateReviewResponse.from(
-                        reviewService.createReview(request, userId)
-                )
-        );
+            Long userId = AuthUtils.getUserId();
+            return ResponseUtils.created(
+                    "리뷰 작성을 성공하였습니다.",
+                    ReviewDto.CreateReviewResponse.from(
+                            reviewService.createReview(request, userId)
+                    )
+            );
     }
 
     @GetMapping("/byPostId")

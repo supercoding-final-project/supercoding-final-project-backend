@@ -2,18 +2,13 @@ package com.github.supercodingfinalprojectbackend.service;
 
 import com.github.supercodingfinalprojectbackend.exception.ApiException;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
-import io.openvidu.java.client.Connection;
-import io.openvidu.java.client.ConnectionProperties;
-import io.openvidu.java.client.OpenVidu;
-import io.openvidu.java.client.OpenViduHttpException;
-import io.openvidu.java.client.OpenViduJavaClientException;
-import io.openvidu.java.client.Session;
-import io.openvidu.java.client.SessionProperties;
-import java.util.Map;
-import javax.annotation.PostConstruct;
+import io.openvidu.java.client.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +24,6 @@ public class VideoService {
     public void initSession() {
         this.openVidu = new OpenVidu(OPENVIDU_URL, OPENVIDU_SECRET);
     }
-
     //화상연결 버튼 클릭시 해당 세션을 만들어줌
     //연결 대상과 맞는 세션아이디를 비교해서 줘야하는가? -> 채팅방안에서 화상채팅 연결을 할 것이기 때문에 대상
     public String createSession(Map<String, Object> params)
