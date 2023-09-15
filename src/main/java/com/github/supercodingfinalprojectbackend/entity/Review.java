@@ -48,7 +48,7 @@ public class Review extends CommonEntity {
                 .build();
     }
 
-    public boolean isValid(Long menteeId) {
+    public Boolean isValid(Long menteeId) {
         return !this.isDeleted && Objects.equals(this.mentee.getMenteeId(), menteeId);
     }
 

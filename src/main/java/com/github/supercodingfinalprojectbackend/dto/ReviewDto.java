@@ -6,6 +6,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -38,9 +43,14 @@ public class ReviewDto {
     @Builder
     public static class CreateReviewRequest {
 
+        @NotNull(message = "postId 값을 입력해 주세요.")
         private Long postId;
+        @NotNull(message = "title 값을 입력해 주세요.")
         private String title;
+        @NotNull(message = "content 값을 입력해 주세요.")
         private String content;
+        @Min(value = 1, message = "평점의 최소값은 1 이상이여야 합니다.")
+        @Max(value = 5, message = "평점의 최대값은 5 이하이여야 합니다.")
         private Integer star;
     }
 

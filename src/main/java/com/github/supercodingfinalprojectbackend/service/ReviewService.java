@@ -17,8 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.github.supercodingfinalprojectbackend.entity.Review.toEntity;
-import static com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode.NOT_FOUND_REVIEW;
-import static com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode.UNABLE_TO_DELETE_REVIEW;
+import static com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -37,16 +36,14 @@ public class ReviewService {
         String inputContent = request.getContent();
         Integer inputStar = request.getStar();
 
-        Mentee mentee = menteeRepository.findByUserUserId(userId);
+        Mentee mentee = menteeRepository.findByUserUserIdAndIsDeletedIsFalse(userId)
+                .orElseThrow(() -> new ApiException(NOT_FOUND_MENTEE));
 
-        // TODO: 예외처리 생기면 refactoring,
-        //  postsRepository Long 타입으로 바뀌면 수정
         Posts posts = postsRepository.findById(inputPostId)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 포스트 입니다."));
+                .orElseThrow(() -> new ApiException(NOT_FOUND_POST));
 
         // TODO: 결제한 사람만 가능 or 리뷰가 끝난 시점?, 횟수만큼 작성가능?
 
-        // TODO: 별점 최소 1 최대 5 유효성 검사 해야함 (DTO 에서)
 
 
         return ReviewDto.from(
@@ -57,10 +54,8 @@ public class ReviewService {
 
     public Page<ReviewDto> getReviews(Long postId, Long cursor, Pageable pageable) {
 
-        // TODO: 예외처리 생기면 refactoring,
-        //  postsRepository Long 타입으로 바뀌면 수정
         Posts posts = postsRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 포스트 입니다."));
+                .orElseThrow(() -> new ApiException(NOT_FOUND_POST));
 
         Page<Review> reviews = reviewRepository
                 .findAllByPostIdAndIsDeletedWithCursor(posts.getPostId(), cursor, pageable);
@@ -71,7 +66,6 @@ public class ReviewService {
     public Page<ReviewDto> getMyReviews(Long userId, Long cursor, Pageable pageable) {
 
         Mentee mentee = menteeRepository.findByUserUserId(userId);
-        log.info("menteeId : {}", mentee.getMenteeId());
         Page<Review> reviews = reviewRepository
                 .findAllByMenteeIdAndIsDeletedWithCursor(mentee.getMenteeId(), cursor, pageable);
 
