@@ -284,5 +284,22 @@ public class MentorDto {
 		private String currentPeriod;
 		private List<MentorCareerDto.Response> careers;
 		private List<String> skillStacks;
+
+		public static InfoResponse of(Mentor mentor, List<MentorCareer> mentorCareers, List<MentorSkillStack> mentorSkillStacks) {
+			User user = mentor.getUser();
+
+			return InfoResponse.builder()
+					.nickname(user.getNickname())
+					.email(user.getEmail())
+					.thumbnailImageUrl(user.getThumbnailImageUrl())
+					.introduction(mentor.getIntroduction())
+					.company(mentor.getCompany())
+					.searchable(mentor.getSearchable())
+					.currentDuty(DutyType.resolvedName(mentor.getCurrentDuty()))
+					.currentPeriod(mentor.getCurrentPeriod())
+					.careers(mentorCareers.stream().map(MentorCareerDto.Response::from).collect(Collectors.toList()))
+					.skillStacks(mentorSkillStacks.stream().map(MentorSkillStack::getSkillStackName).collect(Collectors.toList()))
+					.build();
+		}
 	}
 }
