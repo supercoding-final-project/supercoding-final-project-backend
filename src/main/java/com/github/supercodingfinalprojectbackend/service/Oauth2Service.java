@@ -141,7 +141,7 @@ public class Oauth2Service {
         RequestEntity<?> request = createKakaoUserInfoRequest(kakaoOauthToken);
 
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Kakao.UserInfo> response = ValidateUtils.requireApply(request, r->restTemplate.exchange(r, Kakao.UserInfo.class), 500, "카카오 유저 정보 요청에 실패했습니다.");
+        ResponseEntity<Kakao.UserInfo> response = ValidateUtils.requireNotThrow(request, r->restTemplate.exchange(r, Kakao.UserInfo.class), 500, "카카오 유저 정보 요청에 실패했습니다.");
 
         Kakao.UserInfo kakaoUserInfo = response.getBody();
         if (kakaoUserInfo == null) throw ApiErrorCode.NOT_FOUND_USER_INFO.exception();
@@ -150,7 +150,7 @@ public class Oauth2Service {
 
     private RequestEntity<Void> createKakaoUserInfoRequest(Kakao.OauthToken kakaoOauthToken) {
 
-        URI uri = ValidateUtils.requireApply(kakaoUserInfoUri, URI::create, 500, "카카오 유저 정보 요청 uri를 생성하지 못했습니다.");
+        URI uri = ValidateUtils.requireNotThrow(kakaoUserInfoUri, URI::create, 500, "카카오 유저 정보 요청 uri를 생성하지 못했습니다.");
         ValidateUtils.requireNotNull(kakaoOauthToken, 500, "kakaoOauthToken은 null일 수 없습니다.");
         String accessToken = kakaoOauthToken.getAccessToken();
         HttpHeaders headers = new HttpHeaders();
@@ -161,7 +161,7 @@ public class Oauth2Service {
     }
 
     public void kakaoLogout(String kakaoAccessToken) {
-        URI uri = ValidateUtils.requireApply(kakaoLogoutUri, URI::create, 500, "카카오 로그아웃 요청 uri를 생성하지 못했습니다.");
+        URI uri = ValidateUtils.requireNotThrow(kakaoLogoutUri, URI::create, 500, "카카오 로그아웃 요청 uri를 생성하지 못했습니다.");
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/x-www-form-urlencoded");
@@ -218,7 +218,7 @@ public class Oauth2Service {
         List<String> skillStackNames = request.getSkillStackNames();
         if (skillStackNames != null) {
             List<SkillStack> skillStacks = skillStackNames.stream()
-                    .map(skillStackName->ValidateUtils.requireApply(skillStackName, SkillStackType::valueOf, ApiErrorCode.INVALID_SKILL_STACK))
+                    .map(skillStackName->ValidateUtils.requireNotThrow(skillStackName, SkillStackType::valueOf, ApiErrorCode.INVALID_SKILL_STACK))
                     .map(SkillStackType::getSkillStackCode)
                     .map(c->skillStackRepository.findBySkillStackId(c).orElseThrow(ApiErrorCode.INTERNAL_SERVER_ERROR::exception))
                     .collect(Collectors.toList());
@@ -234,8 +234,8 @@ public class Oauth2Service {
     }
 
     public TokenDto.Response renewTokens(String refreshToken) {
-        String userIdStr = ValidateUtils.requireApply(refreshToken, t->JwtUtils.getSubject(t, secretKey), ApiErrorCode.UNRELIABLE_JWT);
-        Long userId = ValidateUtils.requireApply(userIdStr, Long::parseLong, ApiErrorCode.UNRELIABLE_JWT);
+        String userIdStr = ValidateUtils.requireNotThrow(refreshToken, t->JwtUtils.getSubject(t, secretKey), ApiErrorCode.UNRELIABLE_JWT);
+        Long userId = ValidateUtils.requireNotThrow(userIdStr, Long::parseLong, ApiErrorCode.UNRELIABLE_JWT);
         Login login = ValidateUtils.requireNotNull(authHolder.get(userId), 404, "로그인 기록이 없습니다.");
         TokenHolder tokenHolder = JwtUtils.createTokens(userIdStr, Set.of(login.getUserRole().resolve().name()), secretKey);
         Login newLogin = Login.of(login.getUserRole(), tokenHolder);

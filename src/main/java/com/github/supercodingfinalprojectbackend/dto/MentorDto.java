@@ -9,10 +9,8 @@ import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
 import com.querydsl.core.annotations.QueryProjection;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Objects;
@@ -61,14 +59,14 @@ public class MentorDto {
 		List<MentorCareerDto.Request> careers = ValidateUtils.requireNotNullElse(request.careers, List.of());
 
 
-		DutyType currentDuty = ValidateUtils.requireApply(request.careers.get(0).getDutyName(), s->DutyType.valueOf(s).resolve(), ApiErrorCode.INVALID_DUTY);
+		DutyType currentDuty = ValidateUtils.requireNotThrow(request.careers.get(0).getDutyName(), s->DutyType.valueOf(s).resolve(), ApiErrorCode.INVALID_DUTY);
 
 		List<MentorCareerDto> mentorCareerDtoList = request.careers.stream()
 				.map(MentorCareerDto::from)
 				.collect(Collectors.toList());
 
 		List<MentorSkillStackDto> mentorSkillStackDtoList = request.skillStackNames.stream()
-				.map(skillStackName->ValidateUtils.requireApply(skillStackName, SkillStackType::valueOf, ApiErrorCode.INVALID_SKILL_STACK))
+				.map(skillStackName->ValidateUtils.requireNotThrow(skillStackName, SkillStackType::valueOf, ApiErrorCode.INVALID_SKILL_STACK))
 				.map(MentorSkillStackDto::from)
 				.collect(Collectors.toList());
 

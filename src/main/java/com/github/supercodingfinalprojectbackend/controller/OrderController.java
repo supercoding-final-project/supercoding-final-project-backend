@@ -1,6 +1,5 @@
 package com.github.supercodingfinalprojectbackend.controller;
 
-import com.github.supercodingfinalprojectbackend.dto.MentorCareerDto;
 import com.github.supercodingfinalprojectbackend.dto.OrderSheetDto;
 import com.github.supercodingfinalprojectbackend.dto.PaymentDto;
 import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
@@ -60,7 +59,7 @@ public class OrderController {
         Long userId = AuthUtils.getUserId();
 
         Set<Long> orderSheetIdSet = orderSheetIdStringSet.stream()
-                .map(orderSheetIdString->ValidateUtils.requireApply(orderSheetIdString, Long::parseLong, ApiErrorCode.INVALID_REQUEST_PARAMETER))
+                .map(orderSheetIdString->ValidateUtils.requireNotThrow(()->Long.parseLong(orderSheetIdString), ApiErrorCode.INVALID_REQUEST_PARAMETER))
                 .collect(Collectors.toSet());
 
         OrderSheetDto.OrderSheetIdSetResponse response = orderService.cancelOrders(userId, orderSheetIdSet);
