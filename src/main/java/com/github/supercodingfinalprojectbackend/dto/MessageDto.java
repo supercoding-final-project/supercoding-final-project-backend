@@ -16,8 +16,7 @@ public class MessageDto {
     @Getter
     @Setter
     public static class CreateChatRoomRequest {
-        private Long user1Idx;
-        private Long user2Idx;
+        private Long anotherUserId;
     }
 
     @Getter
@@ -26,14 +25,6 @@ public class MessageDto {
         private Long userId;
     }
 
-    @Getter
-    @Setter
-    public static class ResponseChatLog {
-        private String chatContent;
-        private Long senderId;
-        private Long chatroomId;
-        private String sendAt;
-    }
 
     @Getter
     @Setter
@@ -52,15 +43,6 @@ public class MessageDto {
         private Integer unreadCount;
         private String profileImg;
         private String partnerName;
-    }
-
-    @Getter
-    @Setter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ResponseEnterChatRoom {
-        private List<ResponseChatLog> chatLog;
     }
 
     @Getter
