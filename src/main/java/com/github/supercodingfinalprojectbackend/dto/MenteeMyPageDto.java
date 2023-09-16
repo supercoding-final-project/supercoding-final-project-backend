@@ -16,7 +16,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MenteeMyPageDto {
-    private Long userId;
     private String nickname;
 
     @Getter

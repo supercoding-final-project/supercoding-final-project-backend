@@ -65,6 +65,8 @@ cloud:
       bucket : code-velop
 
 
-
 secret-key-source: ${SECRET_KEY_SOURCE}
-
+logging:
+  level:
+    com:
+      amazonaws: off

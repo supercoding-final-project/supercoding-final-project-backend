@@ -15,7 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -33,15 +35,16 @@ public class MenteeMyPageService {
     private final OrderSheetRepository orderSheetRepository;
     private final SelectedClassTimeRepository selectedClassTimeRepository;
     private final PaymentRepository paymentRepository;
-    public ResponseEntity<?> changeNickName(MenteeMyPageDto myPageDto) {
+    private final S3Service s3Service;
+    public ResponseEntity<?> changeNickName(Long userId, String menteeNickname) {
 
-        User user = userRepository.findByUserIdAndIsDeletedIsFalse(myPageDto.getUserId()).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
+        User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
 
-        ValidateUtils.requireTrue(user.getNickname().matches(myPageDto.getNickname()), ApiErrorCode.MENTEE_MYPAGE_CHANGEINFO_BAD_REQUEST);
+        ValidateUtils.requireTrue(!(user.getNickname().matches(menteeNickname)), ApiErrorCode.MENTEE_MYPAGE_CHANGEINFO_BAD_REQUEST);
 
-        MenteeMyPageDto.ResponseChangeInfo responseChangeInfo = MenteeMyPageDto.ResponseChangeInfo.builder().nickname(myPageDto.getNickname()).build();
+        MenteeMyPageDto.ResponseChangeInfo responseChangeInfo = MenteeMyPageDto.ResponseChangeInfo.builder().nickname(menteeNickname).build();
 
-        user.changeUserNameNickname(myPageDto.getNickname());
+        user.changeUserNameNickname(menteeNickname);
 
         return ResponseUtils.ok("닉네임 변경에 성공하였습니다.", responseChangeInfo);
     }
@@ -132,5 +135,16 @@ public class MenteeMyPageService {
 
         return ResponseEntity.ok(calendarList);
 
+    }
+
+    public ResponseEntity<?> changeUserImage(Long userId, MultipartFile multipartFile) {
+        User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
+        try {
+            String userImage = s3Service.uploadImageFile(multipartFile);
+            user.changeUserImage(userImage);
+            return ResponseUtils.ok("성공적으로 이미지를 변경하였습니다", userImage);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

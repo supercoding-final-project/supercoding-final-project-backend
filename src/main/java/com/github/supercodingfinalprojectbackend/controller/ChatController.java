@@ -21,8 +21,6 @@ public class ChatController {
     @Operation(summary = "채팅 저장")
     @SendTo("/chatroom/{chatroomId}")
     public MessageDto.ResponseMessage getMessage(@DestinationVariable Long chatroomId, MessageDto message) throws InterruptedException {
-        log.info(message.getChatContent());
-
         MessageDto.ResponseMessage responseMessage = chatService.createMessage(chatroomId, message);
         return responseMessage;
     }
