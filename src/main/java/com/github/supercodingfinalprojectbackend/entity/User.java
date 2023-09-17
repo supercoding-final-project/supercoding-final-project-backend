@@ -35,9 +35,10 @@ public class User extends CommonEntity {
                 .build();
     }
 
-    public void changeInfo(String nickname, String email) {
-        if (nickname != null) this.nickname = nickname;
-        if (email != null) this.email = email;
+    public void changeInfo(String nickname, String email, String thumbnailImageUrl) {
+        this.nickname = nickname;
+        this.email = email;
+        this.thumbnailImageUrl = thumbnailImageUrl;
     }
 
     public void changeUserImage(String imageUrl){
