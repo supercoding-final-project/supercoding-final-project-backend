@@ -30,5 +30,9 @@ public class MenteeDto {
         private String email;
         private String nickname;
         private String thumbnailImageUrl;
+
+        public boolean validate() {
+            return nickname != null;
+        }
     }
 }
