@@ -51,39 +51,6 @@ public class MentorDto {
 				.build();
 	}
 
-	public static MentorDto from(JoinRequest request) {
-		Objects.requireNonNull(request);
-
-		String company = ValidateUtils.requireNotNullElse(request.company, "");
-		String introduction = ValidateUtils.requireNotNullElse(request.introduction, "");
-		List<MentorCareerDto.Request> careers = ValidateUtils.requireNotNullElse(request.careers, List.of());
-
-
-		DutyType currentDuty = ValidateUtils.requireNotThrow(request.careers.get(0).getDutyName(), s->DutyType.valueOf(s).resolve(), ApiErrorCode.INVALID_DUTY);
-
-		List<MentorCareerDto> mentorCareerDtoList = request.careers.stream()
-				.map(MentorCareerDto::from)
-				.collect(Collectors.toList());
-
-		List<MentorSkillStackDto> mentorSkillStackDtoList = request.skillStackNames.stream()
-				.map(skillStackName->ValidateUtils.requireNotThrow(skillStackName, SkillStackType::valueOf, ApiErrorCode.INVALID_SKILL_STACK))
-				.map(MentorSkillStackDto::from)
-				.collect(Collectors.toList());
-
-		MentorDto mentorDto = MentorDto.builder()
-				.company(company)
-				.introduction(introduction)
-				.currentDuty(currentDuty)
-				.currentPeriod(request.careers.get(0).getPeriod())
-				.mentorCareerList(mentorCareerDtoList)
-				.mentorSkillStackList(mentorSkillStackDtoList)
-				.build();
-
-		mentorSkillStackDtoList.forEach(s->s.setMentorDto(mentorDto));
-
-		return mentorDto;
-	}
-
 	@Getter
 	@NoArgsConstructor
 	@Builder
