@@ -39,6 +39,6 @@ public class EventService {
 
     public void pushEvent(String key, Object obj) throws IOException {
         SseEmitter emitter = emitterHolder.get(key);
-        emitter.send(obj);
+        if (emitter != null) emitter.send(obj);
     }
 }
