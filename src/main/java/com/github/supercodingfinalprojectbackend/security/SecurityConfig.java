@@ -45,6 +45,7 @@ public class SecurityConfig {
                         .antMatchers("/api/v1/auth/logout", "/api/v1/auth/switch/**").authenticated()
                         .antMatchers("/api/v1/users/role/join/mentor", "/api/v1/users/paymoney", "/api/v1/users/info").authenticated()
                         .antMatchers("/api/v1/mentors/info").authenticated()
+                        .antMatchers("/api/v1/mentees/info").authenticated()
                         .antMatchers("/api/v1/orders/**").authenticated()
                         .anyRequest().permitAll() // 다른 모든 요청을 허용하도록 설정
                 )
