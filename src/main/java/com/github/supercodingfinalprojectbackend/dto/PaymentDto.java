@@ -14,15 +14,6 @@ public class PaymentDto {
     private UserAbstractAccountDto sellerAbstractAccount;
     private UserAbstractAccountDto consumerAbstarctAccount;
 
-    public static PaymentDto from(Payment payment) {
-        return PaymentDto.builder()
-                .paymentId(payment.getPaymentId())
-                .orderSheet(OrderSheetDto.from(payment.getOrderSheet()))
-                .sellerAbstractAccount(UserAbstractAccountDto.from(payment.getSellerAbstractAccount()))
-                .consumerAbstarctAccount(UserAbstractAccountDto.from(payment.getConsumerAbstarctAccount()))
-                .build();
-    }
-
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
