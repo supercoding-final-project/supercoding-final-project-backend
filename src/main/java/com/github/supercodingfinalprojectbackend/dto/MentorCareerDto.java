@@ -78,7 +78,7 @@ public class MentorCareerDto {
 
         public static Response from(MentorCareer mentorCareer) {
             return Response.builder()
-                    .dutyName(mentorCareer.getDuty())
+                    .dutyName(DutyType.resolvedName(mentorCareer.getDuty()))
                     .period(mentorCareer.getPeriod())
                     .build();
         }
