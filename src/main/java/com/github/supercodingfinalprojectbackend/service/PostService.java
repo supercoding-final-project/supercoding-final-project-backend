@@ -7,6 +7,7 @@ import com.github.supercodingfinalprojectbackend.entity.*;
 import com.github.supercodingfinalprojectbackend.entity.type.PostContentType;
 import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
 import com.github.supercodingfinalprojectbackend.entity.type.WeekType;
+import com.github.supercodingfinalprojectbackend.exception.ApiException;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.repository.*;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
@@ -62,8 +63,8 @@ public class PostService {
             postsContentRepository.save(postsContent);
         }
 
-        SkillStackType skillStackType = SkillStackType.findBySkillStackType(postDto.getPostStack());
-        SkillStack skillStack = skillStackRepository.findBySkillStackName(skillStackType.getSkillStackName());
+        SkillStackType skillStackType = SkillStackType.valueOf(postDto.getPostStack());
+        SkillStack skillStack = skillStackRepository.findBySkillStackName(skillStackType.name());
         PostsSkillStack postsSkillStack = PostsSkillStack.fromPost(post,skillStack);
         postsSkillStackRepository.save(postsSkillStack);
 
@@ -78,8 +79,11 @@ public class PostService {
         return ResponseUtils.ok("정상적으로 멘티 모집 조회 되었습니다.", PostDto.PostInfoResponse(posts,contentList,stack));
     }
 
-    public ResponseEntity<ApiResponse<Void>> updatePost(Long postId, PostDto postDto) {
+    public ResponseEntity<ApiResponse<Void>> updatePost(Long userId, Long postId, PostDto postDto) {
         Posts posts = postsRepository.findByPostIdAndIsDeletedFalse(postId).orElseThrow(ApiErrorCode.POST_NOT_POST_ID::exception);
+        Mentor mentor = mentorRepository.findByUserUserIdAndIsDeletedIsFalse(userId).get();
+        if(posts.getMentor().getMentorId() != mentor.getMentorId())throw new ApiException(ApiErrorCode.POST_NOT_MATCH_MENTOR);
+
         posts.postsUpdate(postDto);
 
         List<PostsContent> postsContentList = postsContentRepository.findAllByPosts(posts);
@@ -113,8 +117,11 @@ public class PostService {
         return ResponseUtils.ok("멘티 모집이 정상적으로 수정되었습니다.",null);
     }
 
-    public ResponseEntity<ApiResponse<Void>> deletePost(Long postId) {
+    public ResponseEntity<ApiResponse<Void>> deletePost(Long userId, Long postId) {
         Posts posts = postsRepository.findByPostIdAndIsDeletedFalse(postId).orElseThrow(ApiErrorCode.POST_NOT_POST_ID::exception);
+        Mentor mentor = mentorRepository.findByUserUserIdAndIsDeletedIsFalse(userId).get();
+        if(posts.getMentor().getMentorId() != mentor.getMentorId())throw new ApiException(ApiErrorCode.POST_NOT_MATCH_MENTOR);
+
         posts.postsIsDeleted();
 
         List<PostsContent> postsContentList = postsContentRepository.findAllByPosts(posts);

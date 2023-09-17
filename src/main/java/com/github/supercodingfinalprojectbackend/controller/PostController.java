@@ -4,6 +4,7 @@ import com.github.supercodingfinalprojectbackend.dto.PostDto;
 import com.github.supercodingfinalprojectbackend.dto.PostDto.OrderCodeReviewDto;
 import com.github.supercodingfinalprojectbackend.service.PostService;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils.ApiResponse;
+import com.github.supercodingfinalprojectbackend.util.auth.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -21,8 +22,7 @@ public class PostController {
     private final PostService postService;
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> createPost(@RequestBody @Valid PostDto postDto) {
-//        Long userId = AuthUtils.getUserId();
-        Long userId = 1L;
+        Long userId = AuthUtils.getUserId();
         return postService.createPost(postDto,userId);
     }
 
@@ -33,12 +33,14 @@ public class PostController {
 
     @PatchMapping("/{postId}")
     public ResponseEntity<ApiResponse<Void>> updatePost(@PathVariable Long postId,@RequestBody @Valid PostDto postDto){
-        return postService.updatePost(postId,postDto);
+        Long userId = AuthUtils.getUserId();
+        return postService.updatePost(userId,postId,postDto);
     }
 
     @DeleteMapping("/{postId}")
     public ResponseEntity<ApiResponse<Void>> deletePost(@PathVariable Long postId){
-        return postService.deletePost(postId);
+        Long userId = AuthUtils.getUserId();
+        return postService.deletePost(userId,postId);
     }
 
     @GetMapping("/day")
@@ -48,7 +50,7 @@ public class PostController {
 
     @PostMapping("/order")
     public ResponseEntity<ApiResponse<List<Integer>>> orderCodeReview(@RequestBody OrderCodeReviewDto orderCodeReviewDto) {
-        Long userId = 1L;
+        Long userId = AuthUtils.getUserId();
         return postService.orderCodeReview(orderCodeReviewDto,userId);
     }
 }
