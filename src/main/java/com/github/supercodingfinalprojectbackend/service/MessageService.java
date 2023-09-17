@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,8 +39,10 @@ public class MessageService {
                             .chatContent(message.getMessageContext())
                             .DbSendAt(formattedDate)
                             .build();
-                })
-                .collect(Collectors.toList());
+                }).
+                collect(Collectors.toList());
+
+        Collections.reverse(responseMessages);
 
 
         return ResponseUtils.ok("채팅로그가 성공적으로 반환되었습니다",responseMessages);
