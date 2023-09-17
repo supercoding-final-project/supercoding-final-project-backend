@@ -17,9 +17,10 @@ public class EventController {
     private final EventService eventService;
 
     @GetMapping("/test")
-    public SseEmitter sseTest() {
-        Long userId = AuthUtils.getUserId();
-        return eventService.createEmitter(userId, UserRole.NONE, EventType.NONE);
+    public SseEmitter sseTest(@RequestParam String eventTypeName) {
+//        Long userId = AuthUtils.getUserId();
+        EventType eventType = ValidateUtils.requireNotNull(EventType.parseType(eventTypeName), 400, "eventTypeName은 다음 중 하나여야 합니다. " + EventType.getScopeAsString());
+        return eventService.createEmitter(1L, UserRole.NONE, eventType);
     }
 
     @GetMapping("/identifier")

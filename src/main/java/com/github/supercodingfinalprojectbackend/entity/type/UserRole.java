@@ -25,7 +25,7 @@ public enum UserRole {
 
     @Override
     public String toString() {
-        return resolve().toString();
+        return resolve().name();
     }
 
     public static String getScopeAsString() {

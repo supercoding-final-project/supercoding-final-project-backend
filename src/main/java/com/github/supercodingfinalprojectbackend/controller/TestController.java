@@ -128,10 +128,12 @@ public class TestController {
 
     @GetMapping("/sse")
     public void testSse() {
-        Long userId = AuthUtils.getUserId();
-        String key = eventService.createEmitterKey(userId, UserRole.NONE, EventType.NONE);
+//        Long userId = AuthUtils.getUserId();
+        String key1 = eventService.createEmitterKey(1L, UserRole.NONE, EventType.NONE);
+        String key2 = eventService.createEmitterKey(1L, UserRole.NONE, EventType.PAYMENT);
         try {
-            eventService.pushEvent(key, "Hello, World!");
+            eventService.pushEvent(key1, "Hello, none!");
+            eventService.pushEvent(key2, "Hello, payment!");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
