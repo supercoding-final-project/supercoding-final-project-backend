@@ -20,4 +20,19 @@ public class MenteeDto {
                 .user(UserDto.from(mentee.getUser()))
                 .build();
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @ToString
+    public static class MenteeInfoRequest {
+        private String email;
+        private String nickname;
+        private String thumbnailImageUrl;
+
+        public boolean validate() {
+            return nickname != null;
+        }
+    }
 }
