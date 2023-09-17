@@ -319,6 +319,9 @@ public class MentorDto {
 		private List<String> skillStacks;
 
 		public static MentorProfileResponse from(Mentor mentor) {
+			List<MentorCareerDto.Response> careers = mentor.getMentorCareerList() != null ? mentor.getMentorCareerList().stream().map(MentorCareerDto.Response::from).collect(Collectors.toList()) : null;
+			List<String> skillStacks = mentor.getMentorSkillStacks() != null ? mentor.getMentorSkillStacks().stream().map(MentorSkillStack::getSkillStackName).collect(Collectors.toList()) : null;
+
 			return MentorProfileResponse.builder()
 					.mentorId(mentor.getMentorId())
 					.company(mentor.getCompany())
@@ -326,8 +329,8 @@ public class MentorDto {
 					.currentDutyName(DutyType.resolvedName(mentor.getCurrentDuty()))
 					.currentPeriod(mentor.getCurrentPeriod())
 					.searchable(mentor.getSearchable())
-					.careers(mentor.getMentorCareerList().stream().map(MentorCareerDto.Response::from).collect(Collectors.toList()))
-					.skillStacks(mentor.getMentorSkillStacks().stream().map(MentorSkillStack::getSkillStackName).collect(Collectors.toList()))
+					.careers(careers)
+					.skillStacks(skillStacks)
 					.build();
 		}
 	}
