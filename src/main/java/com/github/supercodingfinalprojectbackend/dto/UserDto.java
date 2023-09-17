@@ -24,4 +24,18 @@ public class UserDto {
                 .thumbnailImageUrl(user.getThumbnailImageUrl())
                 .build();
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @ToString
+    public static class UserInfoResponse {
+        private Long userId;
+        private Long menteeId;
+        private String email;
+        private String nickname;
+        private String thumbnailImageUrl;
+        private MentorDto.MentorProfileResponse mentorProfile;
+    }
 }
