@@ -31,8 +31,8 @@ public class ChatRoom {
     @Column(name = "chat_name")
     private String chatName;
 
-    @Column(name = "is_chat", columnDefinition = "tinyint default 0")
-    private Boolean isChat = false;
+    @Column(name = "is_chat")
+    private Boolean isChat;
 
     @Column(name = "created_at")
     @CreationTimestamp

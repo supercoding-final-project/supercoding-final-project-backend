@@ -26,13 +26,13 @@ public class MessageController {
     private final MessageService messageService;
     private final ChatRoomRepository chatRoomRepository;
 
-    @Operation(summary = "메세지 리시트 반환 기능")
+    @Operation(summary = "메세지 리스트 반환 기능")
     @GetMapping("/message")
     public ResponseEntity<?> getMessageByChatRoom(
             @RequestParam Long ChatRoomId, @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "20") Integer size){
 
         ChatRoom chatRoom = chatRoomRepository.findByChatRoomIdAndIsChatIsFalse(ChatRoomId).orElseThrow(ApiErrorCode.CHATROOMID_NOT_FOUND::exception);
-        Pageable pageable = PageRequest.of(page,size, Sort.by("sendAt").descending());
+        Pageable pageable = PageRequest.of(page,size, Sort.by("sendAt").ascending());
 
         return messageService.getMessageByChatroom(chatRoom,pageable);
     }

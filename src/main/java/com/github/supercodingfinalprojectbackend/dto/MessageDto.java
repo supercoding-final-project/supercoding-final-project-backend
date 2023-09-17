@@ -9,14 +9,14 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MessageDto {
+    private Long chatRoomId;
     private Long senderId;
     private String sendAt;
     private String chatContent;
     @Getter
     @Setter
     public static class CreateChatRoomRequest {
-        private Long user1Idx;
-        private Long user2Idx;
+        private Long anotherUserId;
     }
 
     @Getter
@@ -25,14 +25,6 @@ public class MessageDto {
         private Long userId;
     }
 
-    @Getter
-    @Setter
-    public static class ResponseChatLog {
-        private String chatContent;
-        private Long senderId;
-        private Long chatroomId;
-        private String sendAt;
-    }
 
     @Getter
     @Setter
@@ -58,18 +50,10 @@ public class MessageDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ResponseEnterChatRoom {
-        private List<ResponseChatLog> chatLog;
-    }
-
-    @Getter
-    @Setter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
     public static class ResponseMessage {
         private Long senderId;
         private String sendAt;
         private String chatContent;
+        private String DbSendAt;
     }
 }

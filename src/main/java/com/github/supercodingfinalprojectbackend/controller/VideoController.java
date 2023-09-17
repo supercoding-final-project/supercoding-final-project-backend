@@ -14,7 +14,6 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-//@CrossOrigin(origins = "*")
 @RequestMapping("/api/v1/video")
 public class VideoController {
 

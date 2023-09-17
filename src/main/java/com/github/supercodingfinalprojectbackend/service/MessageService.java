@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,11 +28,17 @@ public class MessageService {
         Page<Message> page = messageRepository.findAllByChatRoom(chatRoom,pageable).orElseThrow(ApiErrorCode.CHATROOMID_NOT_FOUND::exception);
 
         List<MessageDto.ResponseMessage> responseMessages = page.getContent().stream()
-                .map(message -> MessageDto.ResponseMessage.builder()
-                        .senderId(message.getSenderId())
-                        .sendAt(message.getSendAtFront())
-                        .chatContent(message.getMessageContext())
-                        .build())
+                .map(message -> {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    String formattedDate = dateFormat.format(message.getSendAt());
+
+                    return MessageDto.ResponseMessage.builder()
+                            .senderId(message.getSenderId())
+                            .sendAt(message.getSendAtFront())
+                            .chatContent(message.getMessageContext())
+                            .DbSendAt(formattedDate)
+                            .build();
+                })
                 .collect(Collectors.toList());
 
 

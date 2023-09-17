@@ -2,6 +2,7 @@ package com.github.supercodingfinalprojectbackend.controller;
 
 import com.github.supercodingfinalprojectbackend.dto.MentorDto;
 import com.github.supercodingfinalprojectbackend.dto.PaymoneyDto;
+import com.github.supercodingfinalprojectbackend.dto.UserDto;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.service.Oauth2Service;
 import com.github.supercodingfinalprojectbackend.service.UserService;
@@ -9,7 +10,6 @@ import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
 import com.github.supercodingfinalprojectbackend.util.auth.AuthUtils;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
@@ -54,5 +54,13 @@ public class UserController {
 
         PaymoneyDto.Response response = userService.getPaymoney(userId);
         return ResponseUtils.ok("페이머니를 성공적으로 조회했습니다.", response);
+    }
+
+    @GetMapping("/info")
+    @Operation(summary = "유저 정보 조회")
+    public ResponseEntity<ResponseUtils.ApiResponse<UserDto.UserInfoResponse>> getUserInfo() {
+        Long userId = AuthUtils.getUserId();
+        UserDto.UserInfoResponse response = userService.getUserInfo(userId);
+        return ResponseUtils.ok("유저 정보를 성공적으로 조회했습니다.", response);
     }
 }

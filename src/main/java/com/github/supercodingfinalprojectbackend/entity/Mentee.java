@@ -26,4 +26,8 @@ public class Mentee extends CommonEntity {
                 .user(user)
                 .build();
     }
+
+    public void changeInfo(String email, String nickname, String thumbnailImageUrl) {
+        this.user.changeInfo(nickname, email, thumbnailImageUrl);
+    }
 }

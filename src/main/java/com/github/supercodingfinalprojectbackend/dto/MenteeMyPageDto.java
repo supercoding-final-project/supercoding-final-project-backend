@@ -16,7 +16,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MenteeMyPageDto {
-    private Long userId;
     private String nickname;
 
     @Getter
@@ -93,4 +92,36 @@ public class MenteeMyPageDto {
                 .createdAt(payment.getCreatedAt())
                 .build();
     }
+
+
+    @Getter
+    @AllArgsConstructor
+    public static class RequestCalendersList{
+       private Long userId;
+       private Integer month;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class ResponseCalenderList{
+        private Integer month;
+        private List<ReservationDate> reservationDates;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class ReservationDate{
+        private Integer day;
+        private List<MentorReservation> mentorReservations;
+    }
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class MentorReservation{
+        private String mentorNickname;
+    }
+
+
 }

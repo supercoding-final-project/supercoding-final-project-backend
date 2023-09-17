@@ -17,6 +17,7 @@ public interface SelectedClassTimeRepository extends JpaRepository<SelectedClass
     List<SelectedClassTime> findAllByMenteeAndDayAndHourAndIsDeletedIsFalse(Mentee mentee, Integer day, Integer hour);
     List<SelectedClassTime> findAllByOrderSheet(OrderSheet orderSheet);
 
+    List<SelectedClassTime> findAllByMenteeUserUserIdAndMonth(Long userid, Integer month);
     void deleteAllByMentorUserUserIdAndOrderSheet(Long userId, OrderSheet orderSheet);
 
     void deleteAllByMenteeUserUserIdAndOrderSheetIsIn(Long userId, List<OrderSheet> orderSheets);
