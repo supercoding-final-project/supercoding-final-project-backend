@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.HtmlUtils;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -25,6 +28,10 @@ public class ChatService {
 
         ChatRoom chatRoom = chatRoomRepository.findByChatRoomIdAndIsChatIsFalse(chatroomID).orElseThrow(ApiErrorCode.CHATROOMID_NOT_FOUND::exception);
 
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String formattedDate = dateFormat.format(date);
+
         Message messageEntity = Message.builder()
                 .isCheck(false)
                 .messageContext(message.getChatContent())
@@ -33,7 +40,7 @@ public class ChatService {
                 .sendAtFront(message.getSendAt())
                 .build();
         messageRepository.save(messageEntity);
-        MessageDto.ResponseMessage responseMessage = new MessageDto.ResponseMessage(message.getSenderId(), message.getSendAt(), HtmlUtils.htmlEscape(message.getChatContent()));
+        MessageDto.ResponseMessage responseMessage = new MessageDto.ResponseMessage(message.getSenderId(), message.getSendAt(), HtmlUtils.htmlEscape(message.getChatContent()),formattedDate);
         return responseMessage;
     }
 }

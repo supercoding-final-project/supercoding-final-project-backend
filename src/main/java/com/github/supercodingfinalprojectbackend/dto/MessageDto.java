@@ -54,5 +54,6 @@ public class MessageDto {
         private Long senderId;
         private String sendAt;
         private String chatContent;
+        private String DbSendAt;
     }
 }
