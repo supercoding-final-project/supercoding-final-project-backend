@@ -4,18 +4,7 @@ import com.github.supercodingfinalprojectbackend.util.jwt.JwtUtils;
 import com.github.supercodingfinalprojectbackend.util.jwt.TokenHolder;
 import lombok.*;
 
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@ToString
 public class TokenDto {
-    private String accessToken;
-    private String refreshToken;
-
-    public static TokenDto from(TokenHolder tokenHolder) {
-        return new TokenDto(tokenHolder.getAccessToken(), tokenHolder.getRefreshToken());
-    }
 
     @Getter
     @NoArgsConstructor
@@ -42,13 +31,6 @@ public class TokenDto {
     public static class Response {
         private String accessToken;
         private String refreshToken;
-
-        public static Response from (TokenDto tokenDto) {
-            return Response.builder()
-                    .accessToken(JwtUtils.prefix(tokenDto.accessToken))
-                    .refreshToken(JwtUtils.prefix(tokenDto.refreshToken))
-                    .build();
-        }
 
         public static Response from(TokenHolder tokenHolder) {
             return Response.builder()

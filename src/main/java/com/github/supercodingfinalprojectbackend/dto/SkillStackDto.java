@@ -21,11 +21,4 @@ public class SkillStackDto {
                 .skillStackImg(skillStack.getSkillStackImg())
                 .build();
     }
-
-    public static SkillStackDto from(SkillStackType skillStackType) {
-        return SkillStackDto.builder()
-                .skillStackId(skillStackType.getSkillStackCode())
-                .skillStackName(skillStackType.getSkillStackName())
-                .build();
-    }
 }
