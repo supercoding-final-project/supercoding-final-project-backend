@@ -8,24 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@ToString
 public class OrderSheetDto {
-    private Long orderSheetId;
-    private PostDto postDto;
-    private MenteeDto menteeDto;
-    private Long totalPrice;
-    private Boolean isCompleted;
-
-    public static OrderSheetDto from(OrderSheetIdRequest request) {
-        return OrderSheetDto.builder()
-                .orderSheetId(request.orderSheetId)
-                .build();
-    }
-
 
     @Getter
     @NoArgsConstructor
