@@ -53,4 +53,9 @@ public class PostController {
         Long userId = AuthUtils.getUserId();
         return postService.orderCodeReview(orderCodeReviewDto,userId);
     }
+
+    @GetMapping("/mentor")
+    public ResponseEntity<ApiResponse<List<PostDto>>> searchPost(@RequestParam Long mentorId, @RequestParam Integer page, @RequestParam Integer size){
+        return postService.searchPost(mentorId,page,size);
+    }
 }
