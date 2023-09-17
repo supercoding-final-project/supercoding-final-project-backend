@@ -33,4 +33,8 @@ public enum UserRole {
         Arrays.stream(values()).filter(v->v.redirect != null).map(UserRole::toString).forEach(sj::add);
         return sj.toString();
     }
+
+    public boolean same(UserRole other) {
+        return resolve().equals(other.resolve());
+    }
 }
