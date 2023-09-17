@@ -87,11 +87,12 @@ public class Oauth2Service {
     public Login serviceLogin(User user) {
         // 이전 로그인 기록을 뒤져서 어떤 역할로 로그인할 것인지 선택
         LoginRecord loginRecord = loginRecordRepository.findFirstByUserAndIsDeletedIsFalseOrderByCreatedAtDesc(user).orElse(null);
-        UserRole userRole = loginRecord == null ? UserRole.MENTEE.resolve() : UserRole.valueOf(loginRecord.getRoleName()).resolve();
+        UserRole userRole = loginRecord == null ? UserRole.MENTEE : Objects.requireNonNull(UserRole.parseType(loginRecord.getRoleName()));
+        ;
 
         // 토큰 생성
         Long userId = user.getUserId();
-        Set<String> authorities = Set.of(userRole.name());
+        Set<String> authorities = Set.of(userRole.toString());
         TokenHolder tokenHolder = JwtUtils.createTokens(userId, authorities, secretKey);
 
         // 메모리에 로그인 정보 저장
@@ -235,7 +236,7 @@ public class Oauth2Service {
     public TokenDto.Response renewTokens(String refreshToken) {
         Long userId = ValidateUtils.requireNotThrow(refreshToken, t->JwtUtils.getUserId(t, secretKey), ApiErrorCode.UNRELIABLE_JWT);
         Login login = ValidateUtils.requireNotNull(authHolder.get(userId), 404, "로그인 기록이 없습니다.");
-        TokenHolder tokenHolder = JwtUtils.createTokens(userId, Set.of(login.getUserRole().resolve().name()), secretKey);
+        TokenHolder tokenHolder = JwtUtils.createTokens(userId, Set.of(login.getUserRole().toString()), secretKey);
         Login newLogin = Login.of(login.getUserRole(), tokenHolder);
         authHolder.put(userId, newLogin);
 

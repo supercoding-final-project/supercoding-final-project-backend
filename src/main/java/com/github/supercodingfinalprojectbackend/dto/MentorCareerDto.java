@@ -28,17 +28,6 @@ public class MentorCareerDto {
         return dutyType.equals(other.getDutyType());
     }
 
-    public static MentorCareerDto from(Request request) {
-        try {
-            return MentorCareerDto.builder()
-                    .dutyType(DutyType.valueOf(request.dutyName.toUpperCase()).resolve())
-                    .period(request.period)
-                    .build();
-        } catch (IllegalArgumentException e) {
-            throw ApiErrorCode.INVALID_DUTY.exception();
-        }
-    }
-
     public static MentorCareerDto from(MentorCareer mentorCareer) {
         return MentorCareerDto.builder()
                 .dutyType(DutyType.valueOf(mentorCareer.getDuty()))

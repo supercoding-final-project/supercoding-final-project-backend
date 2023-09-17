@@ -1,12 +1,17 @@
 package com.github.supercodingfinalprojectbackend.controller;
 
 import com.github.supercodingfinalprojectbackend.dto.response.PageResponse;
+import com.github.supercodingfinalprojectbackend.entity.type.EventType;
+import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
 import com.github.supercodingfinalprojectbackend.exception.ApiException;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
+import com.github.supercodingfinalprojectbackend.service.EventService;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
+import com.github.supercodingfinalprojectbackend.util.auth.AuthUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,13 +19,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.Optional;
 
 
 @RestController()
 @RequestMapping("/api/v1/test")
+@RequiredArgsConstructor
 @Tag(name = "테스트용 API", description = "테스트를 위해 작성된 API입니다.")
 public class TestController {
+
+    private final EventService eventService;
+
     @GetMapping("/")
     @Operation(summary = "스웨거 정상 동작 테스트")
     public Object test() {
@@ -114,5 +124,18 @@ public class TestController {
 
         // 8. 모든 메서드는 status와 message를 직접 받는 것 대신 ErrorCode를 받을 수도 있도록 오버로딩되어 있습니다.
         Integer numInt2 = ValidateUtils.requireNotThrow(()->Integer.parseInt(numStr), ApiErrorCode.INTERNAL_SERVER_ERROR);
+    }
+
+    @GetMapping("/sse")
+    public void testSse() {
+//        Long userId = AuthUtils.getUserId();
+        String key1 = eventService.createEmitterKey(1L, UserRole.NONE, EventType.NONE);
+        String key2 = eventService.createEmitterKey(1L, UserRole.NONE, EventType.PAYMENT);
+        try {
+            eventService.pushEvent(key1, "Hello, none!");
+            eventService.pushEvent(key2, "Hello, payment!");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

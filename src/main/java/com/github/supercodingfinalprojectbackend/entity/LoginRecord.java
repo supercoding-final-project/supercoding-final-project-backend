@@ -27,7 +27,7 @@ public class LoginRecord extends CommonEntity {
     public static LoginRecord of(User user, UserRole userRole) {
         return LoginRecord.builder()
                 .user(user)
-                .roleName(userRole.resolve().name())
+                .roleName(userRole.toString())
                 .build();
     }
 }
