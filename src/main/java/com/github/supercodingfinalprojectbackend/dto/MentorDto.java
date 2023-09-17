@@ -302,4 +302,20 @@ public class MentorDto {
 					.build();
 		}
 	}
+
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	@ToString
+	public static class MentorProfileResponse {
+		private Long mentorId;
+		private String company;
+		private String introduction;
+		private String currentDutyName;
+		private String currentPeriod;
+		private Boolean searchable;
+		private List<MentorCareerDto.Response> careers;
+		private List<String> skillStacks;
+	}
 }
