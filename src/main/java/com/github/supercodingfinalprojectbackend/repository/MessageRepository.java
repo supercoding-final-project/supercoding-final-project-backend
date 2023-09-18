@@ -13,5 +13,6 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
     Optional<Page<Message>> findAllByChatRoom(ChatRoom chatRoom, Pageable pageable);
 
+    Message findAllByMessageIdAndIsCheckIsFalse(Long messageId);
     Message findTopByChatRoomOrderBySendAtDesc(ChatRoom chatRoom);
 }

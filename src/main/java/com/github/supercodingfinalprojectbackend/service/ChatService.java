@@ -10,10 +10,9 @@ import com.github.supercodingfinalprojectbackend.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.util.HtmlUtils;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.TimeZone;
 
 @Service
 @RequiredArgsConstructor
@@ -24,13 +23,13 @@ public class ChatService {
 
     private final ChatRoomRepository chatRoomRepository;
 
-    public MessageDto.ResponseMessage createMessage(Long chatroomID , MessageDto message){
+    public MessageDto.ResponseMessage createMessage(Long chatroomId , MessageDto message){
 
-        ChatRoom chatRoom = chatRoomRepository.findByChatRoomIdAndIsChatIsFalse(chatroomID).orElseThrow(ApiErrorCode.CHATROOMID_NOT_FOUND::exception);
+        ChatRoom chatRoom = chatRoomRepository.findByChatRoomIdAndIsChatIsFalse(chatroomId).orElseThrow(ApiErrorCode.CHATROOMID_NOT_FOUND::exception);
 
-        Date date = new Date();
+        TimeZone koreaTimeZone = TimeZone.getTimeZone("Asia/Seoul");
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String formattedDate = dateFormat.format(date);
+        String formattedDate = dateFormat.format(koreaTimeZone);
 
         Message messageEntity = Message.builder()
                 .isCheck(false)
@@ -39,8 +38,15 @@ public class ChatService {
                 .chatRoom(chatRoom)
                 .sendAtFront(message.getSendAt())
                 .build();
+
         messageRepository.save(messageEntity);
-        MessageDto.ResponseMessage responseMessage = new MessageDto.ResponseMessage(message.getSenderId(), message.getSendAt(), HtmlUtils.htmlEscape(message.getChatContent()),formattedDate);
-        return responseMessage;
+        return new MessageDto.ResponseMessage(message.getSenderId(), message.getSendAt(), message.getChatContent(),formattedDate);
+    }
+
+    public void isCheck(Long messageId,Long chatroomId){
+        Message message = messageRepository.findAllByMessageIdAndIsCheckIsFalse(messageId);
+        message.setIsCheck(true);
+        messageRepository.save(message);
+
     }
 }
