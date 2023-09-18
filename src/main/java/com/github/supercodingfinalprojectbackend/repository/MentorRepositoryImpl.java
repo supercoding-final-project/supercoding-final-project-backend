@@ -95,7 +95,7 @@ public class MentorRepositoryImpl implements MentorRepositoryCustom {
 
 	@Override
 	public Page<MentorInfoResponse> searchAllFromDtoWithCursorPagination(String keyword,
-			List<String> skillStacks, Long cursorId, Pageable pageable){
+			List<String> skillStacks, List<String> duties, Long cursorId, Pageable pageable){
 
 		List<MentorInfoResponse> content = jpaQueryFactory
 				.selectDistinct(new QMentorDto_MentorInfoResponse(
@@ -116,7 +116,8 @@ public class MentorRepositoryImpl implements MentorRepositoryCustom {
 						mentor.searchable.eq(true),
 						mentor.isDeleted.eq(false),
 						mentorNameLike(keyword).or(conMentorSkillStack(keyword)),
-						skillStackFiltering(skillStacks)
+						skillStackFiltering(skillStacks),
+						dutyFiltering(duties)
 				)
 				.limit(pageable.getPageSize())
 				.fetch();
@@ -132,7 +133,8 @@ public class MentorRepositoryImpl implements MentorRepositoryCustom {
 						mentor.searchable.eq(true),
 						mentor.isDeleted.eq(false),
 						mentorNameLike(keyword).or(conMentorSkillStack(keyword)),
-						skillStackFiltering(skillStacks)
+						skillStackFiltering(skillStacks),
+						dutyFiltering(duties)
 				);
 
 		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
@@ -152,5 +154,9 @@ public class MentorRepositoryImpl implements MentorRepositoryCustom {
 
 	private BooleanExpression getRecordsWithCursorId(Long cursorId){
 		return cursorId != null ? mentor.mentorId.gt(cursorId) : null;
+	}
+
+	private BooleanExpression dutyFiltering(List<String> duties){
+		return duties != null ? mentor.currentDuty.in(duties) : null;
 	}
 }
