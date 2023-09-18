@@ -12,6 +12,8 @@ import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
 import com.github.supercodingfinalprojectbackend.util.auth.AuthHolder;
 import com.github.supercodingfinalprojectbackend.util.jwt.JwtUtils;
 import com.github.supercodingfinalprojectbackend.util.jwt.TokenHolder;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,11 +22,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.json.JsonFactory;
 
 import javax.crypto.SecretKey;
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.GeneralSecurityException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -44,6 +52,10 @@ public class Oauth2Service {
     private String kakaoUserInfoUri;
     @Value("${spring.security.oauth2.client.provider.kakao.logout-uri}")
     private String kakaoLogoutUri;
+    @Value("${spring.security.oauth2.client.registration.google.client-id}")
+    private String googleClientId;
+    @Value("${spring.security.oauth2.client.registration.google.client-secret}")
+    private String googleClientSecret;
 
     private final MenteeRepository menteeRepository;
     private final UserRepository userRepository;
@@ -242,4 +254,30 @@ public class Oauth2Service {
 
         return TokenDto.Response.from(tokenHolder);
     }
+
+//    public Login.Response googleLogin(String token) {
+//        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
+//                .setAudience(Collections.singletonList(googleClientId))
+//                .build();
+//
+//
+//        GoogleIdToken idToken = null;
+//        try {
+//            idToken = verifier.verify(token);
+//        } catch (GeneralSecurityException | IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//        if (idToken == null) throw ApiErrorCode.INVALID_GOOGLE_TOKEN.exception();
+//
+//        Payload payload = idToken.getPayload();
+//        String googleUserId = payload.getSubject();
+//        String email = payload.getEmail();
+//        String name = (String) payload.get("name");
+//        String pictureUrl = (String) payload.get("picture");
+//
+//        System.out.println("googleUserId: " + googleUserId);
+//        System.out.println("email: " + email);
+//        System.out.println("name: " + name);
+//        System.out.println("pictureUrl: " + pictureUrl);
+//    }
 }
