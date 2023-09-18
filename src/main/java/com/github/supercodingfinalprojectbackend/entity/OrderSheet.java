@@ -27,6 +27,8 @@ public class OrderSheet extends CommonEntity {
     private Integer totlaPrice;
     @Column(name = "is_completed")
     private Boolean isCompleted;
+    @Column(name = "is_reviewed", nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
+    private Boolean is_reviewed;
     @Version
     private Integer version;    // 낙관적 락
 
@@ -50,6 +52,10 @@ public class OrderSheet extends CommonEntity {
         mentee.getUser().getAbstractAccount().chargePaymoney(totlaPrice.longValue());
         this.isCompleted = false;
         softDelete();
+    }
+
+    public void isReviewed() {
+        this.is_reviewed = true;
     }
 
     public static OrderSheet of(OrderCodeReviewDto orderCodeReviewDto, Mentee mentee, Posts posts){

@@ -35,12 +35,16 @@ public class Review extends CommonEntity {
     @Column(name = "star")
     private Integer star;
 
-    public static Review toEntity(Mentee mentee, Posts posts, String content, Integer star) {
+    @Column(name = "number_of_reviews_received")
+    private Integer numberOfReviewsReceived;
+
+    public static Review toEntity(Mentee mentee, Posts posts, String content, Integer star, Integer numberOfReviewsReceived) {
         return Review.builder()
                 .mentee(mentee)
                 .post(posts)
                 .content(content)
                 .star(star)
+                .numberOfReviewsReceived(numberOfReviewsReceived)
                 .build();
     }
 
