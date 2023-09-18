@@ -47,6 +47,8 @@ public class SecurityConfig {
                         .antMatchers("/api/v1/mentors/info").authenticated()
                         .antMatchers("/api/v1/mentees/info").authenticated()
                         .antMatchers("/api/v1/orders/**").authenticated()
+                        .antMatchers("/api/v1/createchat","/api/v1/chatrooms").authenticated()
+                        .antMatchers("/api/v1/mentor/mypage/**","/api/v1/mentee/mypage/**").authenticated()
                         .antMatchers("/api/v1/events/identifier").authenticated()
                         .anyRequest().permitAll() // 다른 모든 요청을 허용하도록 설정
                 )
