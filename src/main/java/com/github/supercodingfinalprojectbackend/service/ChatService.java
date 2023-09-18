@@ -10,6 +10,7 @@ import com.github.supercodingfinalprojectbackend.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.util.HtmlUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
@@ -40,7 +41,7 @@ public class ChatService {
                 .build();
 
         messageRepository.save(messageEntity);
-        return new MessageDto.ResponseMessage(message.getSenderId(), message.getSendAt(), message.getChatContent(),formattedDate);
+        return new MessageDto.ResponseMessage(message.getSenderId(), message.getSendAt(), HtmlUtils.htmlEscape(message.getChatContent()),formattedDate);
     }
 
     public void isCheck(Long messageId,Long chatroomId){
