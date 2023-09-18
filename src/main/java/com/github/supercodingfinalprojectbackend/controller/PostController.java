@@ -60,7 +60,12 @@ public class PostController {
     }
 
     @GetMapping("/search/mentor")
-    public ResponseEntity<ApiResponse<List<PostDto>>> searchAllPost(@RequestParam String word, @RequestParam Integer page, @RequestParam Integer size){
-        return postService.searchAllPost(word,page-1,size);
+    public ResponseEntity<ApiResponse<List<PostDto>>> searchMentorAllPost(@RequestParam String word, @RequestParam Integer page, @RequestParam Integer size){
+        return postService.searchMentorAllPost(word,page-1,size);
+    }
+
+    @GetMapping("/search/skill")
+    public ResponseEntity<ApiResponse<List<PostDto>>> searchSkillAllPost(@RequestParam String word, @RequestParam Integer page, @RequestParam Integer size){
+        return postService.searchSkillAllPost(word,page-1,size);
     }
 }

@@ -14,7 +14,6 @@ import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -205,7 +204,7 @@ public class PostService {
         Mentor mentor = mentorRepository.findByMentorIdAndIsDeletedIsFalse(mentorId).orElseThrow(ApiErrorCode.NOT_FOUND_MENTOR::exception);
         Pageable pageable = PageRequest.of(page,size);
 
-        Page<Posts> posts = postsRepository.findAllByMentorAndIsDeletedFalse(mentor,pageable);
+        List<Posts> posts = postsRepository.findAllByMentorAndIsDeletedFalse(mentor,pageable);
         List<PostDto> postList = new ArrayList<>();
 
         for (Posts post : posts) {
@@ -218,7 +217,7 @@ public class PostService {
         return ResponseUtils.ok("검색이 완료되었습니다.",postList);
     }
 
-    public ResponseEntity<ApiResponse<List<PostDto>>> searchAllPost(String word, Integer page, Integer size) {
+    public ResponseEntity<ApiResponse<List<PostDto>>> searchMentorAllPost(String word, Integer page, Integer size) {
         List<User> userList = userRepository.findAllByNicknameContains(word);
         List<PostDto> postDtoList = new ArrayList<>();
 
@@ -240,6 +239,22 @@ public class PostService {
             int to = Math.min(from + size, postDtoList.size());
             postDtoList = postDtoList.subList(from,to);
         }
+        return ResponseUtils.ok("검색이 완료되었습니다.",postDtoList);
+    }
+
+    public ResponseEntity<ApiResponse<List<PostDto>>> searchSkillAllPost(String word, int page, Integer size) {
+        Pageable pageable = PageRequest.of(page,size);
+        List<Posts> posts = postsRepository.findAllByTitleContains(word,pageable);
+
+        List<PostDto> postDtoList = new ArrayList<>();
+
+        for (Posts post : posts) {
+            List<PostsContent> contentList = postsContentRepository.findAllByPosts(post);
+            String stack = postsSkillStackRepository.findByPosts(post).getSkillStack().getSkillStackName();
+
+            postDtoList.add(PostDto.PostInfoResponse(post,contentList,stack));
+        }
+
         return ResponseUtils.ok("검색이 완료되었습니다.",postDtoList);
     }
 }
