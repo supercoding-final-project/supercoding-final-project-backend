@@ -44,6 +44,14 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/login/google")
+    @Operation(summary = "구글 로그인")
+    public ResponseEntity<ResponseUtils.ApiResponse<Login.Response>> googleLogin(@RequestParam @Parameter(name = "구글 액세스 토큰", required = true) String token) {
+//        Login.Response response = oauth2Service.googleLogin(token);
+//        return ResponseUtils.ok("로그인에 성공했습니다.", response);
+        return null;
+    }
+
     @GetMapping("/logout")
     @Operation(summary = "로그아웃")
     public ResponseEntity<ResponseUtils.ApiResponse<Void>> logout() {

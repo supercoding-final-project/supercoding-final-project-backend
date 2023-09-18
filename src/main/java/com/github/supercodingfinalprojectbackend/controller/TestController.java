@@ -1,6 +1,7 @@
 package com.github.supercodingfinalprojectbackend.controller;
 
 import com.github.supercodingfinalprojectbackend.dto.response.PageResponse;
+import com.github.supercodingfinalprojectbackend.entity.User;
 import com.github.supercodingfinalprojectbackend.entity.type.EventType;
 import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
 import com.github.supercodingfinalprojectbackend.exception.ApiException;
@@ -9,6 +10,7 @@ import com.github.supercodingfinalprojectbackend.service.EventService;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
 import com.github.supercodingfinalprojectbackend.util.auth.AuthUtils;
+import com.github.supercodingfinalprojectbackend.util.sse.EventKey;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -129,13 +131,11 @@ public class TestController {
     @GetMapping("/sse")
     public void testSse() {
 //        Long userId = AuthUtils.getUserId();
-        String key1 = eventService.createEmitterKey(1L, UserRole.NONE, EventType.NONE);
-        String key2 = eventService.createEmitterKey(1L, UserRole.NONE, EventType.PAYMENT);
-        try {
-            eventService.pushEvent(key1, "Hello, none!");
-            eventService.pushEvent(key2, "Hello, payment!");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        User recipient = User.builder().userId(1L).build();
+        EventKey key1 = EventKey.of(recipient, EventType.NONE);
+        EventKey key2 = EventKey.aboutOrder(recipient);
+
+        eventService.pushEvent(key1, "Hello, none!");
+        eventService.pushEvent(key2, "Hello, payment!");
     }
 }
