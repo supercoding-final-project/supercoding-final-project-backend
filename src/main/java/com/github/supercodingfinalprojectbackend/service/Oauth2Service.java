@@ -215,6 +215,7 @@ public class Oauth2Service {
 
     public MentorDto.JoinResponse joinMentor(Long userId, MentorDto.JoinRequest request) {
         User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
+        if (mentorRepository.existsByUserUserIdAndIsDeletedIsFalse(userId)) throw new ApiException(409, "이미 멘토로 등록되어 있습니다.");
         Mentor mentor = mentorRepository.save(Mentor.of(user, request.getCompany(), request.getIntroduction()));
 
         List<MentorCareerDto.Request> careers = request.getCareers();

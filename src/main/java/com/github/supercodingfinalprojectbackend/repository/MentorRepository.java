@@ -14,4 +14,6 @@ public interface MentorRepository extends JpaRepository<Mentor, Long>, MentorRep
     Optional<Mentor> findByUserUserIdAndIsDeletedIsFalse(Long userId);
 
     Optional<Mentor> findByMentorIdAndIsDeletedIsFalse(Long userId);
+
+    boolean existsByUserUserIdAndIsDeletedIsFalse(Long userId);
 }
