@@ -20,9 +20,9 @@ public class ReviewDto {
     private Long postId;
     private Long menteeId;
     private String nickname;
-    private String title;
     private String content;
     private Integer star;
+    private Integer numberOfReviewsReceived;
 
     public static ReviewDto from(Review review) {
         return ReviewDto.builder()
@@ -32,6 +32,7 @@ public class ReviewDto {
                 .nickname(review.getMentee().getUser().getNickname())
                 .content(review.getContent())
                 .star(review.getStar())
+                .numberOfReviewsReceived(review.getNumberOfReviewsReceived())
                 .build();
     }
 
@@ -41,8 +42,8 @@ public class ReviewDto {
     @Builder
     public static class CreateReviewRequest {
 
-        @NotNull(message = "postId 값을 입력해 주세요.")
-        private Long postId;
+        @NotNull(message = "orderSheetId 값을 입력해 주세요.")
+        private Long orderSheetId;
 
         @NotNull(message = "content 값을 입력해 주세요.")
         private String content;
@@ -64,6 +65,7 @@ public class ReviewDto {
         private Long postId;
         private String content;
         private Integer star;
+        private Integer numberOfReviewsReceived;
 
         public static CreateReviewResponse from(ReviewDto reviewDto) {
             return CreateReviewResponse.builder()
@@ -72,6 +74,7 @@ public class ReviewDto {
                     .postId(reviewDto.getPostId())
                     .content(reviewDto.getContent())
                     .star(reviewDto.getStar())
+                    .numberOfReviewsReceived(reviewDto.getNumberOfReviewsReceived())
                     .build();
         }
 
@@ -89,6 +92,7 @@ public class ReviewDto {
         private String nickname;
         private String content;
         private Integer star;
+        private Integer numberOfReviewsReceived;
 
         public static ReviewResponse from(ReviewDto reviewDto) {
             return ReviewResponse.builder()
@@ -98,6 +102,7 @@ public class ReviewDto {
                     .nickname(reviewDto.getNickname())
                     .content(reviewDto.getContent())
                     .star(reviewDto.getStar())
+                    .numberOfReviewsReceived(reviewDto.getNumberOfReviewsReceived())
                     .build();
         }
     }

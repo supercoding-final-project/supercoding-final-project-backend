@@ -35,7 +35,7 @@ public class ReviewService {
     @Transactional
     public ReviewDto createReview(CreateReviewRequest request, Long userId) {
 
-        Long inputPostId = request.getPostId();
+        Long inputOrderSheetId = request.getOrderSheetId();
         String inputContent = request.getContent();
         Integer inputStar = request.getStar();
 
@@ -46,28 +46,20 @@ public class ReviewService {
             throw new ApiException(DELETED_MENTEE);
         }
 
-        Posts post = postsRepository.findById(inputPostId)
-                .orElseThrow(() -> new ApiException(NOT_FOUND_POST));
-
+        OrderSheet orderSheet = orderSheetRepository.findById(inputOrderSheetId)
+                .orElseThrow(() -> new ApiException(NOT_FOUND_ORDERSHEET));
+        Posts post = orderSheet.getPost();
         Mentor mentor = post.getMentor();
 
-        /**
-         * 자격, 작성 시점 : 거래가 완료(환불 X), 예약된 시간 1시간 이후, 일주일 이내
-         */
-//        List<OrderSheet> menteeOrderHistory = orderSheetRepository.findAllByPostAndMenteeAndAndIsCompletedTrue(post, mentee);
-//        if (menteeOrderHistory.isEmpty()) {
-//            throw new ApiException(UNABLE_TO_WRITE_REVIEW);
-//        }
+        int numberOfCodeReviewsReceived = countCodeReviewsReceived(post, mentee, orderSheet);
 
-        /**
-         * 포스트, 멘토 평점 Update
-         */
         updateStar(mentor, post, inputStar);
+        orderSheet.isReviewed();
 
 
         return from(
                 reviewRepository.save(
-                        toEntity(mentee, post, inputContent, inputStar))
+                        toEntity(mentee, post, inputContent, inputStar, numberOfCodeReviewsReceived))
         );
     }
 
@@ -118,9 +110,22 @@ public class ReviewService {
         return from(review);
     }
 
+    public int countCodeReviewsReceived(Posts post, Mentee mentee, OrderSheet orderSheet) {
+        List<OrderSheet> orderSheets = orderSheetRepository.findAllByPostAndMenteeAndIsCompletedTrue(post, mentee);
+
+        int NumberOfCodeReviewsReceived = 0;
+        for (OrderSheet order : orderSheets) {
+            NumberOfCodeReviewsReceived++;
+            if (Objects.equals(order.getOrderSheetId(), orderSheet.getOrderSheetId())) {
+                break;
+            }
+        }
+
+        return NumberOfCodeReviewsReceived;
+    }
+
     public void updateStar(Mentor mentor, Posts post, Integer inputStar) {
 
-        log.info("post.getPostId() : {}", post.getPostId());
         ReviewSummary reviewSummery = reviewRepository.getReviewSummeryByPostId(post.getPostId());
 
         float totalStar = reviewSummery.getTotalStar() + inputStar;
