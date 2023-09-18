@@ -1,5 +1,6 @@
 package com.github.supercodingfinalprojectbackend.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.supercodingfinalprojectbackend.entity.Posts;
 import com.github.supercodingfinalprojectbackend.entity.PostsContent;
 import com.github.supercodingfinalprojectbackend.entity.type.PostContentType;
@@ -17,7 +18,9 @@ import java.util.stream.Collectors;
 @Builder
 @ToString
 public class PostDto {
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long postId;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private MentorDto mentorDto;
     @NotBlank
     private String title;
@@ -56,8 +59,8 @@ public class PostDto {
 
     public static List<String> postContentToList(List<PostsContent> postsContents, PostContentType type){
         return postsContents.stream()
-                .map(PostsContent::getContentType)
-                .filter(contentType -> contentType.equals(type.name()))
+                .filter(contentType -> contentType.getContentType().equals(type.name()))
+                .map(PostsContent::getText)
                 .collect(Collectors.toList());
     }
 

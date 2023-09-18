@@ -7,19 +7,25 @@ import com.github.supercodingfinalprojectbackend.entity.*;
 import com.github.supercodingfinalprojectbackend.entity.type.PostContentType;
 import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
 import com.github.supercodingfinalprojectbackend.entity.type.WeekType;
+import com.github.supercodingfinalprojectbackend.exception.ApiException;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.repository.*;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -28,6 +34,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class PostService {
+    private final UserRepository userRepository;
     private final MentorRepository mentorRepository;
     private final PostsRepository postsRepository;
     private final PostsContentRepository postsContentRepository;
@@ -62,8 +69,8 @@ public class PostService {
             postsContentRepository.save(postsContent);
         }
 
-        SkillStackType skillStackType = SkillStackType.findBySkillStackType(postDto.getPostStack());
-        SkillStack skillStack = skillStackRepository.findBySkillStackName(skillStackType.getSkillStackName());
+        SkillStackType skillStackType = SkillStackType.valueOf(postDto.getPostStack());
+        SkillStack skillStack = skillStackRepository.findBySkillStackName(skillStackType.name());
         PostsSkillStack postsSkillStack = PostsSkillStack.fromPost(post,skillStack);
         postsSkillStackRepository.save(postsSkillStack);
 
@@ -78,8 +85,11 @@ public class PostService {
         return ResponseUtils.ok("정상적으로 멘티 모집 조회 되었습니다.", PostDto.PostInfoResponse(posts,contentList,stack));
     }
 
-    public ResponseEntity<ApiResponse<Void>> updatePost(Long postId, PostDto postDto) {
+    public ResponseEntity<ApiResponse<Void>> updatePost(Long userId, Long postId, PostDto postDto) {
         Posts posts = postsRepository.findByPostIdAndIsDeletedFalse(postId).orElseThrow(ApiErrorCode.POST_NOT_POST_ID::exception);
+        Mentor mentor = mentorRepository.findByUserUserIdAndIsDeletedIsFalse(userId).get();
+        if(posts.getMentor().getMentorId() != mentor.getMentorId())throw new ApiException(ApiErrorCode.POST_NOT_MATCH_MENTOR);
+
         posts.postsUpdate(postDto);
 
         List<PostsContent> postsContentList = postsContentRepository.findAllByPosts(posts);
@@ -113,8 +123,11 @@ public class PostService {
         return ResponseUtils.ok("멘티 모집이 정상적으로 수정되었습니다.",null);
     }
 
-    public ResponseEntity<ApiResponse<Void>> deletePost(Long postId) {
+    public ResponseEntity<ApiResponse<Void>> deletePost(Long userId, Long postId) {
         Posts posts = postsRepository.findByPostIdAndIsDeletedFalse(postId).orElseThrow(ApiErrorCode.POST_NOT_POST_ID::exception);
+        Mentor mentor = mentorRepository.findByUserUserIdAndIsDeletedIsFalse(userId).get();
+        if(posts.getMentor().getMentorId() != mentor.getMentorId())throw new ApiException(ApiErrorCode.POST_NOT_MATCH_MENTOR);
+
         posts.postsIsDeleted();
 
         List<PostsContent> postsContentList = postsContentRepository.findAllByPosts(posts);
@@ -186,5 +199,47 @@ public class PostService {
         }
 
         return ResponseUtils.noContent("코드리뷰 신청이 완료되었습니다.", null);
+    }
+
+    public ResponseEntity<ApiResponse<List<PostDto>>> searchPost(Long mentorId, Integer page, Integer size) {
+        Mentor mentor = mentorRepository.findByMentorIdAndIsDeletedIsFalse(mentorId).orElseThrow(ApiErrorCode.NOT_FOUND_MENTOR::exception);
+        Pageable pageable = PageRequest.of(page,size);
+
+        Page<Posts> posts = postsRepository.findAllByMentorAndIsDeletedFalse(mentor,pageable);
+        List<PostDto> postList = new ArrayList<>();
+
+        for (Posts post : posts) {
+            List<PostsContent> contentList = postsContentRepository.findAllByPosts(post);
+            String stack = postsSkillStackRepository.findByPosts(post).getSkillStack().getSkillStackName();
+
+            postList.add(PostDto.PostInfoResponse(post,contentList,stack));
+        }
+
+        return ResponseUtils.ok("검색이 완료되었습니다.",postList);
+    }
+
+    public ResponseEntity<ApiResponse<List<PostDto>>> searchAllPost(String word, Integer page, Integer size) {
+        List<User> userList = userRepository.findAllByNicknameContains(word);
+        List<PostDto> postDtoList = new ArrayList<>();
+
+        for (User user : userList) {
+            Optional<Mentor> mentor = mentorRepository.findByUserUserIdAndIsDeletedIsFalse(user.getUserId());
+            if(mentor.isEmpty())continue;
+
+            List<Posts> posts = postsRepository.findAllByMentorAndIsDeletedFalse(mentor.get());
+
+            for (Posts post : posts) {
+                List<PostsContent> contentList = postsContentRepository.findAllByPosts(post);
+                String stack = postsSkillStackRepository.findByPosts(post).getSkillStack().getSkillStackName();
+
+                postDtoList.add(PostDto.PostInfoResponse(post,contentList,stack));
+            }
+        }
+        if(postDtoList.size()>0){
+            int from = page * size;
+            int to = Math.min(from + size, postDtoList.size());
+            postDtoList = postDtoList.subList(from,to);
+        }
+        return ResponseUtils.ok("검색이 완료되었습니다.",postDtoList);
     }
 }
