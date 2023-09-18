@@ -46,7 +46,7 @@ jasypt:
     bean: jasyptStringEncryptor
 
 openvidu:
-  url: ENC(fajpCMfVPBScqfPC+Z3OubxABdXHEn2w)
+  url: ENC(V+AHS6P7+xrGvQs4fzt+xmtSWJD2B/B0)
   secret: ENC(GRF6XjYIGxdZ70ki0Ei0FjMF9tpfTqEj)
 
 cloud:
