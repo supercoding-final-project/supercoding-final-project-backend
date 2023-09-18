@@ -52,7 +52,7 @@ openvidu:
 cloud:
   aws:
     credentials:
-      access-key: ENC(ViAHopgVSxgZK4bJmBVuZk5DBiHcPnxNImuB9y4QtBY=)
+      access-key: ENC(fajpCMfVPBScqfPC+Z3OubxABdXHEn2w)
       secret-key: ENC(yowsaWXRxeXBvE+DL7zsEglC4OjAzowSIh17iT+8z/GobsaYcFnYHjyqFhdmtxkaifMjt5VZs8o=)
     region:
       static: ap-northeast-2
