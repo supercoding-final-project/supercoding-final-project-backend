@@ -14,6 +14,7 @@ import org.springframework.web.util.HtmlUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 @Service
 @RequiredArgsConstructor
@@ -24,12 +25,13 @@ public class ChatService {
 
     private final ChatRoomRepository chatRoomRepository;
 
-    public MessageDto.ResponseMessage createMessage(Long chatroomID , MessageDto message){
+    public MessageDto.ResponseMessage createMessage(Long chatroomId , MessageDto message){
 
-        ChatRoom chatRoom = chatRoomRepository.findByChatRoomIdAndIsChatIsFalse(chatroomID).orElseThrow(ApiErrorCode.CHATROOMID_NOT_FOUND::exception);
+        ChatRoom chatRoom = chatRoomRepository.findByChatRoomIdAndIsChatIsFalse(chatroomId).orElseThrow(ApiErrorCode.CHATROOMID_NOT_FOUND::exception);
 
-        Date date = new Date();
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = new Date();
         String formattedDate = dateFormat.format(date);
 
         Message messageEntity = Message.builder()
@@ -39,8 +41,8 @@ public class ChatService {
                 .chatRoom(chatRoom)
                 .sendAtFront(message.getSendAt())
                 .build();
+
         messageRepository.save(messageEntity);
-        MessageDto.ResponseMessage responseMessage = new MessageDto.ResponseMessage(message.getSenderId(), message.getSendAt(), HtmlUtils.htmlEscape(message.getChatContent()),formattedDate);
-        return responseMessage;
+        return new MessageDto.ResponseMessage(message.getSenderId(), message.getSendAt(), HtmlUtils.htmlEscape(message.getChatContent()),formattedDate);
     }
 }

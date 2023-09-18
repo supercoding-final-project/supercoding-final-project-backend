@@ -32,12 +32,13 @@ public class MentorController {
 	public ResponseEntity<ApiResponse<Page<MentorInfoResponse>>> getMentors(
 			@RequestParam(required = false, defaultValue = "") String keyword,
 			@RequestParam(required = false) List<String> skillStack,
+			@RequestParam(required = false) List<String> duties,
 			@RequestParam(defaultValue = "0") Long cursor,
 			@RequestParam(defaultValue = "10") Integer pageSize
 	){
 			return ResponseUtils.ok(
 					"Mentor 리스트를 성공적으로 가져왔습니다.",
-					mentorService.getMentors(keyword, skillStack, cursor, PageRequest.of(0, pageSize))
+					mentorService.getMentors(keyword, skillStack, duties, cursor, PageRequest.of(0, pageSize))
 			);
 	}
 

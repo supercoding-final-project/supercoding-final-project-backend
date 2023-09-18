@@ -76,26 +76,4 @@ public class ChatRoomService {
     public String createChatName(User user1, User user2){
         return user1.getNickname() + " " + user2.getNickname();
     }
-
- /*   public MessageDto.ResponseEnterChatRoom getEnterChatRoom(Long chatRoomId) {
-        ChatRoom chatRoom = chatRoomRepository.findByChatRoomIdAndIsChatIsFalse(chatRoomId).orElseThrow(ApiErrorCode.ChatRoomId_NOT_FOUND::exception);
-
-        List<Message> messages = messageRepository.findByChatRoom(chatRoom, Sort.by(Sort.Order.asc("sendAt")));
-        List<MessageDto.ResponseChatLog> chatMessages = new ArrayList<>();
-
-        for (Message message : messages) {
-            MessageDto.ResponseChatLog chatMessageDto = new MessageDto.ResponseChatLog();
-            chatMessageDto.setChatContent(message.getMessageContext());
-            chatMessageDto.setSenderId(message.getSenderId());
-            chatMessageDto.setSendAt(String.valueOf(message.getSendAtFront()));
-            chatMessageDto.setChatroomId(chatRoom.getChatRoomId());
-            chatMessages.add(chatMessageDto);
-        }
-
-        MessageDto.ResponseEnterChatRoom enterChatRoom = MessageDto.ResponseEnterChatRoom.builder()
-                .chatLog(chatMessages)
-                .build();
-
-        return enterChatRoom;
-    }페이지 네이션 기능 구현으로 인한 주석처리!(혹시 모르니 냅두겠습니다) */
 }
