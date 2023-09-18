@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.HtmlUtils;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.TimeZone;
 
 @Service
@@ -28,9 +29,10 @@ public class ChatService {
 
         ChatRoom chatRoom = chatRoomRepository.findByChatRoomIdAndIsChatIsFalse(chatroomId).orElseThrow(ApiErrorCode.CHATROOMID_NOT_FOUND::exception);
 
-        TimeZone koreaTimeZone = TimeZone.getTimeZone("Asia/Seoul");
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String formattedDate = dateFormat.format(koreaTimeZone);
+        Date date = new Date();
+        String formattedDate = dateFormat.format(date);
 
         Message messageEntity = Message.builder()
                 .isCheck(false)
@@ -42,12 +44,5 @@ public class ChatService {
 
         messageRepository.save(messageEntity);
         return new MessageDto.ResponseMessage(message.getSenderId(), message.getSendAt(), HtmlUtils.htmlEscape(message.getChatContent()),formattedDate);
-    }
-
-    public void isCheck(Long messageId,Long chatroomId){
-        Message message = messageRepository.findAllByMessageIdAndIsCheckIsFalse(messageId);
-        message.setIsCheck(true);
-        messageRepository.save(message);
-
     }
 }
