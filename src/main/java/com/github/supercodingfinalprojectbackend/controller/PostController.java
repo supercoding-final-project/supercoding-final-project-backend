@@ -56,6 +56,11 @@ public class PostController {
 
     @GetMapping("/mentor")
     public ResponseEntity<ApiResponse<List<PostDto>>> searchPost(@RequestParam Long mentorId, @RequestParam Integer page, @RequestParam Integer size){
-        return postService.searchPost(mentorId,page,size);
+        return postService.searchPost(mentorId,page-1,size);
+    }
+
+    @GetMapping("/search/mentor")
+    public ResponseEntity<ApiResponse<List<PostDto>>> searchAllPost(@RequestParam String word, @RequestParam Integer page, @RequestParam Integer size){
+        return postService.searchAllPost(word,page-1,size);
     }
 }

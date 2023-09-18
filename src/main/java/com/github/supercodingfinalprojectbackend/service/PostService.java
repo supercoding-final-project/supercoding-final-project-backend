@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class PostService {
+    private final UserRepository userRepository;
     private final MentorRepository mentorRepository;
     private final PostsRepository postsRepository;
     private final PostsContentRepository postsContentRepository;
@@ -201,7 +203,7 @@ public class PostService {
 
     public ResponseEntity<ApiResponse<List<PostDto>>> searchPost(Long mentorId, Integer page, Integer size) {
         Mentor mentor = mentorRepository.findByMentorIdAndIsDeletedIsFalse(mentorId).orElseThrow(ApiErrorCode.NOT_FOUND_MENTOR::exception);
-        Pageable pageable = PageRequest.of(page-1,size);
+        Pageable pageable = PageRequest.of(page,size);
 
         Page<Posts> posts = postsRepository.findAllByMentorAndIsDeletedFalse(mentor,pageable);
         List<PostDto> postList = new ArrayList<>();
@@ -214,5 +216,30 @@ public class PostService {
         }
 
         return ResponseUtils.ok("검색이 완료되었습니다.",postList);
+    }
+
+    public ResponseEntity<ApiResponse<List<PostDto>>> searchAllPost(String word, Integer page, Integer size) {
+        List<User> userList = userRepository.findAllByNicknameContains(word);
+        List<PostDto> postDtoList = new ArrayList<>();
+
+        for (User user : userList) {
+            Optional<Mentor> mentor = mentorRepository.findByUserUserIdAndIsDeletedIsFalse(user.getUserId());
+            if(mentor.isEmpty())continue;
+
+            List<Posts> posts = postsRepository.findAllByMentorAndIsDeletedFalse(mentor.get());
+
+            for (Posts post : posts) {
+                List<PostsContent> contentList = postsContentRepository.findAllByPosts(post);
+                String stack = postsSkillStackRepository.findByPosts(post).getSkillStack().getSkillStackName();
+
+                postDtoList.add(PostDto.PostInfoResponse(post,contentList,stack));
+            }
+        }
+        if(postDtoList.size()>0){
+            int from = page * size;
+            int to = Math.min(from + size, postDtoList.size());
+            postDtoList = postDtoList.subList(from,to);
+        }
+        return ResponseUtils.ok("검색이 완료되었습니다.",postDtoList);
     }
 }
