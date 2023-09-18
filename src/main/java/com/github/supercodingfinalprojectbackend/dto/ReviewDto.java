@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Getter
@@ -31,7 +30,6 @@ public class ReviewDto {
                 .postId(review.getPost().getPostId())
                 .menteeId(review.getMentee().getMenteeId())
                 .nickname(review.getMentee().getUser().getNickname())
-                .title(review.getTitle())
                 .content(review.getContent())
                 .star(review.getStar())
                 .build();
@@ -45,10 +43,11 @@ public class ReviewDto {
 
         @NotNull(message = "postId 값을 입력해 주세요.")
         private Long postId;
-        @NotNull(message = "title 값을 입력해 주세요.")
-        private String title;
+
         @NotNull(message = "content 값을 입력해 주세요.")
         private String content;
+
+        @NotNull
         @Min(value = 1, message = "평점의 최소값은 1 이상이여야 합니다.")
         @Max(value = 5, message = "평점의 최대값은 5 이하이여야 합니다.")
         private Integer star;
@@ -63,7 +62,6 @@ public class ReviewDto {
         private Long reviewId;
         private Long menteeId;
         private Long postId;
-        private String title;
         private String content;
         private Integer star;
 
@@ -72,7 +70,6 @@ public class ReviewDto {
                     .reviewId(reviewDto.getReviewId())
                     .menteeId(reviewDto.getMenteeId())
                     .postId(reviewDto.getPostId())
-                    .title(reviewDto.getTitle())
                     .content(reviewDto.getContent())
                     .star(reviewDto.getStar())
                     .build();
@@ -90,7 +87,6 @@ public class ReviewDto {
         private Long postId;
         private Long menteeId;
         private String nickname;
-        private String title;
         private String content;
         private Integer star;
 
@@ -100,11 +96,9 @@ public class ReviewDto {
                     .postId(reviewDto.getPostId())
                     .menteeId(reviewDto.getMenteeId())
                     .nickname(reviewDto.getNickname())
-                    .title(reviewDto.getTitle())
                     .content(reviewDto.getContent())
                     .star(reviewDto.getStar())
                     .build();
         }
     }
-
 }
