@@ -14,21 +14,11 @@ public class MentorSkillStackDto {
     private MentorDto mentorDto;
     private SkillStackDto skillStackDto;
 
-    public static MentorSkillStackDto from(MentorSkillStack mentorSkillStack) {
+    public static MentorSkillStackDto of(MentorDto mentorDto, MentorSkillStack mentorSkillStack) {
         return MentorSkillStackDto.builder()
                 .mentorSkillStackId(mentorSkillStack.getMentorSkillStackId())
-                .mentorDto(MentorDto.from(mentorSkillStack.getMentor()))
+                .mentorDto(mentorDto)
                 .skillStackDto(SkillStackDto.from(mentorSkillStack.getSkillStack()))
                 .build();
-    }
-
-    public static MentorSkillStackDto from(SkillStackType skillStackType) {
-        return MentorSkillStackDto.builder()
-                .skillStackDto(SkillStackDto.from(skillStackType))
-                .build();
-    }
-
-    public void setMentorDto(MentorDto mentorDto) {
-        this.mentorDto = mentorDto;
     }
 }

@@ -41,12 +41,13 @@ public class SecurityConfig {
                 )
                 // 접근 권한 설정
                 .authorizeHttpRequests(matcherRegistry -> matcherRegistry
-                        .antMatchers("/api/v1/test/**").authenticated()
+                        .antMatchers("/api/v1/test/").authenticated()
                         .antMatchers("/api/v1/auth/logout", "/api/v1/auth/switch/**").authenticated()
                         .antMatchers("/api/v1/users/role/join/mentor", "/api/v1/users/paymoney", "/api/v1/users/info").authenticated()
                         .antMatchers("/api/v1/mentors/info").authenticated()
                         .antMatchers("/api/v1/mentees/info").authenticated()
                         .antMatchers("/api/v1/orders/**").authenticated()
+                        .antMatchers("/api/v1/events/identifier").authenticated()
                         .anyRequest().permitAll() // 다른 모든 요청을 허용하도록 설정
                 )
                 .addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class)

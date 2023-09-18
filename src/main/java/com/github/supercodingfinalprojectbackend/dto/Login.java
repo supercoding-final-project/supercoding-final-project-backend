@@ -37,7 +37,7 @@ public class Login {
             return Response.builder()
                     .accessToken(JwtUtils.prefix(login.accessToken))
                     .refreshToken(JwtUtils.prefix(login.refreshToken))
-                    .roleName(login.userRole.resolve().name())
+                    .roleName(login.userRole.toString())
                     .build();
         }
     }

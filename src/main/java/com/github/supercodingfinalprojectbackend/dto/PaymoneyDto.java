@@ -3,9 +3,6 @@ package com.github.supercodingfinalprojectbackend.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
-@Getter
-@NoArgsConstructor
-@ToString
 public class PaymoneyDto {
 
     @Getter

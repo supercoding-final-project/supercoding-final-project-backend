@@ -1,10 +1,16 @@
 package com.github.supercodingfinalprojectbackend.entity.type;
 
 public enum DutyType implements CustomEnum {
+    NONE,
     BACKEND_DEVELOPER,
     FRONTEND_DEVELOPER,
-    DATA_ENGINEER
-    ;
+    FULL_STACK_DEVELOPER,
+    MOBILE_APP_DEVELOPER,
+    DEVOPS_ENGINEER,
+    DATA_ENGINEER,
+    GAME_DEVELOPER,
+    AI_ML_ENGINEER,
+    SECURITY_ENGINEER;
     private final DutyType redirect;
 
     DutyType() { this.redirect = null; }

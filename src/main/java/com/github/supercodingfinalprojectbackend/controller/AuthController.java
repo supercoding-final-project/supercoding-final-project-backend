@@ -58,7 +58,7 @@ public class AuthController {
             @PathVariable(name = "roleName") @Parameter(name = "역할 이름", required = true) String roleName
     ) {
         Long userId = AuthUtils.getUserId();
-        UserRole userRole = ValidateUtils.requireNotThrow(()->UserRole.valueOf(roleName.toUpperCase()).resolve(), ApiErrorCode.INVALID_PATH_VARIABLE);
+        UserRole userRole = ValidateUtils.requireNotNull(UserRole.parseType(roleName), 400, "userRoleName은 다음 중 하나여야 합니다. " + UserRole.getScopeAsString());
         Login.Response response = oauth2Service.switchRole(userId, userRole);
         return ResponseUtils.ok("역할을 성공적으로 전환했습니다.", response);
     }
