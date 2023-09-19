@@ -21,7 +21,7 @@ import static com.github.supercodingfinalprojectbackend.dto.ReviewDto.*;
 
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/v1/api/reviews")
+@RequestMapping("/api/v1/reviews")
 @RestController
 public class ReviewController {
 
