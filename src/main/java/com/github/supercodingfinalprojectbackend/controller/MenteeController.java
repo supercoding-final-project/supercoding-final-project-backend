@@ -1,6 +1,7 @@
 package com.github.supercodingfinalprojectbackend.controller;
 
 import com.github.supercodingfinalprojectbackend.dto.MenteeDto;
+import com.github.supercodingfinalprojectbackend.dto.MenteeDto.MenteeInfoRequest;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.service.MenteeService;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
@@ -20,11 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Tag(name = "멘티 API")
 public class MenteeController {
-    private MenteeService menteeService;
+    private final MenteeService menteeService;
 
     @PostMapping("/info")
     @Operation(summary = "멘티 정보 저장")
-    public ResponseEntity<ResponseUtils.ApiResponse<Object>> saveMenteeInfo(@RequestBody MenteeDto.MenteeInfoRequest request) {
+    public ResponseEntity<ResponseUtils.ApiResponse<Object>> saveMenteeInfo(@RequestBody MenteeInfoRequest request) {
         ValidateUtils.requireTrue(request.validate(), ApiErrorCode.INVALID_REQUEST_BODY);
         Long userId = AuthUtils.getUserId();
         menteeService.saveMenteeInfo(userId, request);
