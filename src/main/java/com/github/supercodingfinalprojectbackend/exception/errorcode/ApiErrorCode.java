@@ -41,9 +41,9 @@ public enum ApiErrorCode implements ErrorCode {
     POST_NOT_MATCH_MENTOR(HttpStatus.CONFLICT,"작성자가 일치하지 않습니다."),
     MENTEE_ACCOUNT_NOT_ENOUGH(HttpStatus.CONFLICT,"멘티의 잔액이 부족합니다."),
     DELETED_MENTEE(HttpStatus.NOT_FOUND, "삭제된 멘티 입니다."),
+    UNABLE_TO_WRITE_REVIEW(HttpStatus.FORBIDDEN,"리뷰를 작성할 자격이 없습니다."),
     INVALID_GOOGLE_TOKEN(HttpStatus.UNAUTHORIZED, "구글 액세스 토큰이 유효하지 않습니다."),
     FAIL_TO_UPLOAD_IMAGE_BY_IO_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "서버의 문제로 이미지 업로드에 실패했습니다. 다시 시도해주세요."),
-    UNABLE_TO_WRITE_REVIEW(HttpStatus.FORBIDDEN,"리뷰를 작성할 자격이 없습니다."),
 
     ;
     ApiErrorCode(HttpStatus status, String message) {
