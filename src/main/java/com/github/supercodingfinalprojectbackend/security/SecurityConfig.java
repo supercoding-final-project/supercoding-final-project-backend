@@ -1,9 +1,11 @@
 package com.github.supercodingfinalprojectbackend.security;
 
+import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
 import com.github.supercodingfinalprojectbackend.exception.FilterExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -44,14 +46,16 @@ public class SecurityConfig {
                         .antMatchers("/api/v1/test/").authenticated()
                         .antMatchers("/api/v1/auth/logout", "/api/v1/auth/switch/**").authenticated()
                         .antMatchers("/api/v1/users/role/join/mentor", "/api/v1/users/paymoney", "/api/v1/users/info").authenticated()
-                        .antMatchers("/api/v1/mentors/info").authenticated()
-                        .antMatchers("/api/v1/mentees/info").authenticated()
-                        .antMatchers("/api/v1/orders/**").authenticated()
+                        .antMatchers(HttpMethod.POST, "/api/v1/mentors/info").hasAuthority(UserRole.MENTOR.toString())
+                        .antMatchers(HttpMethod.POST, "/api/v1/orders/approve", "/api/v1/orders/refuse").hasAuthority(UserRole.MENTOR.toString())
+                        .antMatchers(HttpMethod.POST, "/api/v1/mentees/info").hasAuthority(UserRole.MENTEE.toString())
+                        .antMatchers(HttpMethod.POST, "/api/v1/users/images").authenticated()
+                        .antMatchers(HttpMethod.DELETE, "/api/v1/orders/identifier").hasAuthority(UserRole.MENTEE.toString())
                         .antMatchers("/api/v1/createchat","/api/v1/chatrooms").authenticated()
                         .antMatchers("/api/v1/mentor/mypage/**","/api/v1/mentee/mypage/**").authenticated()
                         .antMatchers("/api/v1/events/identifier").authenticated()
                         .antMatchers("/api/v1/post/order","/api/v1/post/*").authenticated()
-                        .antMatchers("GET","/api/v1/post/**").permitAll()
+                        .antMatchers(HttpMethod.GET,"/api/v1/post/**").permitAll()
                         .anyRequest().permitAll() // 다른 모든 요청을 허용하도록 설정
                 )
                 .addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class)

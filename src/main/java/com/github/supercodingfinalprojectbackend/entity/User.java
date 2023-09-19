@@ -41,7 +41,7 @@ public class User extends CommonEntity {
         this.thumbnailImageUrl = thumbnailImageUrl;
     }
 
-    public void changeUserImage(String imageUrl){
+    public void changeThumbnailImageUrl(String imageUrl){
         if (imageUrl!= null) this.thumbnailImageUrl = imageUrl;
     }
     public void changeUserNameNickname(String nickname){
