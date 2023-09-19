@@ -1,9 +1,11 @@
 package com.github.supercodingfinalprojectbackend.controller;
 
 import com.github.supercodingfinalprojectbackend.dto.ImageDto;
+import com.github.supercodingfinalprojectbackend.dto.ImageDto.UrlMapResponse;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.service.S3Service;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
+import com.github.supercodingfinalprojectbackend.util.ResponseUtils.ApiResponse;
 import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,12 +31,12 @@ public class ImageFileController {
 
     @PostMapping(value = "/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "이미지 파일 업로드")
-    private ResponseEntity<ResponseUtils.ApiResponse<ImageDto.UrlMapResponse>> uploadImageFile(
+    private ResponseEntity<ApiResponse<UrlMapResponse>> uploadImageFile(
             @RequestParam(value = "imageFile") @Parameter(name = "이미지 파일", required = true) List<MultipartFile> imageFiles
     ) throws InterruptedException {
         ValidateUtils.requireTrue(imageFiles != null && !imageFiles.isEmpty(), ApiErrorCode.INVALID_REQUEST_BODY);
 
-        ImageDto.UrlMapResponse response = s3Service.uploadImageFiles(imageFiles);
+        UrlMapResponse response = s3Service.uploadImageFiles(imageFiles);
 
         return ResponseUtils.created("이미지가 성공적으로 업로드되었습니다.", response);
     }
