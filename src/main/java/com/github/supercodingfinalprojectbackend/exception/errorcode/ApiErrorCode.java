@@ -40,7 +40,9 @@ public enum ApiErrorCode implements ErrorCode {
 
     POST_NOT_MATCH_MENTOR(HttpStatus.CONFLICT,"작성자가 일치하지 않습니다."),
     MENTEE_ACCOUNT_NOT_ENOUGH(HttpStatus.CONFLICT,"멘티의 잔액이 부족합니다."),
-    DELETED_MENTEE(HttpStatus.NOT_FOUND, "삭제된 멘티 입니다.");
+    DELETED_MENTEE(HttpStatus.NOT_FOUND, "삭제된 멘티 입니다."),
+    INVALID_GOOGLE_TOKEN(HttpStatus.UNAUTHORIZED, "구글 액세스 토큰이 유효하지 않습니다.");
+
     ApiErrorCode(HttpStatus status, String message) {
         this.message = message;
         this.status = status.value();

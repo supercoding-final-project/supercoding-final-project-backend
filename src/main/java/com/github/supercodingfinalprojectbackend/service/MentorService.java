@@ -38,22 +38,10 @@ public class MentorService {
 	private final MentorCareerRepository mentorCareerRepository;
 
 	public Page<MentorDto.MentorInfoResponse> getMentors(
-			String keyWord, List<String> skillStacks, Long cursor, Pageable pageable){
+			String keyWord, List<String> skillStacks, List<String> duties, Long cursor, Pageable pageable){
 
-//		1차 구현 순수 Entity 조회
-//		List<Mentor> mentors = mentorRepository.searchAll(keyWord, skillStacks);
+		Page<MentorInfoResponse> mentors = mentorRepository.searchAllFromDtoWithCursorPagination(keyWord, skillStacks, duties, cursor, pageable);
 
-//		2차 구현 DTO 조회
-//		List<MentorDto.MentorInfoResponse> mentors = mentorRepository.searchAllFromDto(keyWord, skillStacks);
-
-//		3차 OffsetPagination
-//		Page<MentorInfoResponse> mentors = mentorRepository.searchAllFromDtoWithOffsetPagination(keyWord, skillStacks, pageable);
-
-//		4차 cursorPagination
-		Page<MentorInfoResponse> mentors = mentorRepository.searchAllFromDtoWithCursorPagination(keyWord, skillStacks, cursor, pageable);
-
-//		1차 응답
-//		return mentors.stream().map(MentorDto::fromEntity).collect(Collectors.toList());
 		return mentors;
 	}
 

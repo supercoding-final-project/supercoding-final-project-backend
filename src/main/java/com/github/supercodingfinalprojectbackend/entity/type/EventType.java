@@ -5,8 +5,8 @@ import java.util.StringJoiner;
 
 public enum EventType {
     NONE,
-    PAYMENT
-    ;
+    PAYMENT,
+    ORDER;
 
     private final EventType redirect;
 

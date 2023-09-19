@@ -3,6 +3,7 @@ package com.github.supercodingfinalprojectbackend.controller;
 import com.github.supercodingfinalprojectbackend.dto.Login;
 import com.github.supercodingfinalprojectbackend.dto.TokenDto;
 import com.github.supercodingfinalprojectbackend.entity.type.UserRole;
+import com.github.supercodingfinalprojectbackend.exception.ApiException;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.service.Oauth2Service;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
@@ -44,10 +45,19 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/login/google")
+    @Operation(summary = "구글 로그인")
+    public ResponseEntity<ResponseUtils.ApiResponse<Login.Response>> googleLogin(@RequestParam @Parameter(name = "구글 액세스 토큰", required = true) String token) {
+//        Login.Response response = oauth2Service.googleLogin(token);
+//        return ResponseUtils.ok("로그인에 성공했습니다.", response);
+        return null;
+    }
+
     @GetMapping("/logout")
     @Operation(summary = "로그아웃")
     public ResponseEntity<ResponseUtils.ApiResponse<Void>> logout() {
         Long userId = AuthUtils.getUserId();
+        if (userId == 1004 || userId == 5252) throw new ApiException(400, "슈퍼토큰은 로그아웃이 불가능합니다!");
         oauth2Service.logout(userId);
         return ResponseUtils.ok("로그아웃에 성공했습니다.", null);
     }
@@ -58,6 +68,7 @@ public class AuthController {
             @PathVariable(name = "roleName") @Parameter(name = "역할 이름", required = true) String roleName
     ) {
         Long userId = AuthUtils.getUserId();
+        if (userId == 1004 || userId == 5252) throw new ApiException(400, "슈퍼토큰은 역할 전환이 불가능합니다!");
         UserRole userRole = ValidateUtils.requireNotNull(UserRole.parseType(roleName), 400, "userRoleName은 다음 중 하나여야 합니다. " + UserRole.getScopeAsString());
         Login.Response response = oauth2Service.switchRole(userId, userRole);
         return ResponseUtils.ok("역할을 성공적으로 전환했습니다.", response);
