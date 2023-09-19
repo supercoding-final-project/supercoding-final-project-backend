@@ -1,6 +1,7 @@
 package com.github.supercodingfinalprojectbackend.controller;
 
 import com.github.supercodingfinalprojectbackend.dto.ReviewDto;
+import com.github.supercodingfinalprojectbackend.dto.Reviewable;
 import com.github.supercodingfinalprojectbackend.service.ReviewService;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils.ApiResponse;
@@ -13,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+
+import java.util.List;
 
 import static com.github.supercodingfinalprojectbackend.dto.ReviewDto.*;
 
@@ -60,6 +63,18 @@ public class ReviewController {
                     "user가 작성한 리뷰 조회를 성공하였습니다.",
                     reviewService.getMyReviews(userId, cursor, PageRequest.of(0, pageSize))
                             .map(ReviewDto.ReviewResponse::from)
+            );
+    }
+
+    @GetMapping("/reviewable")
+    public ResponseEntity<ApiResponse<Page<Reviewable>>> getReviewableReviews(
+            @RequestParam(defaultValue = "0") Long cursor,
+            @RequestParam(defaultValue = "10") Integer pageSize
+    ) {
+            Long userId = AuthUtils.getUserId();
+            return ResponseUtils.ok(
+                    "user가 리뷰 가능한 리뷰 목록 조회를 성공하였습니다.",
+                    reviewService.getReviewableReviews(userId, cursor, PageRequest.of(0, pageSize))
             );
     }
 
