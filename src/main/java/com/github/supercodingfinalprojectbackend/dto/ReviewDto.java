@@ -18,8 +18,11 @@ public class ReviewDto {
 
     private Long reviewId;
     private Long postId;
+    private String title;
+    private Long mentorId;
+    private String mentorNickname;
     private Long menteeId;
-    private String nickname;
+    private String menteeNickname;
     private String content;
     private Integer star;
     private Integer numberOfReviewsReceived;
@@ -28,8 +31,11 @@ public class ReviewDto {
         return ReviewDto.builder()
                 .reviewId(review.getReviewId())
                 .postId(review.getPost().getPostId())
+                .title(review.getPost().getTitle())
+                .mentorId(review.getPost().getMentor().getMentorId())
+                .mentorNickname(review.getPost().getMentor().getUser().getNickname())
                 .menteeId(review.getMentee().getMenteeId())
-                .nickname(review.getMentee().getUser().getNickname())
+                .menteeNickname(review.getMentee().getUser().getNickname())
                 .content(review.getContent())
                 .star(review.getStar())
                 .numberOfReviewsReceived(review.getNumberOfReviewsReceived())
@@ -99,10 +105,37 @@ public class ReviewDto {
                     .reviewId(reviewDto.getReviewId())
                     .postId(reviewDto.getPostId())
                     .menteeId(reviewDto.getMenteeId())
-                    .nickname(reviewDto.getNickname())
+                    .nickname(reviewDto.getMenteeNickname())
                     .content(reviewDto.getContent())
                     .star(reviewDto.getStar())
                     .numberOfReviewsReceived(reviewDto.getNumberOfReviewsReceived())
+                    .build();
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class MyReviewResponse {
+
+        private Long reviewId;
+        private Long postId;
+        private String title;
+        private Long mentorId;
+        private String mentorNickname;
+        private String content;
+        private Integer star;
+
+        public static MyReviewResponse from(ReviewDto reviewDto) {
+            return MyReviewResponse.builder()
+                    .reviewId(reviewDto.getReviewId())
+                    .postId(reviewDto.getPostId())
+                    .title(reviewDto.getTitle())
+                    .mentorId(reviewDto.getMentorId())
+                    .mentorNickname(reviewDto.getMentorNickname())
+                    .content(reviewDto.getContent())
+                    .star(reviewDto.getStar())
                     .build();
         }
     }

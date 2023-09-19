@@ -54,7 +54,7 @@ public class ReviewController {
     }
 
     @GetMapping("/byUserId")
-    public ResponseEntity<ApiResponse<Page<ReviewResponse>>> getMyReviews(
+    public ResponseEntity<ApiResponse<Page<MyReviewResponse>>> getMyReviews(
             @RequestParam(defaultValue = "0") Long cursor,
             @RequestParam(defaultValue = "10") Integer pageSize
     ) {
@@ -62,7 +62,7 @@ public class ReviewController {
             return ResponseUtils.ok(
                     "user가 작성한 리뷰 조회를 성공하였습니다.",
                     reviewService.getMyReviews(userId, cursor, PageRequest.of(0, pageSize))
-                            .map(ReviewDto.ReviewResponse::from)
+                            .map(ReviewDto.MyReviewResponse::from)
             );
     }
 
