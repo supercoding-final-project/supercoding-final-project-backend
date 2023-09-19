@@ -4,6 +4,7 @@ import com.github.supercodingfinalprojectbackend.exception.FilterExceptionHandle
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -51,7 +52,7 @@ public class SecurityConfig {
                         .antMatchers("/api/v1/mentor/mypage/**","/api/v1/mentee/mypage/**").authenticated()
                         .antMatchers("/api/v1/events/identifier").authenticated()
                         .antMatchers("/api/v1/post/order","/api/v1/post/*").authenticated()
-                        .antMatchers("GET","/api/v1/post/**").permitAll()
+                        .antMatchers(HttpMethod.GET,"/api/v1/post/**").permitAll()
                         .anyRequest().permitAll() // 다른 모든 요청을 허용하도록 설정
                 )
                 .addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class)
