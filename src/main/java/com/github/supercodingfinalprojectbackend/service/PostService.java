@@ -3,6 +3,7 @@ package com.github.supercodingfinalprojectbackend.service;
 import com.github.supercodingfinalprojectbackend.dto.PostDto;
 import com.github.supercodingfinalprojectbackend.dto.PostDto.OrderCodeReviewDto;
 import com.github.supercodingfinalprojectbackend.dto.PostDto.PostTimeDto;
+import com.github.supercodingfinalprojectbackend.dto.PostDto.PostTimeResponseDto;
 import com.github.supercodingfinalprojectbackend.entity.*;
 import com.github.supercodingfinalprojectbackend.entity.type.PostContentType;
 import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
@@ -24,6 +25,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -76,12 +78,13 @@ public class PostService {
         return ResponseUtils.created("멘티 모집이 정상적으로 등록되었습니다.",null);
     }
     @Transactional(readOnly = true)
-    public ResponseEntity<ApiResponse<PostDto>> getPost(Long postId) {
+    public ResponseEntity<ApiResponse<PostDto>> getPost(Long postId, Long userId) {
         Posts posts = postsRepository.findByPostIdAndIsDeletedFalse(postId).orElseThrow(ApiErrorCode.POST_NOT_POST_ID::exception);
         List<PostsContent> contentList = postsContentRepository.findAllByPosts(posts);
         String stack = postsSkillStackRepository.findByPosts(posts).getSkillStack().getSkillStackName();
+        boolean permission = userId != 0 && Objects.equals(posts.getMentor().getUser().getUserId(), userId);
 
-        return ResponseUtils.ok("정상적으로 멘티 모집 조회 되었습니다.", PostDto.PostInfoResponse(posts,contentList,stack));
+        return ResponseUtils.ok("정상적으로 멘티 모집 조회 되었습니다.", PostDto.PostInfoResponse(posts,contentList,stack,permission));
     }
 
     public ResponseEntity<ApiResponse<Void>> updatePost(Long userId, Long postId, PostDto postDto) {
@@ -142,7 +145,7 @@ public class PostService {
     }
 
 
-    public ResponseEntity<ApiResponse<List<Integer>>> getTimes(Long postId, String days) {
+    public ResponseEntity<ApiResponse<PostTimeResponseDto>> getTimes(Long postId, String days) {
         Posts posts = postsRepository.findByPostIdAndIsDeletedFalse(postId).orElseThrow(ApiErrorCode.POST_NOT_POST_ID::exception);
         
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
@@ -156,7 +159,7 @@ public class PostService {
                 .map(MentorScheduleTemplate::getValidTime)
                 .collect(Collectors.toList());
 
-        return ResponseUtils.ok("멘토의 신청가능한 시간이 조회되었습니다.",timeList);
+        return ResponseUtils.ok("멘토의 신청가능한 시간이 조회되었습니다.", PostTimeResponseDto.timeResponseDto(timeList));
     }
 
     public ResponseEntity<ApiResponse<List<Integer>>> orderCodeReview(OrderCodeReviewDto orderCodeReviewDto, Long userId) {
@@ -211,7 +214,7 @@ public class PostService {
             List<PostsContent> contentList = postsContentRepository.findAllByPosts(post);
             String stack = postsSkillStackRepository.findByPosts(post).getSkillStack().getSkillStackName();
 
-            postList.add(PostDto.PostInfoResponse(post,contentList,stack));
+            postList.add(PostDto.PostInfoResponse(post,contentList,stack,false));
         }
 
         return ResponseUtils.ok("검색이 완료되었습니다.",postList);
@@ -231,7 +234,7 @@ public class PostService {
                 List<PostsContent> contentList = postsContentRepository.findAllByPosts(post);
                 String stack = postsSkillStackRepository.findByPosts(post).getSkillStack().getSkillStackName();
 
-                postDtoList.add(PostDto.PostInfoResponse(post,contentList,stack));
+                postDtoList.add(PostDto.PostInfoResponse(post,contentList,stack,false));
             }
         }
         if(postDtoList.size()>0){
@@ -252,7 +255,7 @@ public class PostService {
             List<PostsContent> contentList = postsContentRepository.findAllByPosts(post);
             String stack = postsSkillStackRepository.findByPosts(post).getSkillStack().getSkillStackName();
 
-            postDtoList.add(PostDto.PostInfoResponse(post,contentList,stack));
+            postDtoList.add(PostDto.PostInfoResponse(post,contentList,stack,false));
         }
 
         return ResponseUtils.ok("검색이 완료되었습니다.",postDtoList);
