@@ -2,6 +2,7 @@ package com.github.supercodingfinalprojectbackend.service;
 
 import com.github.supercodingfinalprojectbackend.dto.ReviewDto;
 import com.github.supercodingfinalprojectbackend.dto.ReviewSummary;
+import com.github.supercodingfinalprojectbackend.dto.Reviewable;
 import com.github.supercodingfinalprojectbackend.entity.*;
 import com.github.supercodingfinalprojectbackend.exception.ApiException;
 import com.github.supercodingfinalprojectbackend.repository.MenteeRepository;
@@ -11,12 +12,15 @@ import com.github.supercodingfinalprojectbackend.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.DoubleStream;
 
 import static com.github.supercodingfinalprojectbackend.dto.ReviewDto.*;
 import static com.github.supercodingfinalprojectbackend.entity.Review.toEntity;
@@ -87,6 +91,17 @@ public class ReviewService {
                 .findAllByMenteeIdAndIsDeletedWithCursor(mentee.getMenteeId(), cursor, pageable);
 
         return reviews.map(ReviewDto::from);
+    }
+
+    public Page<Reviewable> getReviewableReviews(Long userId, Long cursor, Pageable pageable) {
+
+        Mentee mentee = menteeRepository.findByUserUserId(userId)
+                .orElseThrow(() -> new ApiException(NOT_FOUND_MENTEE));
+
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        return orderSheetRepository.findReviewableOrderSheetByMenteeId(
+                mentee.getMenteeId(), currentTime, cursor, pageable);
     }
 
     @Transactional

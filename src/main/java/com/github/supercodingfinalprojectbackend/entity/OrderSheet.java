@@ -24,7 +24,7 @@ public class OrderSheet extends CommonEntity {
     @JoinColumn(name = "post_id")
     private Posts post;
     @Column(name = "total_price")
-    private Integer totlaPrice;
+    private Integer totalPrice;
     @Column(name = "is_completed")
     private Boolean isCompleted;
     @Column(name = "is_reviewed", nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
@@ -33,14 +33,14 @@ public class OrderSheet extends CommonEntity {
     private Integer version;    // 낙관적 락
 
     public Payment approvedBy(Mentor mentor) {
-        mentor.getUser().getAbstractAccount().chargePaymoney(totlaPrice.longValue());
+        mentor.getUser().getAbstractAccount().chargePaymoney(totalPrice.longValue());
         isCompleted = true;
 
         return Payment.of(this, mentee, mentor);
     }
 
     public void beRejected() {
-        mentee.getUser().getAbstractAccount().chargePaymoney(totlaPrice.longValue());
+        mentee.getUser().getAbstractAccount().chargePaymoney(totalPrice.longValue());
         this.isCompleted = false;
     }
 
@@ -49,7 +49,7 @@ public class OrderSheet extends CommonEntity {
     }
 
     public void canceled() {
-        mentee.getUser().getAbstractAccount().chargePaymoney(totlaPrice.longValue());
+        mentee.getUser().getAbstractAccount().chargePaymoney(totalPrice.longValue());
         this.isCompleted = false;
         softDelete();
     }
@@ -62,7 +62,7 @@ public class OrderSheet extends CommonEntity {
         return OrderSheet.builder()
                 .mentee(mentee)
                 .post(posts)
-                .totlaPrice(orderCodeReviewDto.getTotalPrice())
+                .totalPrice(orderCodeReviewDto.getTotalPrice())
                 .isCompleted(false)
                 .build();
     }
