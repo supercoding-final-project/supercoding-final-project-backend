@@ -74,7 +74,7 @@ public class UserController {
     @Operation(summary = "유저 썸네일 이미지 변경")
     public ResponseEntity<ApiResponse<Object>> changeUserThumbnailImageUrl(@RequestParam MultipartFile imageFile) {
         Long userId = AuthUtils.getUserId();
-        UserThumbnailImageUrlResponse response = null;
+        UserThumbnailImageUrlResponse response;
         try {
             response = userService.changeUserThumbnailImageUrl(userId, imageFile);
         } catch (IOException e) {

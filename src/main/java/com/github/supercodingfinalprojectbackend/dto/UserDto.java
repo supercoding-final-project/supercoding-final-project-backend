@@ -33,6 +33,7 @@ public class UserDto {
         }
     }
 
+    @Getter
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class UserThumbnailImageUrlResponse {
         private String thumbnailImageUrl;
