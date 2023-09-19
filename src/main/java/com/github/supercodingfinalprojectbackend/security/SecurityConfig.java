@@ -49,6 +49,7 @@ public class SecurityConfig {
                         .antMatchers(HttpMethod.POST, "/api/v1/mentors/info").hasAuthority(UserRole.MENTOR.toString())
                         .antMatchers(HttpMethod.POST, "/api/v1/orders/approve", "/api/v1/orders/refuse").hasAuthority(UserRole.MENTOR.toString())
                         .antMatchers(HttpMethod.POST, "/api/v1/mentees/info").hasAuthority(UserRole.MENTEE.toString())
+                        .antMatchers(HttpMethod.POST, "/api/v1/users/images").authenticated()
                         .antMatchers(HttpMethod.DELETE, "/api/v1/orders/identifier").hasAuthority(UserRole.MENTEE.toString())
                         .antMatchers("/api/v1/createchat","/api/v1/chatrooms").authenticated()
                         .antMatchers("/api/v1/mentor/mypage/**","/api/v1/mentee/mypage/**").authenticated()
