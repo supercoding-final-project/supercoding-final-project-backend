@@ -15,7 +15,7 @@ public class Reviewable {
     private Long mentorId;
     private String mentorNickname;
     private Long postId;
-    private String postTitle;
+    private String title;
     private Long totalTime;
     private Integer totalPrice;
 }
