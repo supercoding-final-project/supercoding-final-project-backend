@@ -38,7 +38,7 @@ public interface OrderSheetRepository extends JpaRepository<OrderSheet, Long> {
     List<OrderSheet> findAllByPostAndMenteeAndIsCompletedTrue(Posts post, Mentee mentee);
     @Query(
             "SELECT new com.github.supercodingfinalprojectbackend.dto" +
-            ".Reviewable(os.orderSheetId, u.nickname, p.title, SUM(sct.hour), os.totalPrice) FROM OrderSheet os " +
+            ".Reviewable(os.orderSheetId, m.mentorId, u.nickname, p.postId, p.title, SUM(sct.hour), os.totalPrice) FROM OrderSheet os " +
             "LEFT JOIN SelectedClassTime sct ON os.orderSheetId = sct.orderSheet.orderSheetId " +
             "LEFT JOIN Posts p ON os.post.postId = p.postId " +
             "LEFT JOIN Mentor m ON p.mentor.mentorId = m.mentorId " +

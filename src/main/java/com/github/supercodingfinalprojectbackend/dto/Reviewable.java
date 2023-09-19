@@ -12,7 +12,9 @@ import lombok.NoArgsConstructor;
 public class Reviewable {
 
     private Long oderSheetId;
+    private Long mentorId;
     private String mentorNickname;
+    private Long postId;
     private String postTitle;
     private Long totalTime;
     private Integer totalPrice;
