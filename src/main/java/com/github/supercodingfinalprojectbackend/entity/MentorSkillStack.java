@@ -37,7 +37,14 @@ public class MentorSkillStack extends CommonEntity {
 				.build();
 	}
 
-	public void softDelete() {
+    public static MentorSkillStack dummy(Mentor dummyMentor, SkillStack dummySkillStack) {
+		return MentorSkillStack.builder()
+				.mentor(dummyMentor)
+				.skillStack(dummySkillStack)
+				.build();
+    }
+
+    public void softDelete() {
 		this.isDeleted = true;
 	}
 

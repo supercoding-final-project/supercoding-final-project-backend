@@ -1,5 +1,7 @@
 package com.github.supercodingfinalprojectbackend.entity.type;
 
+import java.util.Random;
+
 public enum DutyType implements CustomEnum {
     NONE,
     BACKEND_DEVELOPER,
@@ -27,7 +29,19 @@ public enum DutyType implements CustomEnum {
         return dutyName != null ? DutyType.valueOf(dutyName).resolve().name() : null;
     }
 
+    public static String dummy() {
+        final int count = values().length - 1;
+        final int index = 1 + new Random().nextInt(count);
+        return values()[index].toString();
+    }
+
     // resole 호출 반드시 필요
     @Override
     public DutyType resolve() { return redirect != null ? redirect.resolve() : this; }
+
+
+    @Override
+    public String toString() {
+        return resolve().name();
+    }
 }
