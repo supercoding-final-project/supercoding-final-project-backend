@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Random;
 
 @Entity
 @Getter
@@ -55,4 +56,30 @@ public class Posts extends CommonEntity{
         this.star = star;
     }
 
+    public static Posts dummy(Mentor dummyMentor) {
+
+        return Posts.builder()
+                .mentor(dummyMentor)
+                .title("천상천하유아독존 " + dummyMentor.getUser().getNickname() + "님의 코드리뷰! 이런 기회는 흔하지 않다구~ ")
+                .level(randomLevel())
+                .price(randomPrice())
+                .star(randomStar())
+                .build();
+    }
+
+    private static Float randomStar() {
+        final float min = 0.0f;
+        final float max = 5.0f;
+        final float value = min + (max - min) * new Random().nextFloat();
+        return Math.round(value * 10) / 10.0f;
+    }
+
+    private static Integer randomPrice() {
+        return (new Random().nextInt(490) + 10) * 1000;
+    }
+
+    private static String randomLevel() {
+        String[] levels = {"입문", "초급", "중급", "상급", "최상"};
+        return levels[new Random().nextInt(levels.length)];
+    }
 }
