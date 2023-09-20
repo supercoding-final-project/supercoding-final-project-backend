@@ -15,4 +15,9 @@ public enum SocialPlatformType implements CustomEnum {
 
     @Override
     public SocialPlatformType resolve() { return redirect != null ? redirect.resolve() : this; }
+
+    @Override
+    public String toString() {
+        return resolve().name();
+    }
 }

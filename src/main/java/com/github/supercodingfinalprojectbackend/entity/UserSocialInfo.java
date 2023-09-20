@@ -30,7 +30,7 @@ public class UserSocialInfo extends CommonEntity {
         return UserSocialInfo.builder()
                 .user(user)
                 .socialId(socialId)
-                .socialPlatformName(socialPlatformType.name())
+                .socialPlatformName(socialPlatformType.resolve().name())
                 .build();
     }
 }
