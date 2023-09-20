@@ -22,7 +22,7 @@ public class PostController {
 
     private final PostService postService;
     @PostMapping
-    public ResponseEntity<ApiResponse<Void>> createPost(@RequestBody @Valid PostDto postDto) {
+    public ResponseEntity<ApiResponse<Long>> createPost(@RequestBody @Valid PostDto postDto) {
         Long userId = AuthUtils.getUserId();
         return postService.createPost(postDto,userId);
     }
@@ -66,12 +66,12 @@ public class PostController {
         return postService.searchPost(mentorId,page-1,size);
     }
 
-    @GetMapping("/search/mentor")
+    @GetMapping("/search")
     public ResponseEntity<ApiResponse<List<PostDto>>> searchMentorAllPost(@RequestParam String word, @RequestParam Integer page, @RequestParam Integer size){
         return postService.searchMentorAllPost(word,page-1,size);
     }
 
-    @GetMapping("/search/skill")
+    @GetMapping("/filter")
     public ResponseEntity<ApiResponse<List<PostDto>>> searchSkillAllPost(@RequestParam String word, @RequestParam Integer page, @RequestParam Integer size){
         return postService.searchSkillAllPost(word,page-1,size);
     }

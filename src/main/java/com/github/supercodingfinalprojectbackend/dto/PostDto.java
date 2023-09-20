@@ -36,6 +36,8 @@ public class PostDto {
     private String postStack;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private boolean permission;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Long userId;
     @NotNull
     @Size(min = 1)
     private List<String> workCareer;
@@ -45,6 +47,7 @@ public class PostDto {
     @NotNull
     @Size(min = 1)
     private List<String> reviewStyle;
+
 
     public static PostDto PostInfoResponse(Posts posts, List<PostsContent> postsContent, String skillStack, boolean permission) {
 
@@ -67,6 +70,7 @@ public class PostDto {
                 .educateCareer(educateCareerList)
                 .reviewStyle(reviewStyleList)
                 .permission(permission)
+                .userId(posts.getMentor().getUser().getUserId())
                 .build();
     }
 

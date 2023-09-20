@@ -27,7 +27,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -48,7 +47,7 @@ public class PostService {
 
     private final SelectedClassTimeRepository selectedClassTimeRepository;
 
-    public ResponseEntity<ApiResponse<Void>> createPost(PostDto postDto, Long userId) {
+    public ResponseEntity<ApiResponse<Long>> createPost(PostDto postDto, Long userId) {
         Mentor mentor = mentorRepository.findByUserUserIdAndIsDeletedIsFalse(userId).get();
         Posts entity = Posts.fromDto(postDto,mentor);
         Posts post = postsRepository.save(entity);
@@ -76,7 +75,7 @@ public class PostService {
         PostsSkillStack postsSkillStack = PostsSkillStack.fromPost(post,skillStack);
         postsSkillStackRepository.save(postsSkillStack);
 
-        return ResponseUtils.created("멘티 모집이 정상적으로 등록되었습니다.",null);
+        return ResponseUtils.created("멘티 모집이 정상적으로 등록되었습니다.",post.getPostId());
     }
     @Transactional(readOnly = true)
     public ResponseEntity<ApiResponse<PostDto>> getPost(Long postId, Long userId) {
@@ -220,46 +219,22 @@ public class PostService {
         Pageable pageable = PageRequest.of(page,size);
 
         List<Posts> posts = postsRepository.findAllByMentorAndIsDeletedFalse(mentor,pageable);
-        List<PostDto> postList = new ArrayList<>();
-
-        for (Posts post : posts) {
-            List<PostsContent> contentList = postsContentRepository.findAllByPosts(post);
-            String stack = postsSkillStackRepository.findByPosts(post).getSkillStack().getSkillStackName();
-
-            postList.add(PostDto.PostInfoResponse(post,contentList,stack,false));
-        }
-
-        return ResponseUtils.ok("검색이 완료되었습니다.",postList);
+        return ResponseUtils.ok("검색이 완료되었습니다.",fromList(posts));
     }
 
     public ResponseEntity<ApiResponse<List<PostDto>>> searchMentorAllPost(String word, Integer page, Integer size) {
-        List<User> userList = userRepository.findAllByNicknameContains(word);
-        List<PostDto> postDtoList = new ArrayList<>();
-
-        for (User user : userList) {
-            Optional<Mentor> mentor = mentorRepository.findByUserUserIdAndIsDeletedIsFalse(user.getUserId());
-            if(mentor.isEmpty())continue;
-
-            List<Posts> posts = postsRepository.findAllByMentorAndIsDeletedFalse(mentor.get());
-
-            for (Posts post : posts) {
-                List<PostsContent> contentList = postsContentRepository.findAllByPosts(post);
-                String stack = postsSkillStackRepository.findByPosts(post).getSkillStack().getSkillStackName();
-
-                postDtoList.add(PostDto.PostInfoResponse(post,contentList,stack,false));
-            }
-        }
-        if(postDtoList.size()>0){
-            int from = page * size;
-            int to = Math.min(from + size, postDtoList.size());
-            postDtoList = postDtoList.subList(from,to);
-        }
-        return ResponseUtils.ok("검색이 완료되었습니다.",postDtoList);
+        List<Posts> posts = postsRepository.findAllByTitleContainsAndIsDeletedFalse(word,PageRequest.of(page,size));
+        return ResponseUtils.ok("검색이 완료되었습니다.",fromList(posts));
     }
 
     public ResponseEntity<ApiResponse<List<PostDto>>> searchSkillAllPost(String word, int page, Integer size) {
         Pageable pageable = PageRequest.of(page,size);
         List<Posts> posts = postsRepository.findAllByTitleContains(word,pageable);
+
+        return ResponseUtils.ok("검색이 완료되었습니다.",fromList(posts));
+    }
+
+    public List<PostDto> fromList(List<Posts> posts){
 
         List<PostDto> postDtoList = new ArrayList<>();
 
@@ -269,7 +244,6 @@ public class PostService {
 
             postDtoList.add(PostDto.PostInfoResponse(post,contentList,stack,false));
         }
-
-        return ResponseUtils.ok("검색이 완료되었습니다.",postDtoList);
+        return postDtoList;
     }
 }

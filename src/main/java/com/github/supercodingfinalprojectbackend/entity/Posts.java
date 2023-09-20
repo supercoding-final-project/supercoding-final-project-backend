@@ -55,4 +55,6 @@ public class Posts extends CommonEntity{
         this.star = star;
     }
 
+
+
 }
