@@ -50,7 +50,7 @@ public class MenteeMyPageDto {
                 .orderId(orderSheet.getOrderSheetId())
                 .postTitle(orderSheet.getPost().getTitle())
                 .mentorNickname(orderSheet.getPost().getMentor().getUser().getNickname())
-                .totalPrice(orderSheet.getTotlaPrice())
+                .totalPrice(orderSheet.getTotalPrice())
                 .isCompleted(orderSheet.getIsCompleted())
                 .build();
     }
@@ -88,7 +88,7 @@ public class MenteeMyPageDto {
                 .postName(posts.getTitle())
                 .transactionCalendars(selectedClassTime)
                 .mentorNickname(posts.getMentor().getUser().getNickname())
-                .totalPrice(orderSheet.getTotlaPrice())
+                .totalPrice(orderSheet.getTotalPrice())
                 .createdAt(payment.getCreatedAt())
                 .build();
     }
