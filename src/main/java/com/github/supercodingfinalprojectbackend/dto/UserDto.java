@@ -32,4 +32,14 @@ public class UserDto {
                     .build();
         }
     }
+
+    @Getter
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class UserThumbnailImageUrlResponse {
+        private String thumbnailImageUrl;
+
+        public static UserThumbnailImageUrlResponse from(String thumbnailImageUrl) {
+            return new UserThumbnailImageUrlResponse(thumbnailImageUrl);
+        }
+    }
 }

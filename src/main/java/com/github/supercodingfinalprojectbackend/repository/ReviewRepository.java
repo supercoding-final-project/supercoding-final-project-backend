@@ -1,5 +1,6 @@
 package com.github.supercodingfinalprojectbackend.repository;
 
+import com.github.supercodingfinalprojectbackend.dto.ReviewSummary;
 import com.github.supercodingfinalprojectbackend.entity.Review;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,4 +27,12 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
                     "ORDER BY r.reviewId ASC "
     )
     Page<Review> findAllByMenteeIdAndIsDeletedWithCursor(Long menteeId, Long cursor, Pageable pageable);
+
+    @Query(
+            "SELECT new com.github.supercodingfinalprojectbackend.dto" +
+                    ".ReviewSummary(COUNT(r.post.postId), SUM(r.star)) " +
+                    "FROM Review r " +
+                    "WHERE r.post.postId = :postId AND r.isDeleted = false "
+    )
+    ReviewSummary getReviewSummeryByPostId(Long postId);
 }

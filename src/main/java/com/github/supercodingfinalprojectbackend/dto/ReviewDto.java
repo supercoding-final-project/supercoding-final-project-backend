@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Getter
@@ -19,21 +18,27 @@ public class ReviewDto {
 
     private Long reviewId;
     private Long postId;
-    private Long menteeId;
-    private String nickname;
     private String title;
+    private Long mentorId;
+    private String mentorNickname;
+    private Long menteeId;
+    private String menteeNickname;
     private String content;
     private Integer star;
+    private Integer numberOfReviewsReceived;
 
     public static ReviewDto from(Review review) {
         return ReviewDto.builder()
                 .reviewId(review.getReviewId())
                 .postId(review.getPost().getPostId())
+                .title(review.getPost().getTitle())
+                .mentorId(review.getPost().getMentor().getMentorId())
+                .mentorNickname(review.getPost().getMentor().getUser().getNickname())
                 .menteeId(review.getMentee().getMenteeId())
-                .nickname(review.getMentee().getUser().getNickname())
-                .title(review.getTitle())
+                .menteeNickname(review.getMentee().getUser().getNickname())
                 .content(review.getContent())
                 .star(review.getStar())
+                .numberOfReviewsReceived(review.getNumberOfReviewsReceived())
                 .build();
     }
 
@@ -43,12 +48,13 @@ public class ReviewDto {
     @Builder
     public static class CreateReviewRequest {
 
-        @NotNull(message = "postId 값을 입력해 주세요.")
-        private Long postId;
-        @NotNull(message = "title 값을 입력해 주세요.")
-        private String title;
+        @NotNull(message = "orderSheetId 값을 입력해 주세요.")
+        private Long orderSheetId;
+
         @NotNull(message = "content 값을 입력해 주세요.")
         private String content;
+
+        @NotNull
         @Min(value = 1, message = "평점의 최소값은 1 이상이여야 합니다.")
         @Max(value = 5, message = "평점의 최대값은 5 이하이여야 합니다.")
         private Integer star;
@@ -63,18 +69,18 @@ public class ReviewDto {
         private Long reviewId;
         private Long menteeId;
         private Long postId;
-        private String title;
         private String content;
         private Integer star;
+        private Integer numberOfReviewsReceived;
 
         public static CreateReviewResponse from(ReviewDto reviewDto) {
             return CreateReviewResponse.builder()
                     .reviewId(reviewDto.getReviewId())
                     .menteeId(reviewDto.getMenteeId())
                     .postId(reviewDto.getPostId())
-                    .title(reviewDto.getTitle())
                     .content(reviewDto.getContent())
                     .star(reviewDto.getStar())
+                    .numberOfReviewsReceived(reviewDto.getNumberOfReviewsReceived())
                     .build();
         }
 
@@ -90,21 +96,47 @@ public class ReviewDto {
         private Long postId;
         private Long menteeId;
         private String nickname;
-        private String title;
         private String content;
         private Integer star;
+        private Integer numberOfReviewsReceived;
 
         public static ReviewResponse from(ReviewDto reviewDto) {
             return ReviewResponse.builder()
                     .reviewId(reviewDto.getReviewId())
                     .postId(reviewDto.getPostId())
                     .menteeId(reviewDto.getMenteeId())
-                    .nickname(reviewDto.getNickname())
+                    .nickname(reviewDto.getMenteeNickname())
+                    .content(reviewDto.getContent())
+                    .star(reviewDto.getStar())
+                    .numberOfReviewsReceived(reviewDto.getNumberOfReviewsReceived())
+                    .build();
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class MyReviewResponse {
+
+        private Long reviewId;
+        private Long postId;
+        private String title;
+        private Long mentorId;
+        private String mentorNickname;
+        private String content;
+        private Integer star;
+
+        public static MyReviewResponse from(ReviewDto reviewDto) {
+            return MyReviewResponse.builder()
+                    .reviewId(reviewDto.getReviewId())
+                    .postId(reviewDto.getPostId())
                     .title(reviewDto.getTitle())
+                    .mentorId(reviewDto.getMentorId())
+                    .mentorNickname(reviewDto.getMentorNickname())
                     .content(reviewDto.getContent())
                     .star(reviewDto.getStar())
                     .build();
         }
     }
-
 }

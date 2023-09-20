@@ -141,7 +141,7 @@ public class MenteeMyPageService {
         User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
         try {
             String userImage = s3Service.uploadImageFile(multipartFile);
-            user.changeUserImage(userImage);
+            user.changeThumbnailImageUrl(userImage);
             return ResponseUtils.ok("성공적으로 이미지를 변경하였습니다", userImage);
         } catch (IOException e) {
             throw new RuntimeException(e);
