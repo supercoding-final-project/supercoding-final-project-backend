@@ -174,8 +174,8 @@ public class MentorDto {
 		private Boolean searchable;
 
 		public boolean validate() {
-			if (careers != null && !careers.isEmpty() && !careers.stream().allMatch(MentorCareerDto.Request::validate)) return false;
-			if (skillStacks != null && !skillStacks.isEmpty() && !skillStacks.stream().allMatch(SkillStackType::contains)) return false;
+			if (careers != null && !careers.isEmpty() && careers.stream().noneMatch(MentorCareerDto.Request::validate)) return false;
+			if (skillStacks != null && !skillStacks.isEmpty() && skillStacks.stream().noneMatch(SkillStackType::contains)) return false;
 
 			return nickname != null &&
 					searchable != null;
