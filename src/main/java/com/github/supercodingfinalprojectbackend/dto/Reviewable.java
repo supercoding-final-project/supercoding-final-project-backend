@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Reviewable {
 
-    private Long oderSheetId;
+    private Long orderSheetId;
     private Long mentorId;
     private String mentorNickname;
     private Long postId;

@@ -1,7 +1,6 @@
 package com.github.supercodingfinalprojectbackend.entity;
 
 
-import com.github.supercodingfinalprojectbackend.dto.ScheduleDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,10 +30,10 @@ public class MentorScheduleTemplate {
     @Column(name = "valid_time")
     private Integer validTime;
 
-    public static MentorScheduleTemplate from(ScheduleDto scheduleDto, Mentor mentor, Integer validTime) {
+    public static MentorScheduleTemplate from(String scheduleWeek, Mentor mentor, Integer validTime) {
         return MentorScheduleTemplate.builder()
                 .mentor(mentor)
-                .scheduleWeek((scheduleDto.getScheduleWeek())) // 날짜를 설정
+                .scheduleWeek(scheduleWeek) // 날짜를 설정
                 .validTime(validTime) // validTime을 MentorScheduleTemplate에 추가
                 .build();
     }
