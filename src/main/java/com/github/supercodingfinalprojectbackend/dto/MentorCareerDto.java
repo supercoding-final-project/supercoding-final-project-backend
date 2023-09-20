@@ -15,6 +15,7 @@ import java.util.function.Predicate;
 public class MentorCareerDto {
     private DutyType dutyType;
     private String period;
+    private String fullString;
 
     @Override
     public int hashCode() {
@@ -32,6 +33,7 @@ public class MentorCareerDto {
         return MentorCareerDto.builder()
                 .dutyType(DutyType.valueOf(mentorCareer.getDuty()))
                 .period(mentorCareer.getPeriod())
+                .fullString(DutyType.valueOf(mentorCareer.getDuty()) + " " + mentorCareer.getPeriod())
                 .build();
     }
 
