@@ -68,6 +68,7 @@ public class Mentor extends CommonEntity {
 				.company(company)
 				.introduction(introduction)
 				.searchable(false)
+				.star(0.0f)
 				.build();
 	}
 
