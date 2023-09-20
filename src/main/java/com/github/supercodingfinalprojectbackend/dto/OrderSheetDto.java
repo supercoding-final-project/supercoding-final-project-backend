@@ -3,6 +3,7 @@ package com.github.supercodingfinalprojectbackend.dto;
 import com.github.supercodingfinalprojectbackend.entity.OrderSheet;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+import org.springframework.core.annotation.Order;
 
 import java.util.List;
 import java.util.Set;
@@ -22,6 +23,10 @@ public class OrderSheetDto {
 
         public boolean validate() {
             return orderSheetId != null;
+        }
+
+        public static OrderSheetIdRequest dummy1() {
+            return new OrderSheetIdRequest(6L);
         }
     }
 

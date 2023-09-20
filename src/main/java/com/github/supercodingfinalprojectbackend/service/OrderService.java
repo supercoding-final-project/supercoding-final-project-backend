@@ -15,13 +15,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Set;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 @Slf4j
 public class OrderService {
@@ -32,9 +31,10 @@ public class OrderService {
     private final SelectedClassTimeRepository selectedClassTimeRepository;
     private final EventService eventService;
 
-    public PaymentDto.PaymentIdResponse approveOrder(Long userId, OrderSheetDto.OrderSheetIdRequest orderDtoRequest) {
+    @Transactional
+    public PaymentDto.PaymentIdResponse approveOrder(Long userId, OrderSheetDto.OrderSheetIdRequest request) {
         Mentor mentor = mentorRepository.findByUserUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_MENTOR::exception);
-        Long orderSheetId = orderDtoRequest.getOrderSheetId();
+        Long orderSheetId = request.getOrderSheetId();
 
         OrderSheet orderSheet = orderSheetRepository.findByPostMentorAndOrderSheetIdAndIsDeletedIsFalseAndIsCompletedIsFalse(mentor, orderSheetId)
                 .orElseThrow(ApiErrorCode.NOT_FOUND_ORDERSHEET::exception);
@@ -54,6 +54,7 @@ public class OrderService {
         return PaymentDto.PaymentIdResponse.from(payment);
     }
 
+    @Transactional
     public OrderSheetDto.OrderSheetIdResponse refuseOrder(Long userId, OrderSheetDto.OrderSheetIdRequest orderDtoRequest) {
         Long orderSheetId = orderDtoRequest.getOrderSheetId();
 
@@ -77,6 +78,7 @@ public class OrderService {
         return OrderSheetDto.OrderSheetIdResponse.from(orderSheet);
     }
 
+    @Transactional
     public OrderSheetDto.OrderSheetIdSetResponse cancelOrders(Long userId, Set<Long> orderSheetIdSet) {
         List<OrderSheet> orderSheets = orderSheetRepository.findAllByMenteeUserUserIdAndOrderSheetIdIsInAndIsCompletedIsFalseAndIsDeletedIsFalse(userId, orderSheetIdSet);
         orderSheets.forEach(OrderSheet::canceled);
