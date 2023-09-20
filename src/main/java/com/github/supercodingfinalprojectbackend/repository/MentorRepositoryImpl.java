@@ -49,7 +49,8 @@ public class MentorRepositoryImpl implements MentorRepositoryCustom {
 						mentor.company,
 						mentor.currentDuty,
 						mentor.currentPeriod,
-						mentor.user.thumbnailImageUrl
+						mentor.user.thumbnailImageUrl,
+						mentor.star
 				))
 				.from(mentor)
 				.leftJoin(mentor.mentorSkillStacks, mentorSkillStack)
@@ -73,7 +74,8 @@ public class MentorRepositoryImpl implements MentorRepositoryCustom {
 						mentor.company,
 						mentor.currentDuty,
 						mentor.currentPeriod,
-						mentor.user.thumbnailImageUrl
+						mentor.user.thumbnailImageUrl,
+						mentor.star
 				))
 				.from(mentor)
 				.leftJoin(mentor.mentorSkillStacks, mentorSkillStack)
@@ -105,7 +107,8 @@ public class MentorRepositoryImpl implements MentorRepositoryCustom {
 						mentor.company,
 						mentor.currentDuty,
 						mentor.currentPeriod,
-						mentor.user.thumbnailImageUrl
+						mentor.user.thumbnailImageUrl,
+						mentor.star
 				))
 				.from(mentor)
 				.leftJoin(mentor.mentorSkillStacks, mentorSkillStack)

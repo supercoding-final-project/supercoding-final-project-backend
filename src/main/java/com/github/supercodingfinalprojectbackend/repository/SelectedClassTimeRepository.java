@@ -13,8 +13,8 @@ import java.util.List;
 public interface SelectedClassTimeRepository extends JpaRepository<SelectedClassTime, Long> {
 
     List<SelectedClassTime> findAllByMentorAndOrderSheetAndIsDeletedIsFalse(Mentor mentor, OrderSheet orderSheet);
-    List<SelectedClassTime> findAllByMentorAndDayAndHourAndIsDeletedIsFalse(Mentor mentor, Integer day, Integer hour);
-    List<SelectedClassTime> findAllByMenteeAndDayAndHourAndIsDeletedIsFalse(Mentee mentee, Integer day, Integer hour);
+    List<SelectedClassTime> findAllByMentorAndDayAndIsDeletedIsFalse(Mentor mentor, Integer day);
+    List<SelectedClassTime> findAllByMenteeAndDayAndIsDeletedIsFalse(Mentee mentee, Integer day);
     List<SelectedClassTime> findAllByOrderSheet(OrderSheet orderSheet);
 
     List<SelectedClassTime> findAllByMenteeUserUserIdAndMonth(Long userid, Integer month);

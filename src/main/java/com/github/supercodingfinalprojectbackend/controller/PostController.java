@@ -2,6 +2,7 @@ package com.github.supercodingfinalprojectbackend.controller;
 
 import com.github.supercodingfinalprojectbackend.dto.PostDto;
 import com.github.supercodingfinalprojectbackend.dto.PostDto.OrderCodeReviewDto;
+import com.github.supercodingfinalprojectbackend.dto.PostDto.PostTimeResponseDto;
 import com.github.supercodingfinalprojectbackend.service.PostService;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils.ApiResponse;
 import com.github.supercodingfinalprojectbackend.util.auth.AuthUtils;
@@ -28,7 +29,13 @@ public class PostController {
 
     @GetMapping("/{postId}")
     public ResponseEntity<ApiResponse<PostDto>> getPost(@PathVariable Long postId){
-        return postService.getPost(postId);
+        long userId;
+        try{
+            userId = AuthUtils.getUserId();
+        }catch (Exception e){
+            userId = 0L;
+        }
+        return postService.getPost(postId,userId);
     }
 
     @PatchMapping("/{postId}")
@@ -44,7 +51,7 @@ public class PostController {
     }
 
     @GetMapping("/day")
-    public ResponseEntity<ApiResponse<List<Integer>>> getTimes(@RequestParam Long postId, @RequestParam String days){
+    public ResponseEntity<ApiResponse<PostTimeResponseDto>> getTimes(@RequestParam Long postId, @RequestParam String days){
         return postService.getTimes(postId,days);
     }
 

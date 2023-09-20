@@ -1,7 +1,6 @@
 package com.github.supercodingfinalprojectbackend.dto;
 
 import com.github.supercodingfinalprojectbackend.entity.SkillStack;
-import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
 import lombok.*;
 
 @Getter
@@ -20,5 +19,21 @@ public class SkillStackDto {
                 .skillStackName(skillStack.getSkillStackName())
                 .skillStackImg(skillStack.getSkillStackImg())
                 .build();
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class Top10SkillStackResponse {
+        private String skillStackName;
+        private String skillStackImg;
+
+        public static Top10SkillStackResponse from(SkillStackDto skillStackDto) {
+            return Top10SkillStackResponse.builder()
+                    .skillStackName(skillStackDto.getSkillStackName())
+                    .skillStackImg(skillStackDto.getSkillStackImg())
+                    .build();
+        }
     }
 }
