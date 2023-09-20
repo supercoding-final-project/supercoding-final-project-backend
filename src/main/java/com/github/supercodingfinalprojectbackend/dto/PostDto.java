@@ -4,11 +4,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.supercodingfinalprojectbackend.entity.Posts;
 import com.github.supercodingfinalprojectbackend.entity.PostsContent;
 import com.github.supercodingfinalprojectbackend.entity.type.PostContentType;
+import com.github.supercodingfinalprojectbackend.entity.type.SkillStackCategoryType;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +30,8 @@ public class PostDto {
     private String level;
     @NotNull
     private Integer price;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String stackCategory;
     @NotBlank
     private String postStack;
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -48,10 +52,16 @@ public class PostDto {
         List<String> educateCareerList = postContentToList(postsContent,PostContentType.EDUCATE_CAREER);
         List<String> reviewStyleList = postContentToList(postsContent,PostContentType.REVIEW_STYLE);
 
+        String stackCategory = Arrays.stream(SkillStackCategoryType.values())
+                .filter(skillStackCategoryType -> skillStackCategoryType.getSkillStackTypeSet().stream()
+                        .anyMatch(skillStackType -> skillStackType.name().equals(skillStack)))
+                .collect(Collectors.toList()).get(0).name();
+
         return PostDto.builder()
                 .title(posts.getTitle())
                 .level(posts.getLevel())
                 .price(posts.getPrice())
+                .stackCategory(stackCategory)
                 .postStack(skillStack)
                 .workCareer(workCareerList)
                 .educateCareer(educateCareerList)
