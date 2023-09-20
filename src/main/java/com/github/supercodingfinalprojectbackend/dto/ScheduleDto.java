@@ -13,7 +13,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ScheduleDto {
-    private Long mentorId;
-    private String scheduleWeek;
-    private List<Integer> validTime;
+    public Long mentorId;
+    private List<Integer> sunday;
+    private List<Integer> monday;
+    private List<Integer> tuesday;
+    private List<Integer> wednesday;
+    private List<Integer> thursday;
+    private List<Integer> friday;
+    private List<Integer> saturday;
 }

@@ -19,7 +19,7 @@ public class MentorTemplateController {
 
     @PostMapping()
     @Operation(summary = "멘토 스케쥴 설정")
-    public ResponseEntity<?> postSchedules(@RequestBody ScheduleDto scheduleDto){
+    public ResponseEntity<?> postSchedules(@RequestBody ScheduleDto scheduleDto) throws IllegalAccessException {
         return mentorTemplateService.scheduleMentor(scheduleDto);
     }
 }
