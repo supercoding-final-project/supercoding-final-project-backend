@@ -68,11 +68,12 @@ public class MentorDto {
 		private String company;
 		private String currentDuty;
 		private String currentPeriod;
+		private Float star;
 
 		@QueryProjection
 		public MentorInfoResponse(
 				Long mentorId, String nickname, String introduction, String company,
-				String currentDuty, String currentPeriod, String thumbnailImageUrl
+				String currentDuty, String currentPeriod, String thumbnailImageUrl, Float star
 		) {
 			this.mentorId = mentorId;
 			this.nickname = nickname;
@@ -81,6 +82,7 @@ public class MentorDto {
 			this.currentDuty = currentDuty;
 			this.currentPeriod = currentPeriod;
 			this.thumbnailImageUrl = thumbnailImageUrl;
+			this.star = star;
 		}
 	}
 
