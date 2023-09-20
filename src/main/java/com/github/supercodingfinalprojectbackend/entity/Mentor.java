@@ -48,6 +48,9 @@ public class Mentor extends CommonEntity {
 	@OneToMany(mappedBy = "mentor")
 	private List<MentorCareer> mentorCareerList = new ArrayList<>();
 
+	@Column(name = "star")
+	private Float star;
+
 	public static Mentor of(User user, MentorDto mentorDto) {
 		return Mentor.builder()
 				.user(user)
@@ -98,5 +101,9 @@ public class Mentor extends CommonEntity {
 		this.searchable = request.getSearchable();
 		this.currentDuty = request.getCurrentDuty();
 		this.currentPeriod = request.getCurrentPeriod();
+	}
+
+	public void updateStar(Float star) {
+		this.star = star;
 	}
 }

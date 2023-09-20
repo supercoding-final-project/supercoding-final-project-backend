@@ -25,6 +25,8 @@ public class Posts extends CommonEntity{
     private String level;
     @Column(name = "price")
     private Integer price;
+    @Column(name = "star")
+    private Float star;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mentor_id")
@@ -47,6 +49,10 @@ public class Posts extends CommonEntity{
 
     public void postsIsDeleted(){
         this.isDeleted = true;
+    }
+
+    public void updateStar(Float star) {
+        this.star = star;
     }
 
 }
