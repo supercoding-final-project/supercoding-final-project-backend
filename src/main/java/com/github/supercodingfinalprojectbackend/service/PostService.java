@@ -3,6 +3,7 @@ package com.github.supercodingfinalprojectbackend.service;
 import com.github.supercodingfinalprojectbackend.dto.PostDto;
 import com.github.supercodingfinalprojectbackend.dto.PostDto.OrderCodeReviewDto;
 import com.github.supercodingfinalprojectbackend.dto.PostDto.PostTimeDto;
+import com.github.supercodingfinalprojectbackend.dto.PostDto.PostTimeResponseDto;
 import com.github.supercodingfinalprojectbackend.entity.*;
 import com.github.supercodingfinalprojectbackend.entity.type.PostContentType;
 import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -76,12 +79,13 @@ public class PostService {
         return ResponseUtils.created("멘티 모집이 정상적으로 등록되었습니다.",null);
     }
     @Transactional(readOnly = true)
-    public ResponseEntity<ApiResponse<PostDto>> getPost(Long postId) {
+    public ResponseEntity<ApiResponse<PostDto>> getPost(Long postId, Long userId) {
         Posts posts = postsRepository.findByPostIdAndIsDeletedFalse(postId).orElseThrow(ApiErrorCode.POST_NOT_POST_ID::exception);
         List<PostsContent> contentList = postsContentRepository.findAllByPosts(posts);
         String stack = postsSkillStackRepository.findByPosts(posts).getSkillStack().getSkillStackName();
+        boolean permission = userId != 0 && Objects.equals(posts.getMentor().getUser().getUserId(), userId);
 
-        return ResponseUtils.ok("정상적으로 멘티 모집 조회 되었습니다.", PostDto.PostInfoResponse(posts,contentList,stack));
+        return ResponseUtils.ok("정상적으로 멘티 모집 조회 되었습니다.", PostDto.PostInfoResponse(posts,contentList,stack,permission));
     }
 
     public ResponseEntity<ApiResponse<Void>> updatePost(Long userId, Long postId, PostDto postDto) {
@@ -142,7 +146,7 @@ public class PostService {
     }
 
 
-    public ResponseEntity<ApiResponse<List<Integer>>> getTimes(Long postId, String days) {
+    public ResponseEntity<ApiResponse<PostTimeResponseDto>> getTimes(Long postId, String days) {
         Posts posts = postsRepository.findByPostIdAndIsDeletedFalse(postId).orElseThrow(ApiErrorCode.POST_NOT_POST_ID::exception);
         
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
@@ -156,37 +160,48 @@ public class PostService {
                 .map(MentorScheduleTemplate::getValidTime)
                 .collect(Collectors.toList());
 
-        return ResponseUtils.ok("멘토의 신청가능한 시간이 조회되었습니다.",timeList);
+        return ResponseUtils.ok("멘토의 신청가능한 시간이 조회되었습니다.", PostTimeResponseDto.timeResponseDto(timeList));
     }
-
     public ResponseEntity<ApiResponse<List<Integer>>> orderCodeReview(OrderCodeReviewDto orderCodeReviewDto, Long userId) {
         Mentee mentee = menteeRepository.findByUserUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_MENTEE::exception);
         Posts posts = postsRepository.findByPostIdAndIsDeletedFalse(orderCodeReviewDto.getPostId()).orElseThrow(ApiErrorCode.POST_NOT_POST_ID::exception);
 
         OrderSheet orderSheet = orderSheetRepository.save(OrderSheet.of(orderCodeReviewDto, mentee, posts));
         List<PostTimeDto> timeDtoList = orderCodeReviewDto.getSelectTime();
+        List<SelectedClassTime> timeList = new ArrayList<>();
+        List<Integer> mentorReservationList = new ArrayList<>();
+        List<Integer> menteeReservationList = new ArrayList<>();
 
         for (PostTimeDto postTimeDto : timeDtoList) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
-            LocalDate date = LocalDate.parse(postTimeDto.getDay(),formatter);
+            LocalDate date = LocalDate.parse(postTimeDto.getDay(), formatter);
             List<Integer> list = postTimeDto.getTimeList();
 
-            for (Integer hour : list) {
-                List<SelectedClassTime> checklist = selectedClassTimeRepository.findAllByMentorAndDayAndHourAndIsDeletedIsFalse(posts.getMentor(), date.getDayOfMonth(), hour);
-                if (checklist.size() > 0) {
-                    return ResponseUtils.conflict("이미 예약이 완료된 시간입니다", checklist.stream().map(SelectedClassTime::getHour).collect(Collectors.toList()));
-                }
+            mentorReservationList.addAll(list.stream()
+                    .filter(time -> selectedClassTimeRepository.findAllByMentorAndDayAndIsDeletedIsFalse(posts.getMentor(), date.getDayOfMonth()).stream()
+                            .map(SelectedClassTime::getHour)
+                            .collect(Collectors.toList()).contains(time))
+                    .collect(Collectors.toList()));
 
-                checklist = selectedClassTimeRepository.findAllByMenteeAndDayAndHourAndIsDeletedIsFalse(mentee, date.getDayOfMonth(), hour);
-                if (checklist.size() > 0) {
-                    return ResponseUtils.conflict("동일한 시간에 이미 코드리뷰가 예약되어 있습니다.", checklist.stream().map(SelectedClassTime::getHour).collect(Collectors.toList()));
-                }
+            menteeReservationList.addAll(list.stream()
+                    .filter(time -> selectedClassTimeRepository.findAllByMenteeAndDayAndIsDeletedIsFalse(mentee, date.getDayOfMonth()).stream()
+                            .map(SelectedClassTime::getHour)
+                            .collect(Collectors.toList()).contains(time))
+                    .collect(Collectors.toList()));
+
+            if (mentorReservationList.size() == 0 && menteeReservationList.size() == 0) {
+                timeList.addAll(list.stream()
+                        .map(time -> SelectedClassTime.of(date, time, posts.getMentor(), mentee, orderSheet))
+                        .collect(Collectors.toList())
+                );
             }
+        }
 
-            List<SelectedClassTime> timeList = list.stream()
-                    .map(time->SelectedClassTime.of(date,time,posts.getMentor(),mentee,orderSheet))
-                    .collect(Collectors.toList());
-
+        if (mentorReservationList.size() != 0 ){
+            throw new ApiException(HttpStatus.CONFLICT,"이미 예약이 완료된 시간입니다. 예약이 완료된 시간:"+mentorReservationList);
+        } else if (menteeReservationList.size() != 0) {
+            throw new ApiException(HttpStatus.CONFLICT,"동일한 시간에 이미 코드리뷰가 예약되어 있습니다. 예약된 시간:"+menteeReservationList);
+        }else {
             selectedClassTimeRepository.saveAll(timeList);
         }
 
@@ -211,7 +226,7 @@ public class PostService {
             List<PostsContent> contentList = postsContentRepository.findAllByPosts(post);
             String stack = postsSkillStackRepository.findByPosts(post).getSkillStack().getSkillStackName();
 
-            postList.add(PostDto.PostInfoResponse(post,contentList,stack));
+            postList.add(PostDto.PostInfoResponse(post,contentList,stack,false));
         }
 
         return ResponseUtils.ok("검색이 완료되었습니다.",postList);
@@ -231,7 +246,7 @@ public class PostService {
                 List<PostsContent> contentList = postsContentRepository.findAllByPosts(post);
                 String stack = postsSkillStackRepository.findByPosts(post).getSkillStack().getSkillStackName();
 
-                postDtoList.add(PostDto.PostInfoResponse(post,contentList,stack));
+                postDtoList.add(PostDto.PostInfoResponse(post,contentList,stack,false));
             }
         }
         if(postDtoList.size()>0){
@@ -252,7 +267,7 @@ public class PostService {
             List<PostsContent> contentList = postsContentRepository.findAllByPosts(post);
             String stack = postsSkillStackRepository.findByPosts(post).getSkillStack().getSkillStackName();
 
-            postDtoList.add(PostDto.PostInfoResponse(post,contentList,stack));
+            postDtoList.add(PostDto.PostInfoResponse(post,contentList,stack,false));
         }
 
         return ResponseUtils.ok("검색이 완료되었습니다.",postDtoList);

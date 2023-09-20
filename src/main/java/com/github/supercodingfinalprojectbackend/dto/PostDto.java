@@ -30,6 +30,8 @@ public class PostDto {
     private Integer price;
     @NotBlank
     private String postStack;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private boolean permission;
     @NotNull
     @Size(min = 1)
     private List<String> workCareer;
@@ -40,7 +42,7 @@ public class PostDto {
     @Size(min = 1)
     private List<String> reviewStyle;
 
-    public static PostDto PostInfoResponse(Posts posts, List<PostsContent> postsContent, String skillStack) {
+    public static PostDto PostInfoResponse(Posts posts, List<PostsContent> postsContent, String skillStack, boolean permission) {
 
         List<String> workCareerList = postContentToList(postsContent,PostContentType.WORK_CAREER);
         List<String> educateCareerList = postContentToList(postsContent,PostContentType.EDUCATE_CAREER);
@@ -54,6 +56,7 @@ public class PostDto {
                 .workCareer(workCareerList)
                 .educateCareer(educateCareerList)
                 .reviewStyle(reviewStyleList)
+                .permission(permission)
                 .build();
     }
 
@@ -89,5 +92,20 @@ public class PostDto {
     public static class PostTimeDto {
         private String day;
         private List<Integer> timeList;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @Builder
+    public static class PostTimeResponseDto {
+        private List<Integer> am;
+        private List<Integer> pm;
+
+        public static PostTimeResponseDto timeResponseDto(List<Integer> timeList){
+            return PostTimeResponseDto.builder()
+                    .am(timeList.stream().filter(time->time<12).collect(Collectors.toList()))
+                    .pm(timeList.stream().filter(time->time>=12).collect(Collectors.toList()))
+                    .build();
+        }
     }
 }

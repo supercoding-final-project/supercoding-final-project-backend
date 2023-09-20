@@ -54,8 +54,8 @@ public class SecurityConfig {
                         .antMatchers("/api/v1/createchat","/api/v1/chatrooms").authenticated()
                         .antMatchers("/api/v1/mentor/mypage/**","/api/v1/mentee/mypage/**").authenticated()
                         .antMatchers("/api/v1/events/identifier").authenticated()
-                        .antMatchers("/api/v1/post/order","/api/v1/post/*").authenticated()
                         .antMatchers(HttpMethod.GET,"/api/v1/post/**").permitAll()
+                        .antMatchers("/api/v1/post/order","/api/v1/post/*").authenticated()
                         .anyRequest().permitAll() // 다른 모든 요청을 허용하도록 설정
                 )
                 .addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class)
