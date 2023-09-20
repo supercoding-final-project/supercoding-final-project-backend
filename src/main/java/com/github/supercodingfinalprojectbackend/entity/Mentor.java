@@ -64,11 +64,10 @@ public class Mentor extends CommonEntity {
 				.build();
 	}
 
-	public static Mentor of(User user, String company, String introduction) {
+	public static Mentor of(User user, String company) {
 		return Mentor.builder()
 				.user(Objects.requireNonNull(user))
 				.company(company)
-				.introduction(introduction)
 				.searchable(false)
 				.star(0.0f)
 				.build();
