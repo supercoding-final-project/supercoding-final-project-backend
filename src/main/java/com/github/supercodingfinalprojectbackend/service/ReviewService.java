@@ -145,7 +145,7 @@ public class ReviewService {
 
         float totalStar = reviewSummery.getTotalStar() + inputStar;
         float reviewCount = reviewSummery.getReviewCount() + 1;
-        float updatePostStar  = totalStar / reviewCount;
+        float updatePostStar  = Math.round((totalStar / reviewCount) * 10.0f) / 10.0f;
         post.updateStar(updatePostStar);
 
         List<Posts> mentorPosts = postsRepository.findAllByMentorAndIsDeletedFalse(mentor);
@@ -158,7 +158,7 @@ public class ReviewService {
                 sumMentorPostsStar += mentorPost.getStar();
             }
         }
-        float updateMentorStar = sumMentorPostsStar/postCount;
+        float updateMentorStar = Math.round((sumMentorPostsStar / postCount) * 10.0f) / 10.0f;
         mentor.updateStar(updateMentorStar);
     }
 }

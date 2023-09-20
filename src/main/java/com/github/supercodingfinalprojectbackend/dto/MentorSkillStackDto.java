@@ -10,15 +10,16 @@ import lombok.*;
 @Builder
 @ToString
 public class MentorSkillStackDto {
-    private Long mentorSkillStackId;
-    private MentorDto mentorDto;
-    private SkillStackDto skillStackDto;
 
-    public static MentorSkillStackDto of(MentorDto mentorDto, MentorSkillStack mentorSkillStack) {
+    private Long skillStackId;
+    private String skillStackName;
+    private String skillStackImg;
+
+    public static MentorSkillStackDto from(MentorSkillStack mentorSkillStack) {
         return MentorSkillStackDto.builder()
-                .mentorSkillStackId(mentorSkillStack.getMentorSkillStackId())
-                .mentorDto(mentorDto)
-                .skillStackDto(SkillStackDto.from(mentorSkillStack.getSkillStack()))
+                .skillStackId(mentorSkillStack.getSkillStack().getSkillStackId())
+                .skillStackName(mentorSkillStack.getSkillStack().getSkillStackName())
+                .skillStackImg(mentorSkillStack.getSkillStack().getSkillStackImg())
                 .build();
     }
 }

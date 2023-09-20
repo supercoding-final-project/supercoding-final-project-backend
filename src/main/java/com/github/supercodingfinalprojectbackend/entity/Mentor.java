@@ -68,6 +68,7 @@ public class Mentor extends CommonEntity {
 				.company(company)
 				.introduction(introduction)
 				.searchable(false)
+				.star(0.0f)
 				.build();
 	}
 
@@ -89,7 +90,7 @@ public class Mentor extends CommonEntity {
 	public void setMentorCareers(List<MentorCareer> mentorCareers) {
 		if (mentorCareers != null && !mentorCareers.isEmpty()) {
 			this.currentDuty = mentorCareers.get(0).getDuty();
-			this.currentPeriod = mentorCareers.get(0).getDuty();
+			this.currentPeriod = mentorCareers.get(0).getPeriod();
 		}
 		this.mentorCareerList = mentorCareers;
 	}

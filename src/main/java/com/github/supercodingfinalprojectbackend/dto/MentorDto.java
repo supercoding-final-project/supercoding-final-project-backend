@@ -36,7 +36,8 @@ public class MentorDto {
 	private List<MentorCareerDto> mentorCareerList;
 
 	public static MentorDto from(Mentor mentor){
-		MentorDto mentorDto = MentorDto.builder()
+
+		return MentorDto.builder()
 				.mentorId(mentor.getMentorId())
 				.mentorAbstractAccountId(mentor.getUser().getAbstractAccount().getAbstractAccountId())
 				.nickname(mentor.getUser().getNickname())
@@ -46,16 +47,13 @@ public class MentorDto {
 				.company(mentor.getCompany())
 				.currentDuty(DutyType.valueOf(mentor.getCurrentDuty()).resolve())
 				.currentPeriod(mentor.getCurrentPeriod())
-				.mentorCareerList(mentor.getMentorCareerList().stream().map(MentorCareerDto::from).collect(Collectors.toList()))
+				.mentorCareerList(mentor.getMentorCareerList().stream()
+						.map(MentorCareerDto::from)
+						.collect(Collectors.toList()))
+				.mentorSkillStackList(mentor.getMentorSkillStacks()
+						.stream().map(MentorSkillStackDto::from)
+						.collect(Collectors.toList()))
 				.build();
-
-		mentorDto.setMentorSkillStackList(mentor.getMentorSkillStacks().stream().map(s->MentorSkillStackDto.of(mentorDto, s)).collect(Collectors.toList()));
-
-		return mentorDto;
-	}
-
-	private void setMentorSkillStackList(List<MentorSkillStackDto> mentorSkillStackList) {
-		this.mentorSkillStackList = mentorSkillStackList;
 	}
 
 	@Getter
@@ -70,11 +68,12 @@ public class MentorDto {
 		private String company;
 		private String currentDuty;
 		private String currentPeriod;
+		private Float star;
 
 		@QueryProjection
 		public MentorInfoResponse(
 				Long mentorId, String nickname, String introduction, String company,
-				String currentDuty, String currentPeriod, String thumbnailImageUrl
+				String currentDuty, String currentPeriod, String thumbnailImageUrl, Float star
 		) {
 			this.mentorId = mentorId;
 			this.nickname = nickname;
@@ -83,6 +82,7 @@ public class MentorDto {
 			this.currentDuty = currentDuty;
 			this.currentPeriod = currentPeriod;
 			this.thumbnailImageUrl = thumbnailImageUrl;
+			this.star = star;
 		}
 	}
 
@@ -134,6 +134,7 @@ public class MentorDto {
 		private String introduction;
 		private String company;
 		private String thumbnailImageUrl;
+		private List<MentorSkillStackDto> mentorSkillStackList;
 		private List<MentorCareerDto> mentorCareerList;
 
 		public static MentorDetailResponse from(MentorDto mentorDto) {
@@ -143,6 +144,7 @@ public class MentorDto {
 					.introduction(mentorDto.getIntroduction())
 					.company(mentorDto.getCompany())
 					.thumbnailImageUrl(mentorDto.getThumbnailImageUrl())
+					.mentorSkillStackList(mentorDto.getMentorSkillStackList())
 					.mentorCareerList(mentorDto.getMentorCareerList())
 					.build();
 		}
@@ -174,8 +176,8 @@ public class MentorDto {
 		private Boolean searchable;
 
 		public boolean validate() {
-			if (careers != null && !careers.isEmpty() && !careers.stream().allMatch(MentorCareerDto.Request::validate)) return false;
-			if (skillStacks != null && !skillStacks.isEmpty() && !skillStacks.stream().allMatch(SkillStackType::contains)) return false;
+			if (careers != null && !careers.isEmpty() && careers.stream().noneMatch(MentorCareerDto.Request::validate)) return false;
+			if (skillStacks != null && !skillStacks.isEmpty() && skillStacks.stream().noneMatch(SkillStackType::contains)) return false;
 
 			return nickname != null &&
 					searchable != null;
