@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -161,35 +162,46 @@ public class PostService {
 
         return ResponseUtils.ok("멘토의 신청가능한 시간이 조회되었습니다.", PostTimeResponseDto.timeResponseDto(timeList));
     }
-
     public ResponseEntity<ApiResponse<List<Integer>>> orderCodeReview(OrderCodeReviewDto orderCodeReviewDto, Long userId) {
         Mentee mentee = menteeRepository.findByUserUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_MENTEE::exception);
         Posts posts = postsRepository.findByPostIdAndIsDeletedFalse(orderCodeReviewDto.getPostId()).orElseThrow(ApiErrorCode.POST_NOT_POST_ID::exception);
 
         OrderSheet orderSheet = orderSheetRepository.save(OrderSheet.of(orderCodeReviewDto, mentee, posts));
         List<PostTimeDto> timeDtoList = orderCodeReviewDto.getSelectTime();
+        List<SelectedClassTime> timeList = new ArrayList<>();
+        List<Integer> mentorReservationList = new ArrayList<>();
+        List<Integer> menteeReservationList = new ArrayList<>();
 
         for (PostTimeDto postTimeDto : timeDtoList) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
-            LocalDate date = LocalDate.parse(postTimeDto.getDay(),formatter);
+            LocalDate date = LocalDate.parse(postTimeDto.getDay(), formatter);
             List<Integer> list = postTimeDto.getTimeList();
 
-            for (Integer hour : list) {
-                List<SelectedClassTime> checklist = selectedClassTimeRepository.findAllByMentorAndDayAndHourAndIsDeletedIsFalse(posts.getMentor(), date.getDayOfMonth(), hour);
-                if (checklist.size() > 0) {
-                    return ResponseUtils.conflict("이미 예약이 완료된 시간입니다", checklist.stream().map(SelectedClassTime::getHour).collect(Collectors.toList()));
-                }
+            mentorReservationList.addAll(list.stream()
+                    .filter(time -> selectedClassTimeRepository.findAllByMentorAndDayAndIsDeletedIsFalse(posts.getMentor(), date.getDayOfMonth()).stream()
+                            .map(SelectedClassTime::getHour)
+                            .collect(Collectors.toList()).contains(time))
+                    .collect(Collectors.toList()));
 
-                checklist = selectedClassTimeRepository.findAllByMenteeAndDayAndHourAndIsDeletedIsFalse(mentee, date.getDayOfMonth(), hour);
-                if (checklist.size() > 0) {
-                    return ResponseUtils.conflict("동일한 시간에 이미 코드리뷰가 예약되어 있습니다.", checklist.stream().map(SelectedClassTime::getHour).collect(Collectors.toList()));
-                }
+            menteeReservationList.addAll(list.stream()
+                    .filter(time -> selectedClassTimeRepository.findAllByMenteeAndDayAndIsDeletedIsFalse(mentee, date.getDayOfMonth()).stream()
+                            .map(SelectedClassTime::getHour)
+                            .collect(Collectors.toList()).contains(time))
+                    .collect(Collectors.toList()));
+
+            if (mentorReservationList.size() == 0 && menteeReservationList.size() == 0) {
+                timeList.addAll(list.stream()
+                        .map(time -> SelectedClassTime.of(date, time, posts.getMentor(), mentee, orderSheet))
+                        .collect(Collectors.toList())
+                );
             }
+        }
 
-            List<SelectedClassTime> timeList = list.stream()
-                    .map(time->SelectedClassTime.of(date,time,posts.getMentor(),mentee,orderSheet))
-                    .collect(Collectors.toList());
-
+        if (mentorReservationList.size() != 0 ){
+            throw new ApiException(HttpStatus.CONFLICT,"이미 예약이 완료된 시간입니다. 예약이 완료된 시간:"+mentorReservationList);
+        } else if (menteeReservationList.size() != 0) {
+            throw new ApiException(HttpStatus.CONFLICT,"동일한 시간에 이미 코드리뷰가 예약되어 있습니다. 예약된 시간:"+menteeReservationList);
+        }else {
             selectedClassTimeRepository.saveAll(timeList);
         }
 
