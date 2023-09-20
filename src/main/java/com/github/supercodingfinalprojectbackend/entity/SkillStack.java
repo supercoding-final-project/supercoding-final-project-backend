@@ -25,4 +25,7 @@ public class SkillStack {
 
 	@Column(name = "skill_stack_img")
 	private String skillStackImg;
+
+	@Column(name = "skill_stack_search_count")
+	private Long skillStackSearchCount;
 }
