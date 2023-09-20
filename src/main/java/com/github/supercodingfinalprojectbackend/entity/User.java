@@ -35,6 +35,15 @@ public class User extends CommonEntity {
                 .build();
     }
 
+    public static User dummy(int number, UserAbstractAccount dummyAbstractAccount) {
+        return User.builder()
+                .abstractAccount(dummyAbstractAccount)
+                .email(String.format("dummy%d@email.com", number))
+                .nickname(String.format("dummy%d", number))
+                .thumbnailImageUrl("https://code-velop.s3.ap-northeast-2.amazonaws.com/%EB%B0%B0%EC%9A%B0%20%ED%94%84%EB%A1%9C%ED%95%84%201.jpg")
+                .build();
+    }
+
     public void changeInfo(String nickname, String email, String thumbnailImageUrl) {
         this.nickname = nickname;
         this.email = email;
