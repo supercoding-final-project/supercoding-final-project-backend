@@ -59,8 +59,7 @@ public class MentorService {
 		Mentor mentor = mentorRepository.findByUserUserIdAndIsDeletedIsFalse(userId).orElseThrow(NOT_FOUND_MENTOR::exception);
 		mentor.changeInfo(request);
 
-		List<MentorCareer> oldMentorCareers = mentorCareerRepository.findAllByMentorAndIsDeletedIsFalse(mentor);
-		oldMentorCareers.forEach(MentorCareer::softDelete);
+		mentorCareerRepository.deleteAllByMentor(mentor);
 
 		List<MentorCareerDto.Request> careers = request.getCareers();
 		if (careers != null && !careers.isEmpty()) {
@@ -73,8 +72,7 @@ public class MentorService {
 			mentor.setMentorCareers(null);
 		}
 
-		List<MentorSkillStack> oldMentorSkillStacks = mentorSkillStackRepository.findAllByMentorAndIsDeletedIsFalse(mentor);
-		oldMentorSkillStacks.forEach(MentorSkillStack::softDelete);
+		mentorSkillStackRepository.deleteAllByMentor(mentor);
 
 		List<String> skillStacks = request.getSkillStacks();
 		if (skillStacks != null && !skillStacks.isEmpty()) {

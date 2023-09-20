@@ -11,4 +11,6 @@ import java.util.List;
 public interface MentorSkillStackRepository extends JpaRepository<MentorSkillStack, Long> {
 
     List<MentorSkillStack> findAllByMentorAndIsDeletedIsFalse(Mentor mentor);
+
+    void deleteAllByMentor(Mentor mentor);
 }

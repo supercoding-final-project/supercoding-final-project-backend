@@ -24,7 +24,7 @@ public enum DutyType implements CustomEnum {
     }
 
     public static String resolvedName(String dutyName) {
-        return DutyType.valueOf(dutyName).resolve().name();
+        return dutyName != null ? DutyType.valueOf(dutyName).resolve().name() : null;
     }
 
     // resole 호출 반드시 필요

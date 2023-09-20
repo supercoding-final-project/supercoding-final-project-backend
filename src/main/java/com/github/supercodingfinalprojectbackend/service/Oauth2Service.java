@@ -12,28 +12,22 @@ import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
 import com.github.supercodingfinalprojectbackend.util.auth.AuthHolder;
 import com.github.supercodingfinalprojectbackend.util.jwt.JwtUtils;
 import com.github.supercodingfinalprojectbackend.util.jwt.TokenHolder;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.json.JsonFactory;
 
 import javax.crypto.SecretKey;
-import javax.transaction.Transactional;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.GeneralSecurityException;
 import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 @Service
@@ -70,30 +64,39 @@ public class Oauth2Service {
     @Qualifier("AuthHolder")
     private final AuthHolder authHolder;
 
+    private final ReentrantLock signUpLock = new ReentrantLock();
+
     public Login.Response kakaoLogin(String code) {
         ValidateUtils.requireNotNull(code, 401, "카카오 로그인에 실패했습니다.");
 
         Kakao.OauthToken kakaoOauthToken = getKakaoToken(code);
         Kakao.UserInfo kakaoUserInfo = getKakaoUserInfo(kakaoOauthToken);
+        Kakao.Account kakaoAccount = kakaoUserInfo.getKakaoAccount();
+        Kakao.Profile kakaoProfile = kakaoAccount.getProfile();
 
-        // 회원이 존재하지 않으면 회원 가입
-        Long kakaoId = kakaoUserInfo.getId();
-        UserSocialInfo userSocialInfo = userSocialInfoRepository.findBySocialIdAndSocialPlatformNameAndIsDeletedIsFalse(kakaoId, SocialPlatformType.KAKAO.resolve().name())
-                .orElseGet(()->{
-                    Kakao.Account kakaoAccount = kakaoUserInfo.getKakaoAccount();
-                    Kakao.Profile kakaoProfile = kakaoAccount.getProfile();
-
-                    UserAbstractAccount userAbstractAccount = userAbstractAccountRepository.save(UserAbstractAccount.of());
-                    User user = userRepository.save(User.of(userAbstractAccount, kakaoAccount.getEmail(), kakaoProfile.getNickname(), kakaoProfile.getThumbnailImageUrl()));
-                    menteeRepository.save(Mentee.from(user));
-
-                    return userSocialInfoRepository.save(UserSocialInfo.of(user, kakaoUserInfo.getId(), SocialPlatformType.KAKAO.resolve()));
-                });
+        UserSocialInfo userSocialInfo;
+        try {
+            userSocialInfo = autoSignUp(kakaoUserInfo.getId(), SocialPlatformType.KAKAO, kakaoAccount.getEmail(), kakaoProfile.getNickname(), kakaoProfile.getThumbnailImageUrl());
+        } catch (DataIntegrityViolationException e) {
+            throw new ApiException(409, "중복 회원가입이 감지되었습니다!");
+        }
 
         Login login = serviceLogin(userSocialInfo.getUser());
         kakaoLogout(kakaoOauthToken.getAccessToken());
 
         return Login.Response.from(login);
+    }
+
+    public UserSocialInfo autoSignUp(Long socialId, SocialPlatformType socialPlatformType, String email, String nickname, String thumbnailImageUrl) {
+        Objects.requireNonNull(nickname);
+
+        return userSocialInfoRepository.findBySocialIdAndSocialPlatformNameAndIsDeletedIsFalse(socialId, socialPlatformType.toString())
+                    .orElseGet(()->{
+                        UserAbstractAccount userAbstractAccount = userAbstractAccountRepository.save(UserAbstractAccount.of());
+                        User user = userRepository.save(User.of(userAbstractAccount, email, nickname, thumbnailImageUrl));
+                        menteeRepository.save(Mentee.from(user));
+                        return userSocialInfoRepository.save(UserSocialInfo.of(user, socialId, socialPlatformType));
+                    });
     }
 
     public Login serviceLogin(User user) {
@@ -254,6 +257,10 @@ public class Oauth2Service {
         authHolder.put(userId, newLogin);
 
         return TokenDto.Response.from(tokenHolder);
+    }
+
+    public List<UserSocialInfo> findAllUserSocialInfo(long kakaoId, SocialPlatformType socialPlatformType) {
+        return userSocialInfoRepository.findAllBySocialIdAndSocialPlatformNameAndIsDeletedIsFalse(kakaoId, socialPlatformType.toString());
     }
 
 //    public Login.Response googleLogin(String token) {
