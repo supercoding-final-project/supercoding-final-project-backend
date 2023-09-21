@@ -1,6 +1,5 @@
 package com.github.supercodingfinalprojectbackend.entity;
 
-import com.github.supercodingfinalprojectbackend.util.DummyUtils;
 import lombok.*;
 
 import javax.persistence.*;
@@ -8,12 +7,11 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Random;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Entity
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @EqualsAndHashCode(of = "abstractAccountId", callSuper = false)
 @Table(name = "user_abstract_accounts")
 public class UserAbstractAccount extends CommonEntity {
@@ -26,11 +24,16 @@ public class UserAbstractAccount extends CommonEntity {
     @Column(name = "paymoney")
     private Long paymoney;
 
+    private final ReentrantLock chargePaymentLock = new ReentrantLock();
+
+    private UserAbstractAccount(Long abstractAccountId, String accountNumber, Long paymoney) {
+        this.abstractAccountId = abstractAccountId;
+        this.accountNumber = accountNumber;
+        this.paymoney = paymoney;
+    }
+
     public static UserAbstractAccount of() {
-        return UserAbstractAccount.builder()
-                .accountNumber(createAccountNumber())
-                .paymoney(0L)
-                .build();
+        return new UserAbstractAccount(null, createAccountNumber(), 0L);
     }
 
     private static String createAccountNumber() {
@@ -49,10 +52,7 @@ public class UserAbstractAccount extends CommonEntity {
     }
 
     public static UserAbstractAccount dummy() {
-        return UserAbstractAccount.builder()
-                .accountNumber(createAccountNumber())
-                .paymoney(randomPaymoney())
-                .build();
+        return new UserAbstractAccount(null, createAccountNumber(), randomPaymoney());
     }
 
     private static Long randomPaymoney() {
@@ -63,10 +63,21 @@ public class UserAbstractAccount extends CommonEntity {
     }
 
     public Long chargePaymoney(Long chargeAmount) {
-        return this.paymoney += chargeAmount;
+        try {
+            chargePaymentLock.lock();
+            this.paymoney += chargeAmount;
+        } finally {
+            chargePaymentLock.unlock();
+        }
+
+        return this.paymoney;
     }
 
     public void spendPayMoney(Integer price) {
         this.paymoney -= price;
+    }
+
+    public Long chargePaymoneyNoLock(long paymoney) {
+        return this.paymoney += paymoney;
     }
 }
