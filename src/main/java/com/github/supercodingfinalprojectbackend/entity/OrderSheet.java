@@ -64,6 +64,7 @@ public class OrderSheet extends CommonEntity {
                 .post(posts)
                 .totalPrice(orderCodeReviewDto.getTotalPrice())
                 .isCompleted(false)
+                .is_reviewed(false)
                 .build();
     }
 }
