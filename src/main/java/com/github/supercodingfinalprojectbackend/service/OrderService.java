@@ -61,6 +61,7 @@ public class OrderService {
         OrderSheet orderSheet = orderSheetRepository.findByPostMentorUserUserIdAndOrderSheetIdAndIsDeletedIsFalseAndIsCompletedIsFalse(userId, orderSheetId)
                 .orElseThrow(ApiErrorCode.NOT_FOUND_ORDERSHEET::exception);
 
+
         orderSheet.beRejected();
 
         selectedClassTimeRepository.deleteAllByMentorUserUserIdAndOrderSheet(userId, orderSheet);
