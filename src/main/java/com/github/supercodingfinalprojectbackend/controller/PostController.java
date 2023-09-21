@@ -2,6 +2,7 @@ package com.github.supercodingfinalprojectbackend.controller;
 
 import com.github.supercodingfinalprojectbackend.dto.PostDto;
 import com.github.supercodingfinalprojectbackend.dto.PostDto.OrderCodeReviewDto;
+import com.github.supercodingfinalprojectbackend.dto.PostDto.PostSearchDto;
 import com.github.supercodingfinalprojectbackend.dto.PostDto.PostTimeResponseDto;
 import com.github.supercodingfinalprojectbackend.service.PostService;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils.ApiResponse;
@@ -62,17 +63,18 @@ public class PostController {
     }
 
     @GetMapping("/mentor")
-    public ResponseEntity<ApiResponse<List<PostDto>>> searchPost(@RequestParam Long mentorId, @RequestParam Integer page, @RequestParam Integer size){
-        return postService.searchPost(mentorId,page-1,size);
+    public ResponseEntity<ApiResponse<PostSearchDto>> searchMentorPost(@RequestParam Long mentorId, @RequestParam Integer page, @RequestParam Integer size){
+        return postService.searchMentorPost(mentorId,page-1,size);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<List<PostDto>>> searchMentorAllPost(@RequestParam String word, @RequestParam Integer page, @RequestParam Integer size){
-        return postService.searchMentorAllPost(word,page-1,size);
-    }
-
-    @GetMapping("/filter")
-    public ResponseEntity<ApiResponse<List<PostDto>>> searchSkillAllPost(@RequestParam String word, @RequestParam Integer page, @RequestParam Integer size){
-        return postService.searchSkillAllPost(word,page-1,size);
+    public ResponseEntity<ApiResponse<PostSearchDto>> searchPost(
+            @RequestParam String word,
+            @RequestParam(required = false) List<String> stackCategory,
+            @RequestParam(required = false) List<String> skillStack,
+            @RequestParam(required = false) List<String> level,
+            @RequestParam Integer page,
+            @RequestParam Integer size){
+        return postService.searchPost(word, stackCategory,skillStack, level, page-1,size);
     }
 }
