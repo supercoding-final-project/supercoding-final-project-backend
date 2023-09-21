@@ -24,7 +24,7 @@ public class UserAbstractAccount extends CommonEntity {
     @Column(name = "paymoney")
     private Long paymoney;
 
-    private final ReentrantLock chargePaymentLock = new ReentrantLock();
+    private transient final ReentrantLock chargePaymentLock = new ReentrantLock();
 
     private UserAbstractAccount(Long abstractAccountId, String accountNumber, Long paymoney) {
         this.abstractAccountId = abstractAccountId;
