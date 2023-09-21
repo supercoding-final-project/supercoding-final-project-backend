@@ -2,6 +2,7 @@ package com.github.supercodingfinalprojectbackend.service;
 
 import com.github.supercodingfinalprojectbackend.dto.PostDto;
 import com.github.supercodingfinalprojectbackend.dto.PostDto.OrderCodeReviewDto;
+import com.github.supercodingfinalprojectbackend.dto.PostDto.PostSearchDto;
 import com.github.supercodingfinalprojectbackend.dto.PostDto.PostTimeDto;
 import com.github.supercodingfinalprojectbackend.dto.PostDto.PostTimeResponseDto;
 import com.github.supercodingfinalprojectbackend.entity.*;
@@ -15,6 +16,7 @@ import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -27,7 +29,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -36,7 +37,6 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class PostService {
-    private final UserRepository userRepository;
     private final MentorRepository mentorRepository;
     private final PostsRepository postsRepository;
     private final PostsContentRepository postsContentRepository;
@@ -48,7 +48,7 @@ public class PostService {
 
     private final SelectedClassTimeRepository selectedClassTimeRepository;
 
-    public ResponseEntity<ApiResponse<Void>> createPost(PostDto postDto, Long userId) {
+    public ResponseEntity<ApiResponse<Long>> createPost(PostDto postDto, Long userId) {
         Mentor mentor = mentorRepository.findByUserUserIdAndIsDeletedIsFalse(userId).get();
         Posts entity = Posts.fromDto(postDto,mentor);
         Posts post = postsRepository.save(entity);
@@ -76,13 +76,13 @@ public class PostService {
         PostsSkillStack postsSkillStack = PostsSkillStack.fromPost(post,skillStack);
         postsSkillStackRepository.save(postsSkillStack);
 
-        return ResponseUtils.created("멘티 모집이 정상적으로 등록되었습니다.",null);
+        return ResponseUtils.created("멘티 모집이 정상적으로 등록되었습니다.",post.getPostId());
     }
     @Transactional(readOnly = true)
     public ResponseEntity<ApiResponse<PostDto>> getPost(Long postId, Long userId) {
         Posts posts = postsRepository.findByPostIdAndIsDeletedFalse(postId).orElseThrow(ApiErrorCode.POST_NOT_POST_ID::exception);
         List<PostsContent> contentList = postsContentRepository.findAllByPosts(posts);
-        String stack = postsSkillStackRepository.findByPosts(posts).getSkillStack().getSkillStackName();
+        SkillStack stack = postsSkillStackRepository.findByPosts(posts).getSkillStack();
         boolean permission = userId != 0 && Objects.equals(posts.getMentor().getUser().getUserId(), userId);
 
         return ResponseUtils.ok("정상적으로 멘티 모집 조회 되었습니다.", PostDto.PostInfoResponse(posts,contentList,stack,permission));
@@ -215,61 +215,31 @@ public class PostService {
         return ResponseUtils.noContent("코드리뷰 신청이 완료되었습니다.", null);
     }
 
-    public ResponseEntity<ApiResponse<List<PostDto>>> searchPost(Long mentorId, Integer page, Integer size) {
+    public ResponseEntity<ApiResponse<PostSearchDto>> searchMentorPost(Long mentorId, Integer page, Integer size) {
         Mentor mentor = mentorRepository.findByMentorIdAndIsDeletedIsFalse(mentorId).orElseThrow(ApiErrorCode.NOT_FOUND_MENTOR::exception);
         Pageable pageable = PageRequest.of(page,size);
 
-        List<Posts> posts = postsRepository.findAllByMentorAndIsDeletedFalse(mentor,pageable);
-        List<PostDto> postList = new ArrayList<>();
-
-        for (Posts post : posts) {
-            List<PostsContent> contentList = postsContentRepository.findAllByPosts(post);
-            String stack = postsSkillStackRepository.findByPosts(post).getSkillStack().getSkillStackName();
-
-            postList.add(PostDto.PostInfoResponse(post,contentList,stack,false));
-        }
-
-        return ResponseUtils.ok("검색이 완료되었습니다.",postList);
+        Page<Posts> posts = postsRepository.findAllByMentorAndIsDeletedFalse(mentor,pageable);
+        return ResponseUtils.ok("검색이 완료되었습니다.",fromList(posts));
     }
 
-    public ResponseEntity<ApiResponse<List<PostDto>>> searchMentorAllPost(String word, Integer page, Integer size) {
-        List<User> userList = userRepository.findAllByNicknameContains(word);
-        List<PostDto> postDtoList = new ArrayList<>();
-
-        for (User user : userList) {
-            Optional<Mentor> mentor = mentorRepository.findByUserUserIdAndIsDeletedIsFalse(user.getUserId());
-            if(mentor.isEmpty())continue;
-
-            List<Posts> posts = postsRepository.findAllByMentorAndIsDeletedFalse(mentor.get());
-
-            for (Posts post : posts) {
-                List<PostsContent> contentList = postsContentRepository.findAllByPosts(post);
-                String stack = postsSkillStackRepository.findByPosts(post).getSkillStack().getSkillStackName();
-
-                postDtoList.add(PostDto.PostInfoResponse(post,contentList,stack,false));
-            }
-        }
-        if(postDtoList.size()>0){
-            int from = page * size;
-            int to = Math.min(from + size, postDtoList.size());
-            postDtoList = postDtoList.subList(from,to);
-        }
-        return ResponseUtils.ok("검색이 완료되었습니다.",postDtoList);
-    }
-
-    public ResponseEntity<ApiResponse<List<PostDto>>> searchSkillAllPost(String word, int page, Integer size) {
+    public ResponseEntity<ApiResponse<PostSearchDto>> searchPost(String word, List<String> stackCategory, List<String> skillStack, List<String> level, int page, Integer size) {
         Pageable pageable = PageRequest.of(page,size);
-        List<Posts> posts = postsRepository.findAllByTitleContains(word,pageable);
+        Page<Posts> postsList = postsRepository.filterSearchPosts(word,stackCategory,skillStack,level,pageable);
+        return ResponseUtils.ok("검색이 완료되었습니다.",fromList(postsList));
+    }
+
+    public PostSearchDto fromList(Page<Posts> posts){
 
         List<PostDto> postDtoList = new ArrayList<>();
 
         for (Posts post : posts) {
             List<PostsContent> contentList = postsContentRepository.findAllByPosts(post);
-            String stack = postsSkillStackRepository.findByPosts(post).getSkillStack().getSkillStackName();
+            SkillStack stack = postsSkillStackRepository.findByPosts(post).getSkillStack();
 
             postDtoList.add(PostDto.PostInfoResponse(post,contentList,stack,false));
         }
 
-        return ResponseUtils.ok("검색이 완료되었습니다.",postDtoList);
+        return PostSearchDto.searchDto(postDtoList,posts);
     }
 }

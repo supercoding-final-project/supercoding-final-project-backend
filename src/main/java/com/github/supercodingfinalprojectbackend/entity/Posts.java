@@ -33,6 +33,9 @@ public class Posts extends CommonEntity{
     @JoinColumn(name = "mentor_id")
     private Mentor mentor;
 
+    @OneToOne(mappedBy = "posts")
+    private PostsSkillStack postsSkillStack;
+
     public static Posts fromDto(PostDto postDto, Mentor mentor){
         return Posts.builder()
                 .title(postDto.getTitle())
