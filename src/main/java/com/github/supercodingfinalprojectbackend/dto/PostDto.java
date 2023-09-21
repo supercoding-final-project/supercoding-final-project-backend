@@ -57,6 +57,7 @@ public class PostDto {
         List<String> reviewStyleList = postContentToList(postsContent, PostContentType.REVIEW_STYLE);
 
         return PostDto.builder()
+                .postId(posts.getPostId())
                 .title(posts.getTitle())
                 .level(posts.getLevel())
                 .price(posts.getPrice())
