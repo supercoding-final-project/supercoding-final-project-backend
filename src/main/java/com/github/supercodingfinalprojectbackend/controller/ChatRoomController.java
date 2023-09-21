@@ -37,8 +37,7 @@ public class ChatRoomController {
     public ResponseEntity<?> createChatRoom(@RequestBody MessageDto.CreateChatRoomRequest chatRoomRequest) {
         Long userId = AuthUtils.getUserId();
         User user1 = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
-//        Mentor mentor = mentorRepository.findByMentorIdAndIsDeletedIsFalse(chatRoomRequest.getMentorId()).orElseThrow(ApiErrorCode.NOT_FOUND_MENTOR::exception);
-        Mentor mentor = mentorRepository.findById(chatRoomRequest.getMentorId()).orElseThrow(ApiErrorCode.NOT_FOUND_MENTOR::exception);
+        Mentor mentor = mentorRepository.findByMentorIdAndIsDeletedIsFalse(chatRoomRequest.getMentorId()).orElseThrow(ApiErrorCode.NOT_FOUND_MENTOR::exception);
         User user2 = mentor.getUser();
         ChatRoom chatRoom = chatRoomService.createChatroom(user1, user2);
         return ResponseUtils.ok("성공적으로 채팅방이 생성 되었습니다", chatRoom.getChatRoomId());
