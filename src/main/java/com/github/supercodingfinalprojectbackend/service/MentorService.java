@@ -1,27 +1,32 @@
 package com.github.supercodingfinalprojectbackend.service;
 
+import com.github.supercodingfinalprojectbackend.dto.BatchDto;
 import com.github.supercodingfinalprojectbackend.dto.MentorCareerDto;
 import com.github.supercodingfinalprojectbackend.dto.MentorDto;
 import com.github.supercodingfinalprojectbackend.dto.MentorDto.MentorInfoResponse;
 import com.github.supercodingfinalprojectbackend.entity.Mentor;
 import com.github.supercodingfinalprojectbackend.entity.MentorCareer;
 import com.github.supercodingfinalprojectbackend.entity.MentorSkillStack;
-import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
 import com.github.supercodingfinalprojectbackend.exception.ApiException;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
 import com.github.supercodingfinalprojectbackend.repository.MentorCareerRepository;
 import com.github.supercodingfinalprojectbackend.repository.MentorRepository;
 import com.github.supercodingfinalprojectbackend.repository.MentorSkillStackRepository;
 import com.github.supercodingfinalprojectbackend.repository.SkillStackRepository;
-import com.github.supercodingfinalprojectbackend.util.ValidateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode.NOT_FOUND_MENTOR;
@@ -42,6 +47,7 @@ public class MentorService {
 
 //		Page<MentorInfoResponse> mentors = mentorRepository.searchAllFromDtoWithCursorPagination(keyWord, skillStacks, duties, cursor, pageable);
 		Page<MentorInfoResponse> mentors = mentorRepository.searchAllFromDtoWithOffsetPagination(keyWord, skillStacks, duties, pageable);
+		postKeywordForBatchProcessing(keyWord);
 
 		return mentors;
 	}
@@ -99,4 +105,20 @@ public class MentorService {
 
 		return MentorDto.InfoResponse.of(mentor, mentorCareers, mentorSkillStacks);
     }
+
+	public void postKeywordForBatchProcessing(String keyword) {
+		if (Objects.equals(keyword, "")) {
+			return;
+		}
+		RestTemplate restTemplate = new RestTemplate();
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+
+		BatchDto data = new BatchDto(keyword);
+
+		HttpEntity<BatchDto> requestEntity = new HttpEntity<>(data, headers);
+
+		restTemplate.postForEntity("http://15.164.53.189:8081/v1/api/batch", requestEntity, String.class);
+	}
 }
