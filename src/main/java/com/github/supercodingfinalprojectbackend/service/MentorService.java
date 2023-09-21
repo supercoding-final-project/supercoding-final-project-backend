@@ -63,10 +63,11 @@ public class MentorService {
 
 		List<MentorCareerDto.Request> careers = request.getCareers();
 		if (careers != null && !careers.isEmpty()) {
-			List<MentorCareer> mentorCareerList = careers.stream()
-					.map(c->MentorCareer.of(mentor, c))
-					.map(mentorCareerRepository::save)
-					.collect(Collectors.toList());
+			List<MentorCareer> mentorCareerList = mentorCareerRepository.saveAll(
+					careers.stream()
+							.map(c->MentorCareer.of(mentor, c))
+							.collect(Collectors.toList())
+			);
 			mentor.setMentorCareers(mentorCareerList);
 		} else {
 			mentor.setMentorCareers(null);
@@ -74,15 +75,14 @@ public class MentorService {
 
 		mentorSkillStackRepository.deleteAllByMentor(mentor);
 
-		List<String> skillStacks = request.getSkillStacks();
-		if (skillStacks != null && !skillStacks.isEmpty()) {
-			List<MentorSkillStack> mentorSkillStackList = skillStacks.stream()
-					.map(s->ValidateUtils.requireNotThrow(s, SkillStackType::valueOf, ApiErrorCode.INVALID_SKILL_STACK))
-					.map(SkillStackType::getSkillStackCode)
-					.map(c->skillStackRepository.findBySkillStackId(c).orElseThrow(ApiErrorCode.INTERNAL_SERVER_ERROR::exception))
-					.map(s->MentorSkillStack.of(mentor, s))
-					.map(mentorSkillStackRepository::save)
-					.collect(Collectors.toList());
+		List<String> skillStackNames = request.getSkillStacks();
+		if (skillStackNames != null && !skillStackNames.isEmpty()) {
+			List<MentorSkillStack> mentorSkillStackList = mentorSkillStackRepository.saveAll(
+					skillStackNames.stream()
+							.map(skillStackName->skillStackRepository.findBySkillStackName(skillStackName).orElseThrow(ApiErrorCode.INVALID_SKILL_STACK::exception))
+							.map(skillStack->MentorSkillStack.of(mentor, skillStack))
+							.collect(Collectors.toList())
+			);
 			mentor.setMentorSkillStacks(mentorSkillStackList);
 		} else {
 			mentor.setMentorSkillStacks(null);

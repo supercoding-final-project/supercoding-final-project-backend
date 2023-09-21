@@ -72,7 +72,7 @@ public class PostService {
         }
 
         SkillStackType skillStackType = SkillStackType.valueOf(postDto.getPostStack());
-        SkillStack skillStack = skillStackRepository.findBySkillStackName(skillStackType.name());
+        SkillStack skillStack = skillStackRepository.findBySkillStackName(skillStackType.name()).orElseThrow(ApiErrorCode.INVALID_SKILL_STACK::exception);
         PostsSkillStack postsSkillStack = PostsSkillStack.fromPost(post,skillStack);
         postsSkillStackRepository.save(postsSkillStack);
 
@@ -121,7 +121,7 @@ public class PostService {
         }
 
         PostsSkillStack postsSkillStack = postsSkillStackRepository.findByPosts(posts);
-        SkillStack skillStack = skillStackRepository.findBySkillStackName(postDto.getPostStack());
+        SkillStack skillStack = skillStackRepository.findBySkillStackName(postDto.getPostStack()).orElseThrow(ApiErrorCode.INVALID_SKILL_STACK::exception);
         postsSkillStack.skillStackUpdate(skillStack);
         return ResponseUtils.ok("멘티 모집이 정상적으로 수정되었습니다.",null);
     }

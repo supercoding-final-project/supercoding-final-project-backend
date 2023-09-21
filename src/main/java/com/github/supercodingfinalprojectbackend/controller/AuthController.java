@@ -70,6 +70,7 @@ public class AuthController {
         Long userId = AuthUtils.getUserId();
         if (userId == 1004 || userId == 5252) throw new ApiException(400, "슈퍼토큰은 역할 전환이 불가능합니다!");
         UserRole userRole = ValidateUtils.requireNotNull(UserRole.parseType(roleName), 400, "userRoleName은 다음 중 하나여야 합니다. " + UserRole.getScopeAsString());
+        if (!oauth2Service.hasRole(userId, userRole)) throw ApiErrorCode.DOES_NOT_HAVE_ROLL.exception();
         Login.Response response = oauth2Service.switchRole(userId, userRole);
         return ResponseUtils.ok("역할을 성공적으로 전환했습니다.", response);
     }

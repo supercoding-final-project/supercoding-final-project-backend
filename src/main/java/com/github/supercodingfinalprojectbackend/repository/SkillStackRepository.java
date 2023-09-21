@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public interface SkillStackRepository extends JpaRepository<SkillStack, Long> {
     Optional<SkillStack> findBySkillStackId(Long skillStackCode);
-    SkillStack findBySkillStackName(String skillName);
+    Optional<SkillStack> findBySkillStackName(String skillName);
 
     @Query("SELECT s FROM SkillStack s ORDER BY s.skillStackSearchCount DESC")
     List<SkillStack> findTop10ByOrderBySkillStackSearchCountDesc(Pageable pageable);
