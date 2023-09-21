@@ -40,7 +40,8 @@ public class MentorService {
 	public Page<MentorDto.MentorInfoResponse> getMentors(
 			String keyWord, List<String> skillStacks, List<String> duties, Long cursor, Pageable pageable){
 
-		Page<MentorInfoResponse> mentors = mentorRepository.searchAllFromDtoWithCursorPagination(keyWord, skillStacks, duties, cursor, pageable);
+//		Page<MentorInfoResponse> mentors = mentorRepository.searchAllFromDtoWithCursorPagination(keyWord, skillStacks, duties, cursor, pageable);
+		Page<MentorInfoResponse> mentors = mentorRepository.searchAllFromDtoWithOffsetPagination(keyWord, skillStacks, duties, pageable);
 
 		return mentors;
 	}

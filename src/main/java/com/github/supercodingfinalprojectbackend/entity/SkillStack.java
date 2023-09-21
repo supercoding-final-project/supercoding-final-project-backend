@@ -23,6 +23,9 @@ public class SkillStack {
 	@Column(name = "skill_stack_name")
 	private String skillStackName;
 
+	@Column(name = "skill_stack_category")
+	private String skillStackCategory;
+
 	@Column(name = "skill_stack_img")
 	private String skillStackImg;
 

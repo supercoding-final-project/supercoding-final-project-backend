@@ -61,7 +61,7 @@ public class MentorRepositoryImpl implements MentorRepositoryCustom {
 
 	@Override
 	public Page<MentorInfoResponse> searchAllFromDtoWithOffsetPagination(String keyword,
-			List<String> skillStacks, Pageable pageable){
+			List<String> skillStacks, List<String> duties, Pageable pageable){
 
 		// Querydsl fetchResults() , fetchCount() Deprecated
 		// 대체 방법으로 해결
@@ -80,7 +80,14 @@ public class MentorRepositoryImpl implements MentorRepositoryCustom {
 				.from(mentor)
 				.leftJoin(mentor.mentorSkillStacks, mentorSkillStack)
 				.leftJoin(mentorSkillStack.skillStack, skillStack)
-				.where(conMentorSkillStack(keyword).or(mentorNameLike(keyword)))
+				.leftJoin(mentor.user, user)
+				.where(
+						mentor.searchable.eq(true),
+						mentor.isDeleted.eq(false),
+						mentorNameLike(keyword).or(conMentorSkillStack(keyword)),
+						skillStackFiltering(skillStacks),
+						dutyFiltering(duties)
+				)
 				.offset(pageable.getOffset())
 				.limit(pageable.getPageSize())
 				.fetch();
@@ -90,7 +97,14 @@ public class MentorRepositoryImpl implements MentorRepositoryCustom {
 				.from(mentor)
 				.leftJoin(mentor.mentorSkillStacks, mentorSkillStack)
 				.leftJoin(mentorSkillStack.skillStack, skillStack)
-				.where(conMentorSkillStack(keyword).or(mentorNameLike(keyword)));
+				.leftJoin(mentor.user, user)
+				.where(
+						mentor.searchable.eq(true),
+						mentor.isDeleted.eq(false),
+						mentorNameLike(keyword).or(conMentorSkillStack(keyword)),
+						skillStackFiltering(skillStacks),
+						dutyFiltering(duties)
+				);
 
 		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
 	}

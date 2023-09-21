@@ -14,7 +14,7 @@ public interface MentorRepositoryCustom {
 	List<MentorInfoResponse> searchAllFromDto(String keyword, List<String> skillStacks);
 
 	Page<MentorInfoResponse> searchAllFromDtoWithOffsetPagination(String keyword,
-			List<String> skillStacks, Pageable pageable);
+			List<String> skillStacks, List<String> duties, Pageable pageable);
 
 	Page<MentorInfoResponse> searchAllFromDtoWithCursorPagination(String keyword,
 			List<String> skillStacks, List<String> duties, Long cursor, Pageable pageable);
