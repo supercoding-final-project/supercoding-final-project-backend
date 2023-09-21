@@ -35,6 +35,8 @@ public class PostDto {
     @NotBlank
     private String postStack;
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String skillStackImg;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private boolean permission;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long mentorId;
@@ -60,6 +62,7 @@ public class PostDto {
                 .price(posts.getPrice())
                 .stackCategory(skillStack.getSkillStackCategory())
                 .postStack(skillStack.getSkillStackName())
+                .skillStackImg(skillStack.getSkillStackImg())
                 .workCareer(workCareerList)
                 .educateCareer(educateCareerList)
                 .reviewStyle(reviewStyleList)

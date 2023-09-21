@@ -57,7 +57,10 @@ public class ReviewService {
 
         int numberOfCodeReviewsReceived = countCodeReviewsReceived(post, mentee, orderSheet);
 
-        updateStar(mentor, post, inputStar);
+        /**
+         * 배치로 대체
+         */
+//        updateStar(mentor, post, inputStar);
         orderSheet.isReviewed();
 
 
@@ -142,7 +145,7 @@ public class ReviewService {
     public void updateStar(Mentor mentor, Posts post, Integer inputStar) {
 
         ReviewSummary reviewSummery = reviewRepository.getReviewSummeryByPostId(post.getPostId());
-
+        log.info("reviewSummery : {}", reviewSummery.getTotalStar());
         float totalStar = reviewSummery.getTotalStar() + inputStar;
         float reviewCount = reviewSummery.getReviewCount() + 1;
         float updatePostStar  = Math.round((totalStar / reviewCount) * 10.0f) / 10.0f;
