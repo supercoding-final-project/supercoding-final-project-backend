@@ -30,7 +30,7 @@ public class OrderSheet extends CommonEntity {
     @Column(name = "is_reviewed", nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
     private Boolean is_reviewed;
     @Version
-    private Integer version;    // 낙관적 락
+    private int version;    // 낙관적 락
 
     public Payment approvedBy(Mentor mentor) {
         mentor.getUser().getAbstractAccount().chargePaymoney(totalPrice.longValue());
