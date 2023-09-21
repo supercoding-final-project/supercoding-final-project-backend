@@ -44,8 +44,7 @@ public enum ApiErrorCode implements ErrorCode {
     UNABLE_TO_WRITE_REVIEW(HttpStatus.FORBIDDEN,"리뷰를 작성할 자격이 없습니다."),
     INVALID_GOOGLE_TOKEN(HttpStatus.UNAUTHORIZED, "구글 액세스 토큰이 유효하지 않습니다."),
     FAIL_TO_UPLOAD_IMAGE_BY_IO_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "서버의 문제로 이미지 업로드에 실패했습니다. 다시 시도해주세요."),
-
-    ;
+    DOES_NOT_HAVE_ROLL(HttpStatus.NOT_FOUND, "해당 역할을 가지고 있지 않습니다.");
     ApiErrorCode(HttpStatus status, String message) {
         this.message = message;
         this.status = status.value();

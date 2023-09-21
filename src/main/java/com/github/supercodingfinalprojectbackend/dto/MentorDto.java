@@ -180,7 +180,7 @@ public class MentorDto {
 			if (skillStacks != null && !skillStacks.isEmpty() && skillStacks.stream().noneMatch(SkillStackType::contains)) return false;
 
 			return nickname != null &&
-					searchable != null;
+					searchable != null && introduction != null && company != null;
 		}
 
 		public String getCurrentDuty() {

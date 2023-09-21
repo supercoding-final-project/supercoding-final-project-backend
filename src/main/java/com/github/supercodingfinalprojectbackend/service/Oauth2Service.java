@@ -198,7 +198,7 @@ public class Oauth2Service {
         User user = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
 
         Login login = authHolder.get(userId);
-        if (!login.getUserRole().equals(userRole)) {
+        if (!login.getUserRole().same(userRole)) {
             login = switchLogin(user, userRole);
         }
 
@@ -224,25 +224,22 @@ public class Oauth2Service {
         List<MentorCareerDto.Request> careers = request.getCareers();
         if (careers != null) {
             ValidateUtils.requireTrue(careers.stream().allMatch(MentorCareerDto.Request::validate), ApiErrorCode.INVALID_DUTY);
-            List<MentorCareer> mentorCareers = careers.stream()
-                    .map(c->MentorCareer.of(mentor, c))
-                    .map(mentorCareerRepository::save)
-                    .collect(Collectors.toList());
+            List<MentorCareer> mentorCareers = mentorCareerRepository.saveAll(
+                    careers.stream()
+                            .map(c->MentorCareer.of(mentor, c))
+                            .collect(Collectors.toList())
+            );
             mentor.setMentorCareers(mentorCareers);
         }
 
         List<String> skillStackNames = request.getSkillStackNames();
         if (skillStackNames != null) {
-            List<SkillStack> skillStacks = skillStackNames.stream()
-                    .map(skillStackName->ValidateUtils.requireNotThrow(skillStackName, SkillStackType::valueOf, ApiErrorCode.INVALID_SKILL_STACK))
-                    .map(SkillStackType::getSkillStackCode)
-                    .map(c->skillStackRepository.findBySkillStackId(c).orElseThrow(ApiErrorCode.INTERNAL_SERVER_ERROR::exception))
-                    .collect(Collectors.toList());
-
-            List<MentorSkillStack> mentorSkillStacks = skillStacks.stream()
-                    .map(s->MentorSkillStack.of(mentor, s))
-                    .map(mentorSkillStackRepository::save)
-                    .collect(Collectors.toList());
+            List<MentorSkillStack> mentorSkillStacks = mentorSkillStackRepository.saveAll(
+                    skillStackNames.stream()
+                            .map(skillStackName->skillStackRepository.findBySkillStackName(skillStackName).orElseThrow(ApiErrorCode.INVALID_SKILL_STACK::exception))
+                            .map(skillStack -> MentorSkillStack.of(mentor, skillStack))
+                            .collect(Collectors.toList())
+            );
             mentor.setMentorSkillStacks(mentorSkillStacks);
         }
 
@@ -261,6 +258,17 @@ public class Oauth2Service {
 
     public List<UserSocialInfo> findAllUserSocialInfo(long kakaoId, SocialPlatformType socialPlatformType) {
         return userSocialInfoRepository.findAllBySocialIdAndSocialPlatformNameAndIsDeletedIsFalse(kakaoId, socialPlatformType.toString());
+    }
+
+    public boolean hasRole(Long userId, UserRole userRole) {
+        switch (userRole) {
+            case MENTOR:
+                return mentorRepository.existsByUserUserIdAndIsDeletedIsFalse(userId);
+            case MENTEE:
+                return true;
+            default:
+                return false;
+        }
     }
 
 //    public Login.Response googleLogin(String token) {
