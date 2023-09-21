@@ -4,6 +4,7 @@ import com.github.supercodingfinalprojectbackend.dto.MenteeMyPageDto;
 import com.github.supercodingfinalprojectbackend.service.MenteeMyPageService;
 import com.github.supercodingfinalprojectbackend.util.auth.AuthUtils;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/mentee/mypage")
+@Tag(name = "멘티마이페이지 API")
 @Slf4j
 public class MenteeMyPageController {
 

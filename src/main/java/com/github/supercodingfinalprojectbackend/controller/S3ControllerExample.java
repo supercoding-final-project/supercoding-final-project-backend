@@ -2,6 +2,7 @@ package com.github.supercodingfinalprojectbackend.controller;
 
 
 import com.github.supercodingfinalprojectbackend.service.S3Service;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @RestController
 @Slf4j
+@Tag(name = "S3 예제 API")
 @RequestMapping("api/v1/s3/example")
 public class S3ControllerExample {
     private final S3Service s3Service;
