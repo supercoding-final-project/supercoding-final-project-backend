@@ -12,6 +12,7 @@ import com.github.supercodingfinalprojectbackend.service.ChatRoomService;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
 import com.github.supercodingfinalprojectbackend.util.auth.AuthUtils;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Transactional
 @RequestMapping("/api/v1")
+@Tag(name = "채팅방 API")
 @Slf4j
 public class ChatRoomController {
 
