@@ -3,8 +3,10 @@ package com.github.supercodingfinalprojectbackend.controller;
 
 import com.github.supercodingfinalprojectbackend.dto.MessageDto;
 import com.github.supercodingfinalprojectbackend.entity.ChatRoom;
+import com.github.supercodingfinalprojectbackend.entity.Mentor;
 import com.github.supercodingfinalprojectbackend.entity.User;
 import com.github.supercodingfinalprojectbackend.exception.errorcode.ApiErrorCode;
+import com.github.supercodingfinalprojectbackend.repository.MentorRepository;
 import com.github.supercodingfinalprojectbackend.repository.UserRepository;
 import com.github.supercodingfinalprojectbackend.service.ChatRoomService;
 import com.github.supercodingfinalprojectbackend.util.ResponseUtils;
@@ -25,6 +27,7 @@ public class ChatRoomController {
 
 
     private final UserRepository userRepository;
+    private final MentorRepository mentorRepository;
 
     private final ChatRoomService chatRoomService;
 
@@ -34,7 +37,8 @@ public class ChatRoomController {
     public ResponseEntity<?> createChatRoom(@RequestBody MessageDto.CreateChatRoomRequest chatRoomRequest) {
         Long userId = AuthUtils.getUserId();
         User user1 = userRepository.findByUserIdAndIsDeletedIsFalse(userId).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
-        User user2 = userRepository.findByUserIdAndIsDeletedIsFalse(chatRoomRequest.getAnotherUserId()).orElseThrow(ApiErrorCode.NOT_FOUND_USER::exception);
+        Mentor mentor = mentorRepository.findByMentorIdAndIsDeletedIsFalse(chatRoomRequest.getMentorId()).orElseThrow(ApiErrorCode.NOT_FOUND_MENTOR::exception);
+        User user2 = mentor.getUser();
         ChatRoom chatRoom = chatRoomService.createChatroom(user1, user2);
         return ResponseUtils.ok("성공적으로 채팅방이 생성 되었습니다", chatRoom.getChatRoomId());
     }

@@ -16,7 +16,7 @@ public class MessageDto {
     @Getter
     @Setter
     public static class CreateChatRoomRequest {
-        private Long anotherUserId;
+        private Long mentorId;
     }
 
     @Getter

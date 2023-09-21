@@ -2,12 +2,14 @@ package com.github.supercodingfinalprojectbackend.entity;
 
 import com.github.supercodingfinalprojectbackend.dto.MentorCareerDto;
 import com.github.supercodingfinalprojectbackend.dto.MentorDto;
+import com.github.supercodingfinalprojectbackend.util.DummyUtils;
 import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 @Entity
 @Table(name = "mentors")
@@ -62,14 +64,34 @@ public class Mentor extends CommonEntity {
 				.build();
 	}
 
-	public static Mentor of(User user, String company, String introduction) {
+	public static Mentor of(User user, String company) {
 		return Mentor.builder()
 				.user(Objects.requireNonNull(user))
 				.company(company)
-				.introduction(introduction)
 				.searchable(false)
 				.star(0.0f)
 				.build();
+	}
+
+	public static Mentor dummy(User dummyUser) {
+		return Mentor.builder()
+				.user(dummyUser)
+				.company("코디밸롭")
+				.introduction("안녕하세요. 천상천하유아독존 " + dummyUser.getNickname() + "입니다!")
+				.searchable(randomSearchable())
+				.star(randomStar())
+				.build();
+	}
+
+	private static Float randomStar() {
+		float min = 0.0f;
+		float max = 5.0f;
+		float value = min + (max - min) * new Random().nextFloat();
+		return Math.round(value * 10) / 10.0f;
+	}
+
+	private static Boolean randomSearchable() {
+		return new Random().nextBoolean();
 	}
 
 	public void setMentorSkillStacks(List<MentorSkillStack> mentorSkillStacks) { this.mentorSkillStacks = mentorSkillStacks; }

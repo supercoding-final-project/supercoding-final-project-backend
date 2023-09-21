@@ -95,15 +95,13 @@ public class MentorDto {
 	public static class JoinRequest {
 		@Schema(name = "현재 다니는 회사")
 		private String company;
-		@Schema(name = "멘토 소개글")
-		private String introduction;
 		@Schema(name = "커리어")
 		private List<MentorCareerDto.Request> careers;
 		@Schema(name = "기술스택")
 		private List<String> skillStackNames;
 
 		public boolean validate() {
-			return company != null && introduction != null;
+			return company != null && careers != null && !careers.isEmpty() && skillStackNames != null && !skillStackNames.isEmpty();
 		}
 	}
 

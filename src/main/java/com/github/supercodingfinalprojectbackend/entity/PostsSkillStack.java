@@ -34,6 +34,13 @@ public class PostsSkillStack extends CommonEntity{
                 .build();
     }
 
+    public static PostsSkillStack dummy(Posts dummyPost, SkillStack dummySkillStack) {
+        return PostsSkillStack.builder()
+                .posts(dummyPost)
+                .skillStack(dummySkillStack)
+                .build();
+    }
+
     public void skillStackUpdate(SkillStack skillStack){
         this.skillStack  = skillStack;
     }

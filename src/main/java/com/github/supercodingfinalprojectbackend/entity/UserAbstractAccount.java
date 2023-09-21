@@ -1,5 +1,6 @@
 package com.github.supercodingfinalprojectbackend.entity;
 
+import com.github.supercodingfinalprojectbackend.util.DummyUtils;
 import lombok.*;
 
 import javax.persistence.*;
@@ -45,6 +46,20 @@ public class UserAbstractAccount extends CommonEntity {
         String num3 = Integer.toHexString(random.nextInt(max - min + 1) + min);
         String num4 = Integer.toHexString(random.nextInt(max - min + 1) + min);
         return num1 + "-" + num2 + "-" + num3 + "-" + num4;
+    }
+
+    public static UserAbstractAccount dummy() {
+        return UserAbstractAccount.builder()
+                .accountNumber(createAccountNumber())
+                .paymoney(randomPaymoney())
+                .build();
+    }
+
+    private static Long randomPaymoney() {
+        final int min = 1;
+        final int max = 1000;
+        final double value = min + (max - min) * new Random().nextDouble();
+        return Math.round(value) * 1_000L;
     }
 
     public Long chargePaymoney(Long chargeAmount) {
