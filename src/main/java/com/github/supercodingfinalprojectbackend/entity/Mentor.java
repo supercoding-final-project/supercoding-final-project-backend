@@ -53,21 +53,11 @@ public class Mentor extends CommonEntity {
 	@Column(name = "star")
 	private Float star;
 
-	public static Mentor of(User user, MentorDto mentorDto) {
+	public static Mentor of(User user, String company, String introduction) {
 		return Mentor.builder()
 				.user(user)
-				.introduction(mentorDto.getIntroduction())
-				.searchable(false)
-				.company(mentorDto.getCompany())
-				.currentDuty(mentorDto.getCurrentDuty().resolve().name())
-				.currentPeriod(mentorDto.getCurrentPeriod())
-				.build();
-	}
-
-	public static Mentor of(User user, String company) {
-		return Mentor.builder()
-				.user(Objects.requireNonNull(user))
 				.company(company)
+				.introduction(introduction)
 				.searchable(false)
 				.star(0.0f)
 				.build();
