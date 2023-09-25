@@ -81,11 +81,3 @@ gantt
 | 멘티 <-> 멘토 전환 |  | 검색 기록 BatchProcessing | 포스트 조회, 등록, 수정, 삭제 |  |
 | 회원 정보 수정 및 조회 |  | 인기 기술 스택 Batch Statistics | 코드리뷰 날짜 조회 및 결제 신청 |  |
 | 페이머니 충전 및 조회 |  | 별점 업데이트 Batch Statistic |  |  |
-
-</br>
-
-# Impressions
-
-## <details><summary>황민혁</summary>
-    hello
-</details>
