@@ -45,26 +45,45 @@ gantt
 
 # Skill Stacks
 
-[Skill Stacks](https://www.notion.so/cfe762e2f47341278be54e305d78366f?pvs=21)
+- Java 11
+- Spring Boot
+- Spring Security
+- JPA(Hibernate)
+- MySQL
+- Querydsl
+- Git/GitHub
+- GitHub Action
+- Spring Batch
+- AWS EC2
+- AWS RDS
+- AWS S3
+- Docker
+- Swagger
+- Webhook
+- WebRTC
+- Notion
+
+</br>
 
 # ERD
+
 ![ERD](./codevelopErd.png)
-![코딩멘토.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/879e8f33-24ec-40b8-9c23-665a4e68d49b/1bae6c66-1937-499f-9ac0-24209ffd6351/%EC%BD%94%EB%94%A9%EB%A9%98%ED%86%A0.png)
 
-# APIs
-
-[APIs](https://www.notion.so/c76e9fca3d934ac6ac3aecc0fd7a6490?pvs=21)
-
-# Frontend Features
-
-[FrontendFeatures](https://www.notion.so/e6ef7a50a83544289efe3900e9c706a0?pvs=21)
+</br>
 
 # Backend Features
 
-[Backend Features](https://www.notion.so/68be6f4e8d0b43109a30f9cdecf7b245?pvs=21)
+| 황민혁 | 김정렬 | 서주원 | 오명재 | 홍종민 |
+| --- | --- | --- | --- | --- |
+| 결제 및 예약 | 화상 회의/화면 공유 | 멘토 검색 및 필터링 | Webhook을 이용한 모니터링 적용 | 채팅 |
+| 로그인/로그아웃, JWT 토큰 인증 |  | 리뷰 조회, 등록, 삭제 | Git Action CI/CD |  |
+| 다중 이미지 업로드 |  | 인기 기술 스택 조회 | 포스트 검색 및 필터링 |  |
+| 멘티 <-> 멘토 전환 |  | 검색 기록 BatchProcessing | 포스트 조회, 등록, 수정, 삭제 |  |
+| 회원 정보 수정 및 조회 |  | 인기 기술 스택 Batch Statistics | 코드리뷰 날짜 조회 및 결제 신청 |  |
+| 페이머니 충전 및 조회 |  | 별점 업데이트 Batch Statistic |  |  |
+
+</br>
 
 # Impressions
 
-[프론트엔드 소감](https://www.notion.so/4085f385f50d45d78df702d418bec3e9?pvs=21)
-
-[백엔드 소감](https://www.notion.so/093de52256c44030926b6ed53017fe69?pvs=21)
+> ## 황민혁
