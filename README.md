@@ -13,79 +13,13 @@
 ||조하윤|홍종민|
 ||모유빈|김정렬|
 
-<aside>
-<img src="/icons/chess-queen_yellow.svg" alt="/icons/chess-queen_yellow.svg" width="40px" /> **허세광**
-
-</aside>
-
-**프론트엔드**
-
-<aside>
-<img src="/icons/chess-queen_yellow.svg" alt="/icons/chess-queen_yellow.svg" width="40px" /> **심채운**
-
-</aside>
-
-<aside>
-<img src="/icons/user_blue.svg" alt="/icons/user_blue.svg" width="40px" /> **김지우**
-
-</aside>
-
-<aside>
-<img src="/icons/user_blue.svg" alt="/icons/user_blue.svg" width="40px" /> **하진수**
-
-</aside>
-
-<aside>
-<img src="/icons/user_pink.svg" alt="/icons/user_pink.svg" width="40px" /> **조하윤**
-
-</aside>
-
-<aside>
-<img src="/icons/user_blue.svg" alt="/icons/user_blue.svg" width="40px" /> **모유빈**
-
-</aside>
-
-**백엔드**
-
----
-
-<aside>
-<img src="/icons/chess-queen_yellow.svg" alt="/icons/chess-queen_yellow.svg" width="40px" /> **황민혁**
-
-</aside>
-
-<aside>
-<img src="/icons/user_blue.svg" alt="/icons/user_blue.svg" width="40px" /> **서주원**
-
-</aside>
-
-<aside>
-<img src="/icons/user_blue.svg" alt="/icons/user_blue.svg" width="40px" /> **오명재**
-
-</aside>
-
-<aside>
-<img src="/icons/user_blue.svg" alt="/icons/user_blue.svg" width="40px" /> **김정렬**
-
-</aside>
-
-<aside>
-<img src="/icons/user_blue.svg" alt="/icons/user_blue.svg" width="40px" /> **홍종민**
-
-</aside>
-
 # Links
-
----
 
 | 구분 | URL |
 | --- | --- |
-| 클라이언트 | https://super-final-front.vercel.app/ |
 | 발표 노션 | https://www.notion.so/Codevelop-2e07fa5f06894653aec83b1ad8723d09?pvs=21 |
 
 # Concept Images
-
----
 
 [제목 없는 데이터베이스](https://www.notion.so/0d1bbcb6090d4d2fa966e4f5b7523254?pvs=21)
 
