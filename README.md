@@ -36,7 +36,7 @@
 [Skill Stacks](https://www.notion.so/cfe762e2f47341278be54e305d78366f?pvs=21)
 
 # ERD
-
+![ERD](./codevelopErd.png)
 ![코딩멘토.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/879e8f33-24ec-40b8-9c23-665a4e68d49b/1bae6c66-1937-499f-9ac0-24209ffd6351/%EC%BD%94%EB%94%A9%EB%A9%98%ED%86%A0.png)
 
 # APIs
