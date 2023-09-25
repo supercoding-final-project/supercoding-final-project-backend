@@ -86,6 +86,6 @@ gantt
 
 # Impressions
 
-<details><summary>## 황민혁</summary>
+## <details><summary>황민혁</summary>
     hello
 </details>
