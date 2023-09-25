@@ -81,7 +81,7 @@ public class PostController {
     @GetMapping("/search")
     @Operation(summary = "포스트 검색")
     public ResponseEntity<ApiResponse<PostSearchDto>> searchPost(
-            @RequestParam String word,
+            @RequestParam(required = false, defaultValue = "") String word,
             @RequestParam(required = false) List<String> stackCategory,
             @RequestParam(required = false) List<String> skillStack,
             @RequestParam(required = false) List<String> level,

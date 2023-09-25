@@ -57,6 +57,7 @@ public class PostDto {
         List<String> reviewStyleList = postContentToList(postsContent, PostContentType.REVIEW_STYLE);
 
         return PostDto.builder()
+                .postId(posts.getPostId())
                 .title(posts.getTitle())
                 .level(posts.getLevel())
                 .price(posts.getPrice())
@@ -114,8 +115,8 @@ public class PostDto {
 
         public static PostTimeResponseDto timeResponseDto(List<Integer> timeList) {
             return PostTimeResponseDto.builder()
-                    .am(timeList.stream().filter(time -> time < 12).collect(Collectors.toList()))
-                    .pm(timeList.stream().filter(time -> time >= 12).collect(Collectors.toList()))
+                    .am(timeList.stream().filter(time -> time <= 12).collect(Collectors.toList()))
+                    .pm(timeList.stream().filter(time -> time > 12).map(time->time-12).collect(Collectors.toList()))
                     .build();
         }
     }
