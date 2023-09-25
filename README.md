@@ -19,17 +19,15 @@
 | --- | --- |
 | 발표 노션 | https://www.notion.so/Codevelop-2e07fa5f06894653aec83b1ad8723d09?pvs=21 |
 
-# Concept Images
-
-[Concept Images](https://www.notion.so/0d1bbcb6090d4d2fa966e4f5b7523254?pvs=21)
-
-# References
-
-[References](https://www.notion.so/bcbae87f05f3438e9c4848c63ed253d8?pvs=21)
-
 # History
 
-[History](https://www.notion.so/5006818b30f148d2a2d635f69cd06adb?pvs=21)
+```mermaid
+gantt
+    title History
+    dateFormat yyyy-MM-dd
+    section History
+        주제 선정: 2023-08-28, 2d
+```
 
 # Skill Stacks
 
