@@ -1,4 +1,27 @@
 spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: ENC(uNAxhIKqrBffW2Xci1t7Nt3e0W0OcifYfkwFsm3we7+6v5ucclxxO/EVpUo2obly)
+            client-secret: ENC(4ASqJYZAwcKLj2LqzvKmPSGEe65kzIpU1KQpENpZ6dpg6zuqRXekyvSRVPaUJXuZ)
+            redirect-uri: ENC(vNB5ry2AiqjXvLkNCmyJkYDLkewsWzse5EWr47S7i1OmhlDpHAh1YWD7kuoVUOyi)
+            authorization-grant-type: authorization_code
+          google:
+            client-id: ENC(nIHKNaLE64roFSa0vhX2owgajZTQbimU4YrQrc8YjFUq9uIx7nmW/4UUon3j1NrJ2h8Vunlg99lKPGchQfX5aDBbfPukyHhEe/Svp1fgFmLMoSH5DKM9fg==)
+            client-secret: ENC(xg86ODTUIGrPNnSVqQ1uJyRP5brUw7zUo+4VqM26dgPrtHswa0/p0x+EPZ6U7jz6)
+            scope:
+              - email
+              - profile
+
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            logout-uri: https://kapi.kakao.com/v1/user/logout
+            user-name-attribute: id
   jpa:
     hibernate:
       ddl-auto: update
@@ -6,9 +29,13 @@ spring:
     show-sql: true
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    url: ${DB_URL}
+    username: ENC(yRSnBz0zcd4GAC57nGGumw==)
+    password: ENC(HnQMcsCKTN0dGXN29eMbhBWNED7S/qZs)
+    url: ENC(3lU7uGf55PMulSrpDKDWu25/rDuMnX9CqxXeuJakA7KMgG4aspIrnZG1ghab+J08WUV9kWbYTfzbV1WF9JkUSMOWrtyQeKm6NfECNAKT1sQSKOjAKtb3KMIT0HK+mWifdgNguLZFqj0E8JU9zHl5lRLfjw2asWRcxtHWSLPIXmnvKrClMM3a94b7OQ6djM8b)
+  mvc:
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
 springdoc:
   packages-to-scan: com.github.supercodingfinalprojectbackend.controller
   default-consumes-media-type: application/json;charset=UTF-8
@@ -17,5 +44,27 @@ springdoc:
     disable-swagger-default-url: true
     display-request-duration: true
     operations-sorter: method
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
 
-secret-key-source: ${SECRET-KEY-SOURCE}
+openvidu:
+  url: ENC(LHO2rEyctWmSVOsqm/+/d5bYAkTFF+9loaxPBD20cnrY8S3XgkVvLg==)
+  secret: ENC(GRF6XjYIGxdZ70ki0Ei0FjMF9tpfTqEj)
+
+cloud:
+  aws:
+    credentials:
+      access-key: ENC(ViAHopgVSxgZK4bJmBVuZk5DBiHcPnxNImuB9y4QtBY=)
+      secret-key: ENC(yowsaWXRxeXBvE+DL7zsEglC4OjAzowSIh17iT+8z/GobsaYcFnYHjyqFhdmtxkaifMjt5VZs8o=)
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+    s3 :
+      bucket : code-velop
+
+
+error-webhook-url : ENC(R1xIh9/+5HfQ/ZjNlpGCWhCnFudyQYF/fPi891j9qzeXfjOBwenYphqXTUaxtitd6TnPkfLtA2UVauRwmWZN08bja7VHhnDqUiMi3+rgfbm2NfqY1PAtVjhVki4cGX2idj0qNi/KaJWk9Qu0gut8ELd+oOS4vlPoRI+wTgssx5IA0X/rqXb8rA==)
+secret-key-source: ${SECRET_KEY_SOURCE}
+
