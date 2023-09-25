@@ -1,5 +1,4 @@
 # Codevelop Backend
----
 
 > **멘토**와 **멘티**를 매칭하여 **코드리뷰** 서비스가 이루어지는 **C2C 플랫폼**
 > 2023.08.28 ~ 2023.09.22 (25일)
@@ -7,8 +6,11 @@
 # Team
 
 **디자이너**
-
----
+|   |   |   |   |   |
+|---|---|---|---|---|
+|   |   |   |   |   |
+|   |   |   |   |   |
+|   |   |   |   |   |
 
 <aside>
 <img src="/icons/chess-queen_yellow.svg" alt="/icons/chess-queen_yellow.svg" width="40px" /> **허세광**
@@ -16,8 +18,6 @@
 </aside>
 
 **프론트엔드**
-
----
 
 <aside>
 <img src="/icons/chess-queen_yellow.svg" alt="/icons/chess-queen_yellow.svg" width="40px" /> **심채운**
