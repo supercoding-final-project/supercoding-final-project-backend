@@ -1,10 +1,7 @@
 package com.github.supercodingfinalprojectbackend.service;
 
 import com.github.supercodingfinalprojectbackend.dto.PostDto;
-import com.github.supercodingfinalprojectbackend.dto.PostDto.OrderCodeReviewDto;
-import com.github.supercodingfinalprojectbackend.dto.PostDto.PostSearchDto;
-import com.github.supercodingfinalprojectbackend.dto.PostDto.PostTimeDto;
-import com.github.supercodingfinalprojectbackend.dto.PostDto.PostTimeResponseDto;
+import com.github.supercodingfinalprojectbackend.dto.PostDto.*;
 import com.github.supercodingfinalprojectbackend.entity.*;
 import com.github.supercodingfinalprojectbackend.entity.type.PostContentType;
 import com.github.supercodingfinalprojectbackend.entity.type.SkillStackType;
@@ -45,7 +42,6 @@ public class PostService {
     private final MentorScheduleTemplateRepository mentorScheduleTemplateRepository;
     private final MenteeRepository menteeRepository;
     private final OrderSheetRepository orderSheetRepository;
-
     private final SelectedClassTimeRepository selectedClassTimeRepository;
 
     public ResponseEntity<ApiResponse<Long>> createPost(PostDto postDto, Long userId) {
@@ -53,23 +49,7 @@ public class PostService {
         Posts entity = Posts.fromDto(postDto,mentor);
         Posts post = postsRepository.save(entity);
 
-        List<String> workCareerList = postDto.getWorkCareer();
-        List<String> educateCareerList = postDto.getEducateCareer();
-        List<String> reviewStyleList = postDto.getReviewStyle();
-
-        for (String workCareer : workCareerList) {
-            PostsContent postsContent = PostsContent.fromPost(workCareer, PostContentType.WORK_CAREER.name(), post);
-            postsContentRepository.save(postsContent);
-        }
-
-        for (String educateCareer : educateCareerList) {
-            PostsContent postsContent = PostsContent.fromPost(educateCareer, PostContentType.EDUCATE_CAREER.name(), post);
-            postsContentRepository.save(postsContent);
-        }
-        for (String reviewStyle : reviewStyleList) {
-            PostsContent postsContent = PostsContent.fromPost(reviewStyle, PostContentType.REVIEW_STYLE.name(), post);
-            postsContentRepository.save(postsContent);
-        }
+        savePostContent(postDto,post);
 
         SkillStackType skillStackType = SkillStackType.valueOf(postDto.getPostStack());
         SkillStack skillStack = skillStackRepository.findBySkillStackName(skillStackType.name()).orElseThrow(ApiErrorCode.INVALID_SKILL_STACK::exception);
@@ -79,13 +59,13 @@ public class PostService {
         return ResponseUtils.created("멘티 모집이 정상적으로 등록되었습니다.",post.getPostId());
     }
     @Transactional(readOnly = true)
-    public ResponseEntity<ApiResponse<PostDto>> getPost(Long postId, Long userId) {
+    public ResponseEntity<ApiResponse<PostInfoResponse>> getPost(Long postId, Long userId) {
         Posts posts = postsRepository.findByPostIdAndIsDeletedFalse(postId).orElseThrow(ApiErrorCode.POST_NOT_POST_ID::exception);
         List<PostsContent> contentList = postsContentRepository.findAllByPosts(posts);
         SkillStack stack = postsSkillStackRepository.findByPosts(posts).getSkillStack();
         boolean permission = userId != 0 && Objects.equals(posts.getMentor().getUser().getUserId(), userId);
 
-        return ResponseUtils.ok("정상적으로 멘티 모집 조회 되었습니다.", PostDto.PostInfoResponse(posts,contentList,stack,permission));
+        return ResponseUtils.ok("정상적으로 멘티 모집 조회 되었습니다.", PostInfoResponse.of(posts,contentList,stack,permission));
     }
 
     public ResponseEntity<ApiResponse<Void>> updatePost(Long userId, Long postId, PostDto postDto) {
@@ -102,23 +82,7 @@ public class PostService {
             postsContentRepository.save(postsContent);
         }
 
-        List<String> workCareerList = postDto.getWorkCareer();
-        List<String> educateCareerList = postDto.getEducateCareer();
-        List<String> reviewStyleList = postDto.getReviewStyle();
-
-        for (String workCareer : workCareerList) {
-            PostsContent postsContent = PostsContent.fromPost(workCareer, PostContentType.WORK_CAREER.name(), posts);
-            postsContentRepository.save(postsContent);
-        }
-
-        for (String educateCareer : educateCareerList) {
-            PostsContent postsContent = PostsContent.fromPost(educateCareer, PostContentType.EDUCATE_CAREER.name(), posts);
-            postsContentRepository.save(postsContent);
-        }
-        for (String reviewStyle : reviewStyleList) {
-            PostsContent postsContent = PostsContent.fromPost(reviewStyle, PostContentType.REVIEW_STYLE.name(), posts);
-            postsContentRepository.save(postsContent);
-        }
+        savePostContent(postDto, posts);
 
         PostsSkillStack postsSkillStack = postsSkillStackRepository.findByPosts(posts);
         SkillStack skillStack = skillStackRepository.findBySkillStackName(postDto.getPostStack()).orElseThrow(ApiErrorCode.INVALID_SKILL_STACK::exception);
@@ -231,15 +195,35 @@ public class PostService {
 
     public PostSearchDto fromList(Page<Posts> posts){
 
-        List<PostDto> postDtoList = new ArrayList<>();
+        List<PostInfoResponse> postDtoList = new ArrayList<>();
 
         for (Posts post : posts) {
             List<PostsContent> contentList = postsContentRepository.findAllByPosts(post);
             SkillStack stack = postsSkillStackRepository.findByPosts(post).getSkillStack();
 
-            postDtoList.add(PostDto.PostInfoResponse(post,contentList,stack,false));
+            postDtoList.add(PostInfoResponse.of(post,contentList,stack,false));
         }
 
         return PostSearchDto.searchDto(postDtoList,posts);
+    }
+
+    public void savePostContent(PostDto postDto, Posts post){
+        List<String> workCareerList = postDto.getWorkCareer();
+        List<String> educateCareerList = postDto.getEducateCareer();
+        List<String> reviewStyleList = postDto.getReviewStyle();
+
+        for (String workCareer : workCareerList) {
+            PostsContent postsContent = PostsContent.fromPost(workCareer, PostContentType.WORK_CAREER.name(), post);
+            postsContentRepository.save(postsContent);
+        }
+
+        for (String educateCareer : educateCareerList) {
+            PostsContent postsContent = PostsContent.fromPost(educateCareer, PostContentType.EDUCATE_CAREER.name(), post);
+            postsContentRepository.save(postsContent);
+        }
+        for (String reviewStyle : reviewStyleList) {
+            PostsContent postsContent = PostsContent.fromPost(reviewStyle, PostContentType.REVIEW_STYLE.name(), post);
+            postsContentRepository.save(postsContent);
+        }
     }
 }

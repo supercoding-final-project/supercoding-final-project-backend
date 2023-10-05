@@ -2,6 +2,7 @@ package com.github.supercodingfinalprojectbackend.controller;
 
 import com.github.supercodingfinalprojectbackend.dto.PostDto;
 import com.github.supercodingfinalprojectbackend.dto.PostDto.OrderCodeReviewDto;
+import com.github.supercodingfinalprojectbackend.dto.PostDto.PostInfoResponse;
 import com.github.supercodingfinalprojectbackend.dto.PostDto.PostSearchDto;
 import com.github.supercodingfinalprojectbackend.dto.PostDto.PostTimeResponseDto;
 import com.github.supercodingfinalprojectbackend.service.PostService;
@@ -35,7 +36,7 @@ public class PostController {
 
     @GetMapping("/{postId}")
     @Operation(summary = "특정 포스트 조회")
-    public ResponseEntity<ApiResponse<PostDto>> getPost(@PathVariable Long postId){
+    public ResponseEntity<ApiResponse<PostInfoResponse>> getPost(@PathVariable Long postId){
         long userId;
         try{
             userId = AuthUtils.getUserId();
