@@ -6,8 +6,7 @@ spring:
           kakao:
             client-id: ENC(uNAxhIKqrBffW2Xci1t7Nt3e0W0OcifYfkwFsm3we7+6v5ucclxxO/EVpUo2obly)
             client-secret: ENC(4ASqJYZAwcKLj2LqzvKmPSGEe65kzIpU1KQpENpZ6dpg6zuqRXekyvSRVPaUJXuZ)
-#            redirect-uri: ENC(vNB5ry2AiqjXvLkNCmyJkYDLkewsWzse5EWr47S7i1OmhlDpHAh1YWD7kuoVUOyi)
-            redirect-uri: ENC(5k28TAEWxf/z6U91DUJED/UwXgBOM0nHomTOAoeCM8d06VTSBCbMNo20mmAAO1rw)
+            redirect-uri: ENC(vNB5ry2AiqjXvLkNCmyJkYDLkewsWzse5EWr47S7i1OmhlDpHAh1YWD7kuoVUOyi)
             authorization-grant-type: authorization_code
           google:
             client-id: ENC(nIHKNaLE64roFSa0vhX2owgajZTQbimU4YrQrc8YjFUq9uIx7nmW/4UUon3j1NrJ2h8Vunlg99lKPGchQfX5aDBbfPukyHhEe/Svp1fgFmLMoSH5DKM9fg==)
