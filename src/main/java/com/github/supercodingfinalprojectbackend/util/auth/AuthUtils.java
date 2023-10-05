@@ -16,6 +16,9 @@ public class AuthUtils {
     public static Long getUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) throw ApiErrorCode.NOT_AUTHENTICATED.exception();
+        System.out.println("*****************************");
+        System.out.println(Long.parseLong((String) authentication.getPrincipal()));
+        System.out.println("*****************************");
         return Long.parseLong((String) authentication.getPrincipal());
     }
 

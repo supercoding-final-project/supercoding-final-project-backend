@@ -20,26 +20,16 @@ import java.util.stream.Collectors;
 @Builder
 @ToString
 public class PostDto {
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long postId;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private MentorDto mentorDto;
     @NotBlank
     private String title;
     @NotBlank
     private String level;
     @NotNull
     private Integer price;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String stackCategory;
     @NotBlank
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String postStack;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String skillStackImg;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private boolean permission;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Long mentorId;
     @NotNull
     @Size(min = 1)
     private List<String> workCareer;
@@ -50,8 +40,7 @@ public class PostDto {
     @Size(min = 1)
     private List<String> reviewStyle;
 
-    public static PostDto PostInfoResponse(Posts posts, List<PostsContent> postsContent, SkillStack skillStack, boolean permission) {
-
+    public static PostDto of(Posts posts, List<PostsContent> postsContent) {
         List<String> workCareerList = postContentToList(postsContent, PostContentType.WORK_CAREER);
         List<String> educateCareerList = postContentToList(postsContent, PostContentType.EDUCATE_CAREER);
         List<String> reviewStyleList = postContentToList(postsContent, PostContentType.REVIEW_STYLE);
@@ -61,14 +50,9 @@ public class PostDto {
                 .title(posts.getTitle())
                 .level(posts.getLevel())
                 .price(posts.getPrice())
-                .stackCategory(skillStack.getSkillStackCategory())
-                .postStack(skillStack.getSkillStackName())
-                .skillStackImg(skillStack.getSkillStackImg())
                 .workCareer(workCareerList)
                 .educateCareer(educateCareerList)
                 .reviewStyle(reviewStyleList)
-                .permission(permission)
-                .mentorId(posts.getMentor().getMentorId())
                 .build();
     }
 
@@ -79,14 +63,27 @@ public class PostDto {
                 .collect(Collectors.toList());
     }
 
-    public static PostDto from(Posts post) {
-        return PostDto.builder()
-                .postId(post.getPostId())
-                .mentorDto(MentorDto.from(post.getMentor()))
-                .title(post.getTitle())
-                .level(post.getLevel())
-                .price(post.getPrice())
-                .build();
+    @Getter
+    @AllArgsConstructor
+    @Builder
+    public static class PostInfoResponse {
+        private PostDto postInfo;
+        private String postStack;
+        private String stackCategory;
+        private String skillStackImg;
+        private boolean permission;
+        private Long mentorId;
+
+        public static PostInfoResponse of(Posts post, List<PostsContent> contentList, SkillStack skillStack, boolean permission) {
+            return PostInfoResponse.builder()
+                    .postInfo(PostDto.of(post,contentList))
+                    .postStack(skillStack.getSkillStackName())
+                    .skillStackImg(skillStack.getSkillStackImg())
+                    .stackCategory(skillStack.getSkillStackCategory())
+                    .permission(permission)
+                    .mentorId(post.getMentor().getMentorId())
+                    .build();
+        }
     }
 
     @Getter
@@ -116,7 +113,7 @@ public class PostDto {
         public static PostTimeResponseDto timeResponseDto(List<Integer> timeList) {
             return PostTimeResponseDto.builder()
                     .am(timeList.stream().filter(time -> time <= 12).collect(Collectors.toList()))
-                    .pm(timeList.stream().filter(time -> time > 12).map(time->time-12).collect(Collectors.toList()))
+                    .pm(timeList.stream().filter(time -> time > 12).map(time -> time - 12).collect(Collectors.toList()))
                     .build();
         }
     }
@@ -125,13 +122,13 @@ public class PostDto {
     @AllArgsConstructor
     @Builder
     public static class PostSearchDto {
-        private List<PostDto> postList;
+        private List<PostInfoResponse> postList;
         private int totalPage;
         private int nowPage;
         private boolean hasPrevious;
         private boolean hasNext;
 
-        public static PostSearchDto searchDto(List<PostDto> postDtoList, Page page) {
+        public static PostSearchDto searchDto(List<PostInfoResponse> postDtoList, Page page) {
             return PostSearchDto.builder()
                     .postList(postDtoList)
                     .totalPage(page.getTotalPages())
@@ -142,3 +139,4 @@ public class PostDto {
         }
     }
 }
+
